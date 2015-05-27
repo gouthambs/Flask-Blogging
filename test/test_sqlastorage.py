@@ -117,5 +117,9 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.test_user_post_table_exists()
 
     def test_save_post(self):
-        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello"])
-        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello"],post_id=1)
+        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello", "world"])
+        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello", "world"],post_id=1)
+
+    def test_get_post_by_id(self):
+        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello", "world"])
+        self.storage.get_post_by_id(1)

@@ -30,8 +30,19 @@ class SQLAStorage(Storage):
             self._save_user_post(user_id, post_id, conn)
 
     def get_post_by_id(self, post_id):
-        result = {}
-        return result
+        r = {}
+        with self._engine.begin() as conn:
+            post_statement = sqla.select([self._post_table]).where(self._post_table.c.id == post_id)
+            post_result = conn.execute(post_statement).fetchone()
+            if post_result is not None:
+                r['post_id'], r['title'], r['text'], r['post_date'], r['last_modified_date'], r['draft'] = post_result
+                tag_statement = sqla.select([self._tag_table.c.text]).\
+                    where(sqla.and_(self._tag_table.c.id == self._tag_posts_table.c.tag_id,
+                                    self._tag_posts_table.c.post_id == post_id)
+                          )
+                tag_result = conn.execute(tag_statement).fetchall()
+                r["tags"] = [t[0] for t in tag_result]
+        return r
 
     def _save_tags(self, tags, post_id, conn):
         tags = self.normalize_tags(tags)
