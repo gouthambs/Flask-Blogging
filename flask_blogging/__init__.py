@@ -21,3 +21,15 @@ class BloggingEngine(object):
 
 
 
+
+class Storage(object):
+
+    def save_post(self, title, text, user_id, tags, draft=False, post_id=None):
+        raise NotImplementedError("This method needs to be implemented by the inheriting class")
+
+    def get_post_by_id(self, post_id):
+        raise NotImplementedError("This method needs to be implemented by the inheriting class")
+
+    @staticmethod
+    def normalize_tags(tags):
+        return [tag.upper() for tag in tags]

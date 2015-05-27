@@ -34,7 +34,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             metadata.reflect(bind=self._db.engine)
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
-            expected_columns = ['id', 'title', 'text', 'post_date', 'last_modified_date', 'user_id', 'draft']
+            expected_columns = ['id', 'title', 'text', 'post_date', 'last_modified_date', 'draft']
             self.assertListEqual(columns, expected_columns)
 
     def test_tag_table_exists(self):
@@ -70,5 +70,52 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             expected_columns = ['user_id', 'post_id']
             self.assertListEqual(columns, expected_columns)
 
-    #def test_tablename_with_prefix(self):
-    #    prefix = "blog_data_"
+    def test_tags_uniqueness(self):
+        table_name = "tag"
+        metadata = sqla.MetaData()
+        metadata.reflect(bind=self._db.engine)
+        table = metadata.tables[table_name]
+        with self._db.engine.begin() as conn:
+            statement = table.insert().values(text="test_tag")
+            conn.execute(statement)
+        # reentering same tag should raise exception
+        with self._db.engine.begin() as conn:
+            statement = table.insert().values(text="test_tag")
+            self.assertRaises(sqla.exc.IntegrityError, conn.execute, statement)
+
+    def test_tag_post_uniqueness(self):
+        table_name = "tag_posts"
+        metadata = sqla.MetaData()
+        metadata.reflect(bind=self._db.engine)
+        table = metadata.tables[table_name]
+        with self._db.engine.begin() as conn:
+            statement = table.insert().values(tag_id=1, post_id=1)
+            conn.execute(statement)
+        # reentering same tag should raise exception
+        with self._db.engine.begin() as conn:
+            statement = table.insert().values(tag_id=1, post_id=1)
+            self.assertRaises(sqla.exc.IntegrityError, conn.execute, statement)
+
+    def test_user_post_uniqueness(self):
+        table_name = "user_posts"
+        metadata = sqla.MetaData()
+        metadata.reflect(bind=self._db.engine)
+        table = metadata.tables[table_name]
+        with self._db.engine.begin() as conn:
+            statement = table.insert().values(user_id=1, post_id=1)
+            conn.execute(statement)
+        # reentering same tag should raise exception
+        with self._db.engine.begin() as conn:
+            statement = table.insert().values(user_id=1, post_id=1)
+            self.assertRaises(sqla.exc.IntegrityError, conn.execute, statement)
+
+    def test_bind_database(self):
+        self.storage._create_all_tables()
+        self.test_post_table_exists()
+        self.test_tag_table_exists()
+        self.test_tag_post_table_exists()
+        self.test_user_post_table_exists()
+
+    def test_save_post(self):
+        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello"])
+        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello"],post_id=1)
