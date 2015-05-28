@@ -40,6 +40,9 @@ class Storage(object):
     def get_post_by_id(self, post_id):
         raise NotImplementedError("This method needs to be implemented by the inheriting class")
 
+    def get_posts(self, count=10, offset=0, recent=True,  tag=None, user_id=None):
+        raise NotImplementedError("This method needs to be implemented by the inheriting class")
+
     @staticmethod
     def normalize_tags(tags):
         return [tag.upper() for tag in tags]

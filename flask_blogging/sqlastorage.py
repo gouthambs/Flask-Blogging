@@ -5,6 +5,7 @@ import sqlalchemy as sqla
 import datetime
 from . import Storage
 
+
 class SQLAStorage(Storage):
     _db = None
     _logger = logging.getLogger("flask-blogging")
@@ -31,19 +32,57 @@ class SQLAStorage(Storage):
         return post_id
 
     def get_post_by_id(self, post_id):
-        r = {}
+        r = None
         with self._engine.begin() as conn:
-            post_statement = sqla.select([self._post_table]).where(self._post_table.c.id == post_id)
-            post_result = conn.execute(post_statement).fetchone()
-            if post_result is not None:
-                r['post_id'], r['title'], r['text'], r['post_date'], r['last_modified_date'], r['draft'] = post_result
-                tag_statement = sqla.select([self._tag_table.c.text]).\
-                    where(sqla.and_(self._tag_table.c.id == self._tag_posts_table.c.tag_id,
-                                    self._tag_posts_table.c.post_id == post_id)
-                          )
-                tag_result = conn.execute(tag_statement).fetchall()
-                r["tags"] = [t[0] for t in tag_result]
+            try:
+                post_statement = sqla.select([self._post_table]).where(self._post_table.c.id == post_id)
+                post_result = conn.execute(post_statement).fetchone()
+                if post_result is not None:
+                    r = dict(post_id=post_result[0], title=post_result[1], text=post_result[2],
+                             post_date=post_result[3], last_modified_date=post_result[4], draft=post_result[5])
+                    # get the tags
+                    tag_statement = sqla.select([self._tag_table.c.text]). \
+                        where(sqla.and_(self._tag_table.c.id == self._tag_posts_table.c.tag_id,
+                                        self._tag_posts_table.c.post_id == post_id)
+                              )
+                    tag_result = conn.execute(tag_statement).fetchall()
+                    r["tags"] = [t[0] for t in tag_result]
+                    # get the user
+                    user_statement = sqla.select([self._user_posts_table.c.user_id]). \
+                        where(self._user_posts_table.c.post_id == post_id)
+                    user_result = conn.execute(user_statement).fetchone()
+                    r["user_id"] = user_result[0]
+            except Exception as e:
+                self._logger.exception(str(e))
+                r = None
         return r
+
+    def get_posts(self, count=10, offset=0, recent=True, tag=None, user_id=None):
+        ordering = sqla.desc(self._post_table.c.last_modified_date) if recent \
+            else self._post_table.c.last_modified_date
+        user_id = str(user_id) if user_id else user_id
+        with self._engine.begin() as conn:
+            select_statement = sqla.select([self._post_table.c.id])
+            filter = None
+            if tag:
+                tag = tag.upper()
+                tag_statement = sqla.select([self._tag_table.c.id]).where(self._tag_table.c.text == tag)
+                tag_id = conn.execute(tag_statement).fetchone()[0]
+                filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
+                              self._post_table.c.id == self._tag_posts_table.c.post_id)
+
+            if user_id:
+                user_filter = sqla.and_(self._user_posts_table.c.user_id == user_id,
+                                        self._post_table.c.id == self._user_posts_table.c.post_id)
+                filter = user_filter if filter is None else sqla.and_(filter, user_filter)
+            if filter is not None:
+                select_statement = select_statement.where(filter)
+
+            select_statement = select_statement.limit(count).offset(offset).order_by(ordering)
+            result = conn.execute(select_statement).fetchall()
+
+        posts = [self.get_post_by_id(id[0]) for id in result]
+        return posts
 
     def _save_tags(self, tags, post_id, conn):
         tags = self.normalize_tags(tags)
@@ -79,16 +118,14 @@ class SQLAStorage(Storage):
         else:
             if result[0] != user_id:
                 try:
-                    statement = self._user_posts_table.update().where(self._user_posts_table.c.post_id == post_id).\
+                    statement = self._user_posts_table.update().where(self._user_posts_table.c.post_id == post_id). \
                         values(user_id=user_id)
                     conn.execute(statement)
                 except Exception as e:
                     self._logger.exception(str(e))
 
-
-
     def _table_name(self, table_name):
-        return self._table_prefix+table_name
+        return self._table_prefix + table_name
 
     def _create_all_tables(self):
         """
@@ -108,7 +145,7 @@ class SQLAStorage(Storage):
         with self._engine.begin() as conn:
             metadata = sqla.MetaData()
             post_table_name = self._table_name("post")
-            if not conn.dialect.has_table(conn, post_table_name ):
+            if not conn.dialect.has_table(conn, post_table_name):
                 self._post_table = sqla.Table(
                     post_table_name, metadata,
                     sqla.Column("id", sqla.Integer, primary_key=True),
@@ -133,7 +170,7 @@ class SQLAStorage(Storage):
         with self._engine.begin() as conn:
             metadata = sqla.MetaData()
             tag_table_name = self._table_name("tag")
-            if not conn.dialect.has_table(conn, tag_table_name ):
+            if not conn.dialect.has_table(conn, tag_table_name):
                 self._tag_table = sqla.Table(
                     tag_table_name, metadata,
                     sqla.Column("id", sqla.Integer, primary_key=True),
@@ -155,9 +192,9 @@ class SQLAStorage(Storage):
         metadata.reflect(bind=self._engine)
         with self._engine.begin() as conn:
             tag_posts_table_name = self._table_name("tag_posts")
-            if not conn.dialect.has_table(conn, tag_posts_table_name ):
-                tag_id_key = self._table_name("tag")+".id"
-                post_id_key = self._table_name("post")+".id"
+            if not conn.dialect.has_table(conn, tag_posts_table_name):
+                tag_id_key = self._table_name("tag") + ".id"
+                post_id_key = self._table_name("post") + ".id"
                 self._tag_posts_table = sqla.Table(
                     tag_posts_table_name, metadata,
                     sqla.Column('tag_id', sqla.Integer,
@@ -167,7 +204,7 @@ class SQLAStorage(Storage):
                                 sqla.ForeignKey(post_id_key, onupdate="CASCADE", ondelete="CASCADE"),
                                 index=True),
                     sqla.UniqueConstraint('tag_id', 'post_id', name='uix_1')
-                    )
+                )
                 metadata.create_all(self._engine)
                 self._logger.debug("Created table with table name %s" % tag_posts_table_name)
             else:
@@ -183,8 +220,8 @@ class SQLAStorage(Storage):
         metadata.reflect(bind=self._engine)
         with self._engine.begin() as conn:
             user_posts_table_name = self._table_name("user_posts")
-            if not conn.dialect.has_table(conn, user_posts_table_name ):
-                post_id_key = self._table_name("post")+".id"
+            if not conn.dialect.has_table(conn, user_posts_table_name):
+                post_id_key = self._table_name("post") + ".id"
                 self._user_posts_table = sqla.Table(
                     user_posts_table_name, metadata,
                     sqla.Column("user_id", sqla.String(128), index=True),

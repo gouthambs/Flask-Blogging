@@ -117,7 +117,6 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             result = conn.execute(statement).fetchall()
             self.assertEqual(len(result), 1)
 
-
     def test_tag_post_uniqueness(self):
         table_name = "tag_posts"
         metadata = sqla.MetaData()
@@ -152,9 +151,82 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.test_user_post_table_exists()
 
     def test_save_post(self):
-        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello", "world"])
-        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello", "world"], post_id=1)
+        self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"])
+        self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"], post_id=1)
 
     def test_get_post_by_id(self):
-        self.storage.save_post(title="title", text="Sample Text", user_id="testuser",tags=["hello", "world"])
-        self.storage.get_post_by_id(1)
+        pid1 = self.storage.save_post(title="Title1", text="Sample Text1", user_id="testuser", tags=["hello", "world"])
+        pid2 = self.storage.save_post(title="Title2", text="Sample Text2", user_id="testuser",
+                                      tags=["hello", "my", "world"])
+
+        post = self.storage.get_post_by_id(pid1)
+        self._assert_post(post, "Title1", "Sample Text1", "testuser", ["HELLO", "WORLD"])
+
+        post = self.storage.get_post_by_id(pid2)
+        self._assert_post(post, "Title2", "Sample Text2", "testuser", ["HELLO", "MY", "WORLD"])
+
+    def _assert_post(self, post, title, text, user_id, tags):
+        tags = set([t.upper() for t in tags])
+        self.assertSetEqual(set(post["tags"]), tags)
+        self.assertEqual(post["title"], title)
+        self.assertEqual(post["text"], text)
+        self.assertEqual(post["user_id"], user_id)
+
+    def test_get_posts(self):
+        for i in range(20):
+            tags = ["hello"] if i < 10 else ["world"]
+            user = "testuser" if i<10 else "newuser"
+            self.storage.save_post(title="Title%d" % i, text="Sample Text%d" % i, user_id=user,tags=tags)
+        # test default queries
+        posts = self.storage.get_posts()
+        self.assertEqual(len(posts), 10)
+        ctr = 19
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "newuser", ["world"])
+            ctr -= 1
+
+        posts = self.storage.get_posts(recent=False)
+        self.assertEqual(len(posts), 10)
+        ctr = 0
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            ctr += 1
+
+        # test count and offset
+        posts = self.storage.get_posts(count=5, offset=5, recent=False)
+        self.assertEqual(len(posts), 5)
+        ctr = 5
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            ctr += 1
+
+        # test tag feature
+        posts = self.storage.get_posts(tag="hello", recent=False)
+        self.assertEqual(len(posts), 10)
+        ctr = 0
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            ctr += 1
+        posts = self.storage.get_posts(tag="world", recent=False)
+        self.assertEqual(len(posts), 10)
+        ctr = 10
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "newuser", ["world"])
+            ctr += 1
+
+        # test user_id feature
+        posts = self.storage.get_posts(user_id="newuser", recent=True)
+        self.assertEqual(len(posts), 10)
+        ctr = 19
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "newuser", ["world"])
+            ctr -= 1
+
+        posts = self.storage.get_posts(user_id="testuser", recent=True)
+        self.assertEqual(len(posts), 10)
+        ctr = 9
+        for post in posts:
+            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            ctr -= 1
+        return
+
