@@ -25,6 +25,16 @@ class BloggingEngine(object):
 class Storage(object):
 
     def save_post(self, title, text, user_id, tags, draft=False, post_id=None):
+        """
+
+        :param title:
+        :param text:
+        :param user_id:
+        :param tags:
+        :param draft:
+        :param post_id:
+        :return: The post_id value, in case of insert or update
+        """
         raise NotImplementedError("This method needs to be implemented by the inheriting class")
 
     def get_post_by_id(self, post_id):

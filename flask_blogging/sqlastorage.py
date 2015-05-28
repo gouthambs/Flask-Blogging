@@ -28,6 +28,7 @@ class SQLAStorage(Storage):
             post_id = post_result.inserted_primary_key[0] if post_id is None else post_id
             self._save_tags(tags, post_id, conn)
             self._save_user_post(user_id, post_id, conn)
+        return post_id
 
     def get_post_by_id(self, post_id):
         r = {}
