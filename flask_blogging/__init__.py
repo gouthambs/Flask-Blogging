@@ -70,7 +70,28 @@ class Storage(object):
     def normalize_tags(tags):
         return [tag.upper() for tag in tags]
 
+
+class MathJaxPattern(markdown.inlinepatterns.Pattern):
+
+    def __init__(self):
+        markdown.inlinepatterns.Pattern.__init__(self, r'(?<!\\)(\$\$?)(.+?)\2')
+
+    def handleMatch(self, m):
+        node = markdown.util.etree.Element('mathjax')
+        node.text = markdown.util.AtomicString(m.group(2) + m.group(3) + m.group(2))
+        return node
+
+class MathJaxExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        # Needs to come before escape matching because \ is pretty important in LaTeX
+        md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
+
+def makeExtension(configs=[]):
+    return MathJaxExtension(configs)
+
+
 class PostProcessor(object):
+    markdown_object = markdown.Markdown(extensions=[MathJaxExtension()])
 
     @staticmethod
     def create_slug(title):
@@ -83,7 +104,7 @@ class PostProcessor(object):
 
     @classmethod
     def render_text(cls, text):
-        return markdown.markdown(text)
+        return cls.markdown_object.convert(text)
 
     @classmethod
     def process(cls, post, render=True):
