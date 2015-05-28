@@ -1,0 +1,23 @@
+{% extends "blog/base.html" %}
+{% block title %}
+Blog Posts
+{% endblock title %}
+
+{% block main %}
+{% for post in posts %}
+<a href="{{post.url}}"><h1>{{ post.title }}</h1></a>
+<!-- post tags-->
+{% if post.tags %}
+<span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;
+{% for tag in post.tags %}
+<span class="label">
+    <a href="{{ url_for('blog_app.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
+    {{ tag }}
+    </a>
+</span>&nbsp;&nbsp;
+{% endfor %}
+<br>
+{% endif %}
+<hr>
+{% endfor %}
+{% endblock main %}

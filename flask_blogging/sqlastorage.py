@@ -1,4 +1,3 @@
-__author__ = 'Gouthaman Balaraman'
 
 import logging
 import sqlalchemy as sqla
@@ -58,8 +57,8 @@ class SQLAStorage(Storage):
         return r
 
     def get_posts(self, count=10, offset=0, recent=True, tag=None, user_id=None):
-        ordering = sqla.desc(self._post_table.c.last_modified_date) if recent \
-            else self._post_table.c.last_modified_date
+        ordering = sqla.desc(self._post_table.c.post_date) if recent \
+            else self._post_table.c.post_date
         user_id = str(user_id) if user_id else user_id
         with self._engine.begin() as conn:
             select_statement = sqla.select([self._post_table.c.id])
