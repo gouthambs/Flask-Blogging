@@ -66,9 +66,11 @@ class SQLAStorage(Storage):
             if tag:
                 tag = tag.upper()
                 tag_statement = sqla.select([self._tag_table.c.id]).where(self._tag_table.c.text == tag)
-                tag_id = conn.execute(tag_statement).fetchone()[0]
-                filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
-                              self._post_table.c.id == self._tag_posts_table.c.post_id)
+                tag_result = conn.execute(tag_statement).fetchone()
+                if tag_result is not None:
+                    tag_id = tag_result[0]
+                    filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
+                                  self._post_table.c.id == self._tag_posts_table.c.post_id)
 
             if user_id:
                 user_filter = sqla.and_(self._user_posts_table.c.user_id == user_id,
@@ -80,7 +82,7 @@ class SQLAStorage(Storage):
             select_statement = select_statement.limit(count).offset(offset).order_by(ordering)
             result = conn.execute(select_statement).fetchall()
 
-        posts = [self.get_post_by_id(id[0]) for id in result]
+        posts = [self.get_post_by_id(pid[0]) for pid in result]
         return posts
 
     def _save_tags(self, tags, post_id, conn):
