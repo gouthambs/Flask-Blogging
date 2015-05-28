@@ -70,6 +70,23 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             expected_columns = ['user_id', 'post_id']
             self.assertListEqual(columns, expected_columns)
 
+    def test_user_post_table_consistency(self):
+        # check if the user post table updates the user_id
+        user_id = 1; post_id = 5
+        with self._db.engine.begin() as conn:
+            self.storage._save_user_post(user_id, post_id, conn)
+            statement = sqla.select([self.storage._user_posts_table])
+            result = conn.execute(statement).fetchall()
+            self.assertEqual(len(result), 1)
+            self.assertListEqual(result, [('1', 5)])
+
+            self.storage._save_user_post(user_id+4, post_id, conn)
+            statement = sqla.select([self.storage._user_posts_table])
+            result = conn.execute(statement).fetchall()
+            self.assertEqual(len(result), 1)
+            self.assertListEqual(result, [('5', 5)])
+        return
+
     def test_tags_uniqueness(self):
         table_name = "tag"
         metadata = sqla.MetaData()
@@ -82,6 +99,24 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         with self._db.engine.begin() as conn:
             statement = table.insert().values(text="test_tag")
             self.assertRaises(sqla.exc.IntegrityError, conn.execute, statement)
+
+    def test_tags_consistency(self):
+        tags = ["hello", "world"]
+        post_id = 2
+        with self._db.engine.begin() as conn:
+            self.storage._save_tags(tags, post_id, conn)
+            statement = sqla.select([self.storage._tag_posts_table]).\
+                where(self.storage._tag_posts_table.c.post_id==post_id)
+            result = conn.execute(statement).fetchall()
+            self.assertEqual(len(result), 2)
+
+            tags.pop()
+            self.storage._save_tags(tags, post_id, conn)
+            statement = sqla.select([self.storage._tag_posts_table]).\
+                where(self.storage._tag_posts_table.c.post_id==post_id)
+            result = conn.execute(statement).fetchall()
+            self.assertEqual(len(result), 1)
+
 
     def test_tag_post_uniqueness(self):
         table_name = "tag_posts"

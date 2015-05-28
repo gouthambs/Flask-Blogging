@@ -66,13 +66,25 @@ class SQLAStorage(Storage):
                 self._logger.exception(str(e))
 
     def _save_user_post(self, user_id, post_id, conn):
-        try:
-            statement = self._user_posts_table.insert().values(user_id=user_id, post_id=post_id)
-            conn.execute(statement)
-        except sqla.exc.IntegrityError: # already exists
-            pass
-        except Exception as e:
-            self._logger.exception(str(e))
+        user_id = str(user_id)
+        statement = sqla.select([self._user_posts_table]).where(self._user_posts_table.c.post_id == post_id)
+        result = conn.execute(statement).fetchone()
+        if result is None:
+            try:
+                statement = self._user_posts_table.insert().values(user_id=user_id, post_id=post_id)
+                conn.execute(statement)
+            except Exception as e:
+                self._logger.exception(str(e))
+        else:
+            if result[0] != user_id:
+                try:
+                    statement = self._user_posts_table.update().where(self._user_posts_table.c.post_id == post_id).\
+                        values(user_id=user_id)
+                    conn.execute(statement)
+                except Exception as e:
+                    self._logger.exception(str(e))
+
+
 
     def _table_name(self, table_name):
         return self._table_prefix+table_name
