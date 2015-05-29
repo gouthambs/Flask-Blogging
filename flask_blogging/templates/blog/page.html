@@ -5,6 +5,7 @@
 
 {% block main %}
   <a href="{{post.url}}"><h1>{{ post.title }}</h1></a>
+    Posted by <i>{{post.user_name}} on {{post.post_date}}
     {{post.rendered_text | safe}}
 
    <br>

@@ -2,7 +2,7 @@
 import logging
 import sqlalchemy as sqla
 import datetime
-from . import Storage
+from .storage import Storage
 
 
 class SQLAStorage(Storage):

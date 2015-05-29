@@ -1,5 +1,7 @@
+from flask.ext.login import login_required, current_user
+from flask import Blueprint, current_app, render_template
+from flask_blogging.forms import BlogEditor
 
-from flask import Blueprint, current_app, render_template, url_for
 
 blog_app = Blueprint("blog_app", __name__, template_folder='templates')
 
@@ -14,8 +16,9 @@ def _get_user_name(user):
 
 
 def _process_post(post, blogging_engine, author=None):
-    post_processor = blogging_engine.post_processor
-    post_processor.process(post)
+    post_processors = blogging_engine.post_processors
+    for post_processor in post_processors:
+        post_processor.process(post)
     if author is None:
         if blogging_engine.user_callback is None:
             raise Exception("No user_loader has been installed for this BloggingEngine."
@@ -35,29 +38,35 @@ def index(count, offset):
     posts = storage.get_posts(count=count, offset=offset)
     for post in posts:
         _process_post(post, blogging_engine)
-    return render_template("blog/index.html", posts=posts)
+    return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
 
 @blog_app.route("/page/<int:post_id>/", defaults={"slug": ""})
 @blog_app.route("/page/<int:post_id>/<slug>/")
 def page_by_id(post_id, slug):
     blogging_engine = _get_blogging_engine(current_app)
-    post_processor = blogging_engine.post_processor
     storage = blogging_engine.storage
     post = storage.get_post_by_id(post_id)
     _process_post(post, blogging_engine)
-    return render_template("blog/page.html", post=post)
+    return render_template("blog/page.html", post=post, config=blogging_engine.config)
 
 
 @blog_app.route("/tag/<tag>/", defaults=dict(count=10, offset=0))
 @blog_app.route("/tag/<tag>/<int:count>/<int:offset>/")
 def posts_by_tag(tag, count, offset):
     blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
-    post_processor = blogging_engine.post_processor
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset, tag=tag)
     for post in posts:
         _process_post(post, blogging_engine)
-    return render_template("blog/index.html", posts=posts)
+    return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
+
+
+@blog_app.route('/editor')
+#@login_required
+def editor():
+    blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
+    form = BlogEditor()
+    return render_template("blog/editor.html", form=form, config=blogging_engine.config)
 
