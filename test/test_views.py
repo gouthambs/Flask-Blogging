@@ -4,6 +4,12 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
+from flask_login import UserMixin
+
+class TestUser(UserMixin):
+    def __init__(self, user_id):
+        self.id = user_id
+
 
 class TestViews(FlaskBloggingTestCase):
 
@@ -26,6 +32,10 @@ class TestViews(FlaskBloggingTestCase):
             user = "testuser" if i<10 else "newuser"
             self.storage.save_post(title="Sample Title%d" % i, text="Sample Text%d" % i,
                                    user_id=user, tags=tags)
+
+            @self.engine.user_loader
+            def load_user(user_id):
+                return TestUser(user_id)
 
     def tearDown(self):
         os.remove(self._dbfile)

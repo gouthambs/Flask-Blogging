@@ -18,6 +18,7 @@ class BloggingEngine(object):
         self.storage = None
         self.url_prefix = url_prefix
         self.post_processor = PostProcessor() if post_processor is None else post_processor
+        self.user_callback = None
         if app is not None and storage is not None:
             self.init_app(app, storage)
 
@@ -28,6 +29,10 @@ class BloggingEngine(object):
         from flask_blogging.views import blog_app
         self.app.register_blueprint(blog_app, url_prefix=self.url_prefix)
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
+
+    def user_loader(self, callback):
+        self.user_callback = callback
+        return callback
 
 
 class Storage(object):
