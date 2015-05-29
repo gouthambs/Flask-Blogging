@@ -2,6 +2,7 @@ __author__ = 'Gouthaman Balaraman'
 __version__ = '0.1.0'
 
 import markdown
+from markdown.extensions.meta import MetaExtension
 from flask import url_for
 
 class BloggingEngine(object):
@@ -91,7 +92,8 @@ def makeExtension(configs=[]):
 
 
 class PostProcessor(object):
-    markdown_object = markdown.Markdown(extensions=[MathJaxExtension()])
+
+    markdown_extensions = [MathJaxExtension(), MetaExtension()]
 
     @staticmethod
     def create_slug(title):
@@ -103,11 +105,14 @@ class PostProcessor(object):
         return url
 
     @classmethod
-    def render_text(cls, text):
-        return cls.markdown_object.convert(text)
+    def render_text(cls, post):
+        md = markdown.Markdown(extensions=cls.markdown_extensions)
+        post["rendered_text"] = md.convert(post["text"])
+        post["meta"] = md.Meta
 
     @classmethod
     def process(cls, post, render=True):
         post["url"] = cls.construct_url(post)
-        post["rendered_text"] = cls.render_text(post["text"]) if render else post["text"]
+        if render:
+            cls.render_text(post)
         return
