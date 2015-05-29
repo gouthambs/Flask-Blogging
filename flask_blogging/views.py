@@ -52,6 +52,7 @@ def page_by_id(post_id, slug):
 
 
 @blog_app.route("/tag/<tag>/", defaults=dict(count=10, offset=0))
+@blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(offset=0))
 @blog_app.route("/tag/<tag>/<int:count>/<int:offset>/")
 def posts_by_tag(tag, count, offset):
     blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
@@ -63,8 +64,8 @@ def posts_by_tag(tag, count, offset):
 
 
 
-@blog_app.route('/editor')
-#@login_required
+@blog_app.route('/editor/')
+@login_required
 def editor():
     blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
     form = BlogEditor()
