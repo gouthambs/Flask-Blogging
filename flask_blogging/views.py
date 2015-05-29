@@ -31,10 +31,10 @@ def _store_form_data(blog_form, storage, user, post_id):
     title = blog_form.title.data
     text = blog_form.text.data
     tags = blog_form.tags.data.split(",")
-    draft = False
+    draft = blog_form.draft.data
     user_id = user.get_id()
-    id = storage.save_post(title, text, user_id, tags, draft, post_id)
-    return id
+    pid = storage.save_post(title, text, user_id, tags, draft, post_id)
+    return pid
 
 @blog_app.route("/", defaults={"count": 10, "offset": 0})
 @blog_app.route("/<int:count>/", defaults={"offset": 0})
@@ -79,11 +79,16 @@ def editor(post_id):
     if request.method == 'POST':
         form = BlogEditor(request.form)
         if form.validate():
-            id = _store_form_data(form, storage, current_user, post_id)
-            return redirect(url_for("blog_app.page_by_id", post_id=id))
+            pid = _store_form_data(form, storage, current_user, post_id)
+            return redirect(url_for("blog_app.page_by_id", post_id=pid))
         else:
             return render_template("blog/editor.html", form=form, config=blogging_engine.config)
-
+    else:
+        if post_id is not None:
+            post = storage.get_post_by_id(post_id)
+            if post is not None:
+                title = post["title"]
+                
     form = BlogEditor()
     return render_template("blog/editor.html", form=form, config=blogging_engine.config)
 
