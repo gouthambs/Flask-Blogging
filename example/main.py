@@ -1,7 +1,7 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_blogging import SQLAStorage, BloggingEngine
-from flask.ext.login import AnonymousUserMixin, LoginManager
+from flask.ext.login import UserMixin, LoginManager, login_user
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///D:\\temp.db'
@@ -20,12 +20,12 @@ def index():
     return "Hello World!"
 
 
-class User(AnonymousUserMixin):
+class User(UserMixin):
     def __init__(self, user_id):
-        self.user_id = user_id
+        self.id = user_id
 
     def get_name(self):
-        return "User "+self.user_id
+        return "User "+self.id
 
 @login_manager.user_loader
 @blog_engine.user_loader
@@ -43,10 +43,13 @@ work as well.
 
 @app.before_first_request
 def add_posts():
-    for i in range(20):
-        tags = ["hello"] if i < 10 else ["world"]
-        user = "testuser" if i<10 else "newuser"
-        blog_engine.storage.save_post(title="Sample Title%d" % i, text=sample_text, user_id=user, tags=tags)
+    #for i in range(20):
+    #    tags = ["hello"] if i < 10 else ["world"]
+    #   user = "testuser" if i<10 else "newuser"
+    #    blog_engine.storage.save_post(title="Sample Title%d" % i, text=sample_text, user_id=user, tags=tags)
+    user = User("test_user")
+    login_user(user)
+
 
 
 if __name__ == "__main__":

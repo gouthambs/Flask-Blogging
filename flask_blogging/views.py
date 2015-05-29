@@ -1,5 +1,5 @@
 from flask.ext.login import login_required, current_user
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, current_app, render_template, request, redirect, url_for
 from flask_blogging.forms import BlogEditor
 
 
@@ -27,7 +27,14 @@ def _process_post(post, blogging_engine, author=None):
     if author is not None:
         post["user_name"] = _get_user_name(author)
 
-
+def _store_form_data(blog_form, storage, user, post_id):
+    title = blog_form.title.data
+    text = blog_form.text.data
+    tags = blog_form.tags.data.split(",")
+    draft = False
+    user_id = user.get_id()
+    id = storage.save_post(title, text, user_id, tags, draft, post_id)
+    return id
 
 @blog_app.route("/", defaults={"count": 10, "offset": 0})
 @blog_app.route("/<int:count>/", defaults={"offset": 0})
@@ -63,11 +70,20 @@ def posts_by_tag(tag, count, offset):
     return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
 
-
-@blog_app.route('/editor/')
+@blog_app.route('/editor/', methods=["GET", "POST"], defaults={"post_id": None})
+@blog_app.route('/editor/<int:post_id>/', methods=["GET", "POST"])
 @login_required
-def editor():
+def editor(post_id):
     blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
+    storage = blogging_engine.storage
+    if request.method == 'POST':
+        form = BlogEditor(request.form)
+        if form.validate():
+            id = _store_form_data(form, storage, current_user, post_id)
+            return redirect(url_for("blog_app.page_by_id", post_id=id))
+        else:
+            return render_template("blog/editor.html", form=form, config=blogging_engine.config)
+
     form = BlogEditor()
     return render_template("blog/editor.html", form=form, config=blogging_engine.config)
 
