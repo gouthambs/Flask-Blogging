@@ -20,7 +20,7 @@ class TestViews(FlaskBloggingTestCase):
         self._db = SQLAlchemy(self.app)
 
     def _create_storage(self, db):
-        self.storage = SQLAStorage(db)
+        self.storage = SQLAStorage(db.engine)
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)

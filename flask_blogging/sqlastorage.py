@@ -9,8 +9,8 @@ class SQLAStorage(Storage):
     _db = None
     _logger = logging.getLogger("flask-blogging")
 
-    def __init__(self, db, table_prefix=""):
-        self._engine = db.engine
+    def __init__(self, engine, table_prefix=""):
+        self._engine = engine
         self._table_prefix = table_prefix
         self._create_all_tables()
 
@@ -88,7 +88,7 @@ class SQLAStorage(Storage):
     def _save_tags(self, tags, post_id, conn):
         tags = self.normalize_tags(tags)
         tag_insert_statement = self._tag_table.insert()
-
+        tag_ids = []
         for tag in tags:
             try:
                 tag_insert_statement = tag_insert_statement.values(text=tag)
@@ -98,6 +98,7 @@ class SQLAStorage(Storage):
                 tag_select_statement = sqla.select([self._tag_table]).where(self._tag_table.c.text == tag)
                 result = conn.execute(tag_select_statement).fetchone()
                 tag_id = result[0]
+            tag_ids.append(tag_id)
             try:
                 tag_post_statement = self._tag_posts_table.insert().values(tag_id=tag_id, post_id=post_id)
                 conn.execute(tag_post_statement)
@@ -105,6 +106,15 @@ class SQLAStorage(Storage):
                 pass
             except Exception as e:
                 self._logger.exception(str(e))
+        try:
+            statement = self._tag_posts_table.delete().where(
+                sqla.and_(sqla.not_(self._tag_posts_table.c.tag_id.in_(tag_ids)),
+                          self._tag_posts_table.c.post_id == post_id
+                          )
+            )
+            conn.execute(statement)
+        except Exception as e:
+            self._logger.exception(str(e))
 
     def _save_user_post(self, user_id, post_id, conn):
         user_id = str(user_id)
