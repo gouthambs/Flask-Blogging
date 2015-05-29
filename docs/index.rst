@@ -3,8 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Flask-Blogging's documentation!
-==========================================
+==============
+Flask-Blogging
+==============
+.. py:currentmodule:: flask.ext.blogging
+
+Flask-Blogging is a Flask extension for adding blog support to your site.
 
 Contents:
 
