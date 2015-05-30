@@ -1,6 +1,7 @@
 import markdown
 from markdown.extensions.meta import MetaExtension
 from flask import url_for
+from flask_login import current_user
 
 
 class MathJaxPattern(markdown.inlinepatterns.Pattern):
@@ -43,7 +44,18 @@ class PostProcessor(object):
 
     @classmethod
     def process(cls, post, render=True):
-        post["url"] = cls.construct_url(post)
+        post["slug"] = cls.create_slug(post["title"])
+        post["editable"] = current_user.get_id() == post["user_id"]
         if render:
             cls.render_text(post)
+        cls.custom_process(post)
         return
+
+    @classmethod
+    def custom_process(cls, post):
+        """
+        Override this method to add additional processes
+        :param post:
+        :return:
+        """
+        pass

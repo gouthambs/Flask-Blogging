@@ -14,3 +14,4 @@ class FlaskBloggingTestCase(unittest.TestCase):
         @self.app.route("/")
         def index():
             return "Hello World!"
+

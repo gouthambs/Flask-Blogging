@@ -4,8 +4,11 @@
 {% endblock title %}
 
 {% block main %}
-  <a href="{{post.url}}"><h1>{{ post.title }}</h1></a>
-    Posted by <em>{{post.user_name}}</em> on {{post.post_date.strftime('%Y-%m-%d')}}
+  <a href="{{ url_for('blog_app.page_by_id', post_id=post.post_id, slug=post.slug) }}">
+      <h1>{{ post.title }}</h1>
+  </a>
+    <p>Posted by <a href="{{ url_for('blog_app.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+on {{post.post_date.strftime('%d %b, %Y')}}</p>
     {{post.rendered_text | safe}}
 
    <br>

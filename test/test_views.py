@@ -37,10 +37,20 @@ class TestViews(FlaskBloggingTestCase):
 
             self.login_manager = LoginManager(self.app)
 
-            @self.login_manager.user_loader
-            @self.engine.user_loader
-            def load_user(user_id):
-                return TestUser(user_id)
+        @self.login_manager.user_loader
+        @self.engine.user_loader
+        def load_user(user_id):
+            return TestUser(user_id)
+
+        @self.app.route("/login/<username>")
+        def login(username):
+            user = TestUser(username)
+            login_user(user)
+
+        @self.app.route("/logout/")
+        def logout():
+            logout_user()
+
 
     def tearDown(self):
         os.remove(self._dbfile)
@@ -52,6 +62,9 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog")
         self.assertEqual(response.status_code, 301)
 
+        response = self.client.get("/blog/10/10/")
+        self.assertEqual(response.status_code, 200)
+
     def test_post_by_id(self):
         response = self.client.get("/blog/page/1/")
         self.assertEqual(response.status_code, 200)
@@ -60,7 +73,7 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get("/blog/page/1")  # trailing slash redirect
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 301)
 
     def test_post_by_tag(self):
         response = self.client.get("/blog/tag/hello/")
@@ -70,6 +83,16 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get("/blog/tag/hello/5/10/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_by_author(self):
+        response = self.client.get("/blog/author/newuser/")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/blog/author/newuser/5/")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/blog/author/newuser/5/10/")
         self.assertEqual(response.status_code, 200)
 
     def test_editor_secured(self):
@@ -85,8 +108,13 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
 
         # login test user and load testuser's posts
-        user = TestUser("testuser")
-        login_user(user)
+        self.login("testuser")
         for i in range(1, 10):
             response = self.client.get("/blog/editor/%d/" % i)
             self.assertEqual(response.status_code, 200)
+
+    def login(self, user_id):
+        self.client.get("/login/"+user_id)
+
+    def logout(self):
+        self.client.get("/logout/")

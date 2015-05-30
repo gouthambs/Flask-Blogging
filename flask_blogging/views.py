@@ -62,19 +62,29 @@ def page_by_id(post_id, slug):
 @blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(offset=0))
 @blog_app.route("/tag/<tag>/<int:count>/<int:offset>/")
 def posts_by_tag(tag, count, offset):
-    blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
+    blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset, tag=tag)
     for post in posts:
         _process_post(post, blogging_engine)
     return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
+@blog_app.route("/author/<user_id>/", defaults=dict(count=10, offset=0))
+@blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(offset=0))
+@blog_app.route("/author/<user_id>/<int:count>/<int:offset>/")
+def posts_by_author(user_id, count, offset):
+    blogging_engine = _get_blogging_engine(current_app)
+    storage = blogging_engine.storage
+    posts = storage.get_posts(count=count, offset=offset, user_id=user_id)
+    for post in posts:
+        _process_post(post, blogging_engine)
+    return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
 @blog_app.route('/editor/', methods=["GET", "POST"], defaults={"post_id": None})
 @blog_app.route('/editor/<int:post_id>/', methods=["GET", "POST"])
 @login_required
 def editor(post_id):
-    blogging_engine = current_app.extensions["FLASK_BLOGGING_ENGINE"]
+    blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     if request.method == 'POST':
         form = BlogEditor(request.form)

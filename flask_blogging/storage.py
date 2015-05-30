@@ -2,7 +2,8 @@ class Storage(object):
 
     def save_post(self, title, text, user_id, tags, draft=False, post_id=None):
         """
-        Persist the blog post data
+        Persist the blog post data. If post_id is None or post_id is invalid, the post must
+        be inserted into the storage. If post_id is a valid id, then the data must be updated.
         :param title:
         :type title: str
         :param text:
@@ -35,7 +36,15 @@ class Storage(object):
         """
         raise NotImplementedError("This method needs to be implemented by the inheriting class")
 
+    def delete_post(self, post_id):
+        """
+
+        :param post_id:
+        :return:
+        """
+        raise NotImplementedError("This method needs to be implemented by the inheriting class")
+
     @staticmethod
     def normalize_tags(tags):
-        return [tag.upper() for tag in tags]
+        return [tag.upper().strip() for tag in tags]
 

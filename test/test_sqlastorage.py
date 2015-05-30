@@ -151,8 +151,34 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.test_user_post_table_exists()
 
     def test_save_post(self):
-        self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"])
-        self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"], post_id=1)
+        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"])
+        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"], post_id=1)
+        p = self.storage.get_post_by_id(2)
+        self.assertIsNone(p)
+
+        # invalid post_id will be treated as inserts
+        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"],
+                                     post_id=5)
+        self.assertNotEqual(pid, 5)
+        self.assertEqual(pid, 2)
+        p = self.storage.get_post_by_id(2)
+        self.assertIsNotNone(p)
+
+    def test_delete_post(self):
+        # insert, check exists, delete, check doesn't exist anymore
+        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"])
+        p = self.storage.get_post_by_id(pid)
+        self.assertIsNotNone(p)
+        self.storage.delete_post(pid)
+        p = self.storage.get_post_by_id(pid)
+        self.assertIsNone(p)
+
+        # insert again.
+        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"],
+                                     post_id=1)
+        p = self.storage.get_post_by_id(pid)
+        self.assertIsNotNone(p)
+
 
     def test_get_post_by_id(self):
         pid1 = self.storage.save_post(title="Title1", text="Sample Text1", user_id="testuser", tags=["hello", "world"])
