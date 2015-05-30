@@ -5,7 +5,7 @@
 
 {% block main %}
   <a href="{{post.url}}"><h1>{{ post.title }}</h1></a>
-    Posted by <i>{{post.user_name}} on {{post.post_date}}
+    Posted by <em>{{post.user_name}}</em> on {{post.post_date.strftime('%Y-%m-%d')}}
     {{post.rendered_text | safe}}
 
    <br>

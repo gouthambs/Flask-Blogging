@@ -1,5 +1,5 @@
 from flask.ext.login import login_required, current_user
-from flask import Blueprint, current_app, render_template, request, redirect, url_for
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, session
 from flask_blogging.forms import BlogEditor
 
 
@@ -82,13 +82,17 @@ def editor(post_id):
             pid = _store_form_data(form, storage, current_user, post_id)
             return redirect(url_for("blog_app.page_by_id", post_id=pid))
         else:
-            return render_template("blog/editor.html", form=form, config=blogging_engine.config)
+            return render_template("blog/editor.html", form=form, post_id=post_id, config=blogging_engine.config)
     else:
         if post_id is not None:
             post = storage.get_post_by_id(post_id)
-            if post is not None:
-                title = post["title"]
+            if (post is not None) and (current_user.get_id() == post["user_id"]):
+                tags = ", ".join(post["tags"])
+                form = BlogEditor(title=post["title"], text=post["text"], tags=tags )
+                return render_template("blog/editor.html", form=form, post_id=post_id, config=blogging_engine.config)
+            else:
+                return redirect(url_for("blog_app.editor", post_id=None))
                 
     form = BlogEditor()
-    return render_template("blog/editor.html", form=form, config=blogging_engine.config)
+    return render_template("blog/editor.html", form=form, post_id=post_id, config=blogging_engine.config)
 
