@@ -1,0 +1,5 @@
+include README.md
+include Requirements.txt
+recursive-include flask_blogging/templates *.*
+recursive-include tests *
+recursive-exclude docs *

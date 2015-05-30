@@ -1,7 +1,7 @@
 import os
 import tempfile
 from flask import current_app
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, login_user, logout_user
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
@@ -76,8 +76,17 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog/editor/")
         self.assertEqual(response.status_code, 401)
 
+        response = self.client.get("/blog/editor/1/")
+        self.assertEqual(response.status_code, 401)
+
     def test_editor(self):
         self.login_manager._login_disabled = True
         response = self.client.get("/blog/editor/")
         self.assertEqual(response.status_code, 200)
 
+        # login test user and load testuser's posts
+        user = TestUser("testuser")
+        login_user(user)
+        for i in range(1, 10):
+            response = self.client.get("/blog/editor/%d/" % i)
+            self.assertEqual(response.status_code, 200)
