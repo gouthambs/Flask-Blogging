@@ -1,6 +1,6 @@
 import os
 import tempfile
-from flask import current_app
+from flask import current_app, g
 from flask.ext.login import LoginManager, login_user, logout_user
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_blogging.sqlastorage import SQLAStorage
@@ -50,7 +50,6 @@ class TestViews(FlaskBloggingTestCase):
         @self.app.route("/logout/")
         def logout():
             logout_user()
-
 
     def tearDown(self):
         os.remove(self._dbfile)
@@ -109,12 +108,17 @@ class TestViews(FlaskBloggingTestCase):
 
         # login test user and load testuser's posts
         self.login("testuser")
+        #user = TestUser("testuser")
+        #g.user = user
         for i in range(1, 10):
+            response = self.client.get("/blog/editor/%d/" % i)
+            self.assertEqual(response.status_code, 200)
+        for i in range(11, 20):
             response = self.client.get("/blog/editor/%d/" % i)
             self.assertEqual(response.status_code, 200)
 
     def login(self, user_id):
-        self.client.get("/login/"+user_id)
+        self.client.get("/login/"+user_id, follow_redirects=True)
 
     def logout(self):
         self.client.get("/logout/")
