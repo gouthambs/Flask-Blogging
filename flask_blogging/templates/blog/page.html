@@ -4,6 +4,29 @@
 {% endblock title %}
 
 {% block main %}
+<div class="modal fade" id="confirmModal" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Are you sure you want to delete this post?</h4>
+            </div>
+            <div class="modal-footer">
+                <form action="{{ url_for('blog_app.delete', post_id=post.post_id) }}" method="POST">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <input type="submit" value="Yes" class="btn btn-primary" id="confirmedDelete"/>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% if post.editable %}
+    <div class="pull-right">
+        <a href="#" id="delete">Delete</a>&nbsp&nbsp&nbsp&nbsp
+        <a href="{{ url_for('blog_app.editor', post_id=post.post_id) }}" id="edit">Edit</a>
+    </div>
+{% endif %}
   <a href="{{ url_for('blog_app.page_by_id', post_id=post.post_id, slug=post.slug) }}">
       <h1>{{ post.title }}</h1>
   </a>
@@ -25,5 +48,15 @@ on {{post.post_date.strftime('%d %b, %Y')}}</p>
     <br>
   {% endif %}
   <br>
+  <hr>
 {% endblock main %}
 
+{% block extrajs %}
+<script>
+    $(document).ready(function(){
+        $("#delete").click(function(){
+            $('#confirmModal').modal('show');
+        });
+    });
+</script>
+{% endblock extrajs %}
