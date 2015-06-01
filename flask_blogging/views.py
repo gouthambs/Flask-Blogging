@@ -56,8 +56,13 @@ def page_by_id(post_id, slug):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     post = storage.get_post_by_id(post_id)
-    _process_post(post, blogging_engine)
-    return render_template("blog/page.html", post=post, config=blogging_engine.config)
+    if post is not None:
+        _process_post(post, blogging_engine)
+        return render_template("blog/page.html", post=post, config=blogging_engine.config)
+    else:
+        flash("The page you are trying to access is not valid!", "warning")
+        return redirect(url_for("blog_app.index"))
+
 
 
 @blog_app.route("/tag/<tag>/", defaults=dict(count=10, offset=0))
@@ -79,8 +84,11 @@ def posts_by_author(user_id, count, offset):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id)
-    for post in posts:
-        _process_post(post, blogging_engine)
+    if len(posts):
+        for post in posts:
+            _process_post(post, blogging_engine)
+    else:
+        flash("No posts found for this user!", "warning")
     return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
 

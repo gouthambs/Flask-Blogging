@@ -1,7 +1,7 @@
 import os
 import tempfile
-from flask import current_app, g
-from flask.ext.login import LoginManager, login_user, logout_user
+from flask import redirect
+from flask.ext.login import LoginManager, login_user, logout_user, current_user
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
@@ -29,27 +29,29 @@ class TestViews(FlaskBloggingTestCase):
         self._create_db()
         self._create_storage(self._db)
         self.engine = BloggingEngine(self.app, self.storage)
-        for i in range(20):
-            tags = ["hello"] if i < 10 else ["world"]
-            user = "testuser" if i<10 else "newuser"
-            self.storage.save_post(title="Sample Title%d" % i, text="Sample Text%d" % i,
-                                   user_id=user, tags=tags)
-
-            self.login_manager = LoginManager(self.app)
+        self.login_manager = LoginManager(self.app)
 
         @self.login_manager.user_loader
         @self.engine.user_loader
         def load_user(user_id):
             return TestUser(user_id)
 
-        @self.app.route("/login/<username>")
+        @self.app.route("/login/<username>/", methods=["POST"])
         def login(username):
-            user = TestUser(username)
-            login_user(user)
+            this_user = TestUser(username)
+            login_user(this_user)
+            return redirect("/")
 
         @self.app.route("/logout/")
         def logout():
             logout_user()
+            return redirect("/")
+
+        for i in range(20):
+            tags = ["hello"] if i < 10 else ["world"]
+            user = "testuser" if i<10 else "newuser"
+            self.storage.save_post(title="Sample Title%d" % i, text="Sample Text%d" % i,
+                                   user_id=user, tags=tags)
 
     def tearDown(self):
         os.remove(self._dbfile)
@@ -94,31 +96,88 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog/author/newuser/5/10/")
         self.assertEqual(response.status_code, 200)
 
-    def test_editor_secured(self):
-        response = self.client.get("/blog/editor/")
-        self.assertEqual(response.status_code, 401)
+        response = self.client.get("/blog/author/nonexistent_user/")
+        assert "No posts found for this user!" in response.data
 
-        response = self.client.get("/blog/editor/1/")
-        self.assertEqual(response.status_code, 401)
+    def test_editor_get(self):
+        """
 
-    def test_editor(self):
-        self.login_manager._login_disabled = True
-        response = self.client.get("/blog/editor/")
-        self.assertEqual(response.status_code, 200)
+        :return:
+        """
+        user_id = "testuser"
+        with self.client:
+            #access to editor should be forbidden before login
+            response = self.client.get("/blog/editor/")
+            self.assertEqual(response.status_code, 401)
 
-        # login test user and load testuser's posts
-        self.login("testuser")
-        #user = TestUser("testuser")
-        #g.user = user
-        for i in range(1, 10):
-            response = self.client.get("/blog/editor/%d/" % i)
+            response = self.client.get("/blog/editor/1/")
+            self.assertEqual(response.status_code, 401)
+
+            self.login(user_id)
+            self.assertEquals(current_user.get_id(), user_id)
+            response = self.client.get("/blog/editor/")
+            assert response.status_code == 200
+
+            for i in range(1, 21):
+                # logged in user can edit their post, and will be redirected if they try to edit other's post
+                response = self.client.get("/blog/editor/%d/" % i)
+                expected_status_code = 200 if i<=10 else 302
+                self.assertEqual(response.status_code, expected_status_code, "Error for item %d %d"\
+                                 % (i, response.status_code))
+            # logout and the access should be gone again
+            self.logout()
+            response = self.client.get("/blog/editor/")
+            self.assertEqual(response.status_code, 401)
+
+            response = self.client.get("/blog/editor/1/")
+            self.assertEqual(response.status_code, 401)
+
+    def test_editor_post(self):
+        user_id = "testuser"
+        with self.client:
+            # access to editor should be forbidden before login
+            response = self.client.get("/blog/page/21/", follow_redirects=True)
+            assert "The page you are trying to access is not valid!" in response.data
+
+            response = self.client.post("/blog/editor/")
+            self.assertEqual(response.status_code, 401)
+
+            response = self.client.post("/blog/editor/1/")
+            self.assertEqual(response.status_code, 401)
+
+            self.login(user_id)
+            self.assertEquals(current_user.get_id(), user_id)
+
+            response = self.client.post("/blog/editor/", data=dict(text="Test Text", tags="tag1, tag2"))
+            self.assertEqual(response.status_code, 200)  # should give back the editor page
+
+            response = self.client.post("/blog/editor/",
+                                        data=dict(title="Test Title",text="Test Text", tags="tag1, tag2"))
+            self.assertEqual(response.status_code, 302)
+
+            response = self.client.get("/blog/page/21/")
             self.assertEqual(response.status_code, 200)
-        for i in range(11, 20):
-            response = self.client.get("/blog/editor/%d/" % i)
-            self.assertEqual(response.status_code, 200)
+
+    def test_delete(self):
+        user_id = "testuser"
+        with self.client:
+
+            # Anonymous user cannot delete
+            response = self.client.post("/blog/delete/1/")
+            self.assertEqual(response.status_code, 401)
+
+            # a user cannot delete another person's post
+            self.login(user_id)
+            self.assertEquals(current_user.get_id(), user_id)
+            response = self.client.post("/blog/delete/11/", follow_redirects=True)
+            assert "You do not have the rights to delete this post" in response.data
+
+            # a user can delete his posts
+            response = self.client.post("/blog/delete/1/", follow_redirects=True)
+            assert "Your post was successfully deleted" in response.data
 
     def login(self, user_id):
-        self.client.get("/login/"+user_id, follow_redirects=True)
+        return self.client.post("/login/%s/" % user_id, follow_redirects=True)
 
     def logout(self):
-        self.client.get("/logout/")
+        return self.client.get("/logout/")
