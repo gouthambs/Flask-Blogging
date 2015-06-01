@@ -23,8 +23,13 @@
 
 {% if post.editable %}
     <div class="pull-right">
-        <a href="#" id="delete">Delete</a>&nbsp&nbsp&nbsp&nbsp
-        <a href="{{ url_for('blog_app.editor', post_id=post.post_id) }}" id="edit">Edit</a>
+        <a href="#" id="delete">
+            <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+        </a>&nbsp&nbsp&nbsp&nbsp
+
+        <a href="{{ url_for('blog_app.editor', post_id=post.post_id) }}" id="edit">
+            <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+        </a>
     </div>
 {% endif %}
   <a href="{{ url_for('blog_app.page_by_id', post_id=post.post_id, slug=post.slug) }}">
