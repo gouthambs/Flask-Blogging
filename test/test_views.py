@@ -28,7 +28,7 @@ class TestViews(FlaskBloggingTestCase):
         FlaskBloggingTestCase.setUp(self)
         self._create_db()
         self._create_storage(self._db)
-        self.engine = BloggingEngine(self.app, self.storage)
+        self.engine = BloggingEngine(self.app, self.storage, url_prefix="/blog")
         self.login_manager = LoginManager(self.app)
 
         @self.login_manager.user_loader

@@ -15,6 +15,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   flask_blogging.rst
+   modules.rst
 
 
 Indices and tables

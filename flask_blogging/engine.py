@@ -1,8 +1,15 @@
+"""
+The BloggingEngine module.
+"""
 from .processor import PostProcessor
 
 
 class BloggingEngine(object):
-    def __init__(self, app=None, storage=None, url_prefix="/blog", post_processors=None, config=None):
+    """
+    The BloggingEngine is core class to add blogging support to
+    your web app.
+    """
+    def __init__(self, app=None, storage=None, url_prefix=None, post_processors=None, config=None):
         """
         Creates the instance
 
@@ -22,7 +29,6 @@ class BloggingEngine(object):
     def init_app(self, app, storage):
         self.app = app
         self.storage = storage
-        #self.app.config["FLASK_BLOGGING_STORAGE"] = self.storage
         from flask_blogging.views import blog_app
         self.app.register_blueprint(blog_app, url_prefix=self.url_prefix)
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self

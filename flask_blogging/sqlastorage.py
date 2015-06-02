@@ -61,28 +61,35 @@ class SQLAStorage(Storage):
                 r = None
         return r
 
-    def get_posts(self, count=10, offset=0, recent=True, tag=None, user_id=None):
+    def get_posts(self, count=10, offset=0, recent=True, tag=None, user_id=None, include_draft=False):
         ordering = sqla.desc(self._post_table.c.post_date) if recent \
             else self._post_table.c.post_date
         user_id = str(user_id) if user_id else user_id
+
         with self._engine.begin() as conn:
             select_statement = sqla.select([self._post_table.c.id])
-            filter = None
+            filters = []
             if tag:
                 tag = tag.upper()
                 tag_statement = sqla.select([self._tag_table.c.id]).where(self._tag_table.c.text == tag)
                 tag_result = conn.execute(tag_statement).fetchone()
                 if tag_result is not None:
                     tag_id = tag_result[0]
-                    filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
-                                  self._post_table.c.id == self._tag_posts_table.c.post_id)
+                    tag_filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
+                                           self._post_table.c.id == self._tag_posts_table.c.post_id)
+                    filters.append(tag_filter)
 
             if user_id:
                 user_filter = sqla.and_(self._user_posts_table.c.user_id == user_id,
                                         self._post_table.c.id == self._user_posts_table.c.post_id)
-                filter = user_filter if filter is None else sqla.and_(filter, user_filter)
-            if filter is not None:
-                select_statement = select_statement.where(filter)
+                filters.append(user_filter)
+
+            draft_filter = self._post_table.c.draft == 1 if include_draft else self._post_table.c.draft == 0
+            filters.append(draft_filter)
+            sql_filter = sqla.and_(*filters)
+
+            if sql_filter is not None:
+                select_statement = select_statement.where(sql_filter)
 
             select_statement = select_statement.limit(count).offset(offset).order_by(ordering)
             result = conn.execute(select_statement).fetchall()
