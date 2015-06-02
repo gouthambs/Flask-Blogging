@@ -2,7 +2,7 @@ import os
 import tempfile
 from flask import redirect
 from flask.ext.login import LoginManager, login_user, logout_user, current_user
-from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
@@ -15,19 +15,16 @@ class TestUser(UserMixin):
 
 class TestViews(FlaskBloggingTestCase):
 
-    def _create_db(self):
+    def _create_storage(self):
         temp_dir = tempfile.gettempdir()
         self._dbfile = os.path.join(temp_dir, "temp.db")
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+self._dbfile
-        self._db = SQLAlchemy(self.app)
-
-    def _create_storage(self, db):
-        self.storage = SQLAStorage(db.engine)
+        conn_string = 'sqlite:///'+self._dbfile
+        engine = create_engine(conn_string)
+        self.storage = SQLAStorage(engine)
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
-        self._create_db()
-        self._create_storage(self._db)
+        self._create_storage()
         self.engine = BloggingEngine(self.app, self.storage, url_prefix="/blog")
         self.login_manager = LoginManager(self.app)
 

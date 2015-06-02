@@ -4,6 +4,7 @@ web application. This extension uses Markdown to store and then
 render the webpage.
 
 Author: Gouthaman Balaraman
+
 Date: June 1, 2015
 """
 

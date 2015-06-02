@@ -42,6 +42,13 @@ def _store_form_data(blog_form, storage, user, post_id):
 @blog_app.route("/<int:count>/", defaults={"offset": 0})
 @blog_app.route("/<int:count>/<int:offset>/")
 def index(count, offset):
+    """
+    Serves the page with a list of blog posts
+
+    :param count:
+    :param offset:
+    :return:
+    """
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset)

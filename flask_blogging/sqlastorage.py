@@ -6,15 +6,49 @@ from .storage import Storage
 
 
 class SQLAStorage(Storage):
+    """
+    The ``SQLAStorage`` implements the interface specified by the ``Storage`` class. This  class
+    uses SQLAlchemy to implement storage and retrieval of data from any of the databases
+    supported by SQLAlchemy. This
+    """
     _db = None
     _logger = logging.getLogger("flask-blogging")
 
     def __init__(self, engine, table_prefix=""):
+        """
+        The constructor for the ``SQLAStorage`` class.
+
+        :param engine: The ``SQLAlchemy`` engine instance created by calling ``create_engine``. One can also use
+         Flask-SQLAlchemy, and pass the engine property.
+        :type engine: object
+        :param table_prefix: (Optional) Prefix to use for the tables created (default ``""``).
+        :type table_prefix: str
+        """
         self._engine = engine
         self._table_prefix = table_prefix
         self._create_all_tables()
 
     def save_post(self, title, text, user_id, tags, draft=False, post_id=None):
+        """
+        Persist the blog post data. If ``post_id`` is ``None`` or ``post_id`` is invalid, the post must
+        be inserted into the storage. If ``post_id`` is a valid id, then the data must be updated.
+
+        :param title: The title of the blog post
+        :type title: str
+        :param text: The text of the blog post
+        :type text: str
+        :param user_id: The user identifier
+        :type user_id: str
+        :param tags: A list of tags
+        :type tags: list
+        :param draft: (Optional) If the post is a draft of if needs to be published. (default ``False``)
+        :type draft: bool
+        :param post_id: (Optional) The post identifier. This should be ``None`` for an insert call,
+         and a valid value for update. (default ``None``)
+        :type post_id: int
+
+        :return: The post_id value, in case of a successful insert or update. Return ``None`` if there were errors.
+        """
         new_post = post_id is None
         current_datetime = datetime.datetime.utcnow()
         draft = 1 if draft is True else 0
@@ -28,7 +62,6 @@ class SQLAStorage(Storage):
             post_statement = post_statement.values(title=title, text=text, post_date=current_datetime,
                                                    last_modified_date=current_datetime, draft=draft)
 
-
             post_result = conn.execute(post_statement)
             post_id = post_result.inserted_primary_key[0] if post_id is None else post_id
             self._save_tags(tags, post_id, conn)
@@ -36,6 +69,13 @@ class SQLAStorage(Storage):
         return post_id
 
     def get_post_by_id(self, post_id):
+        """
+        Fetch the blog post given by ``post_id``
+
+        :param post_id: The post identifier for the blog post
+        :type post_id: int
+        :return: If the ``post_id`` is valid, the post data is retrieved, else returns ``None``.
+        """
         r = None
         with self._engine.begin() as conn:
             try:
@@ -62,6 +102,25 @@ class SQLAStorage(Storage):
         return r
 
     def get_posts(self, count=10, offset=0, recent=True, tag=None, user_id=None, include_draft=False):
+        """
+        Get posts given by filter criteria
+
+        :param count: The number of posts to retrieve (default 10)
+        :type count: int
+        :param offset: The number of posts to offset (default 0)
+        :type offset: int
+        :param recent: Order by recent posts or not
+        :type recent: bool
+        :param tag: Filter by a specific tag
+        :type tag: str
+        :param user_id: Filter by a specific user
+        :type user_id: str
+        :param include_draft: Whether to include posts marked as draft or not
+        :type include_draft: bool
+
+        :return: A list of posts, with each element a dict containing values for the following keys: title, text, draft
+         post_date,
+        """
         ordering = sqla.desc(self._post_table.c.post_date) if recent \
             else self._post_table.c.post_date
         user_id = str(user_id) if user_id else user_id
@@ -98,6 +157,13 @@ class SQLAStorage(Storage):
         return posts
 
     def delete_post(self, post_id):
+        """
+        Delete the post defined by ``post_id``
+
+        :param post_id: The identifier corresponding to a post
+        :type post_id: int
+        :return: Returns True if the post was successfully deleted and False otherwise.
+        """
         status = False
         success = 0
         with self._engine.begin() as conn:
