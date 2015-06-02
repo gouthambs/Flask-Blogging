@@ -60,9 +60,11 @@ on {{post.post_date.strftime('%d %b, %Y')}}</p>
   {% endif %}
   <br>
   <hr>
+{% include "blog/disqus.html" %}
 {% endblock main %}
 
 {% block extrajs %}
+
 <script>
     $(document).ready(function(){
         $("#delete").click(function(){
