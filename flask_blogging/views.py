@@ -15,10 +15,10 @@ def _get_user_name(user):
     return user_name
 
 
-def _process_post(post, blogging_engine, author=None):
+def _process_post(post, blogging_engine, author=None, render=True):
     post_processors = blogging_engine.post_processors
     for post_processor in post_processors:
-        post_processor.process(post)
+        post_processor.process(post, render)
     if author is None:
         if blogging_engine.user_callback is None:
             raise Exception("No user_loader has been installed for this BloggingEngine."
@@ -51,10 +51,12 @@ def index(count, offset):
     """
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
+    config = blogging_engine.config
+    render = config.get("RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset)
     for post in posts:
         _process_post(post, blogging_engine)
-    return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
+    return render_template("blog/index.html", posts=posts, config=config)
 
 
 @blog_app.route("/page/<int:post_id>/", defaults={"slug": ""})

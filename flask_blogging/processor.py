@@ -25,7 +25,7 @@ def makeExtension(configs=[]):
 
 class PostProcessor(object):
 
-    markdown_extensions = [MathJaxExtension(), MetaExtension()]
+    _markdown_extensions = [MathJaxExtension(), MetaExtension()]
 
     @staticmethod
     def create_slug(title):
@@ -38,12 +38,18 @@ class PostProcessor(object):
 
     @classmethod
     def render_text(cls, post):
-        md = markdown.Markdown(extensions=cls.markdown_extensions)
+        md = markdown.Markdown(extensions=cls._markdown_extensions)
         post["rendered_text"] = md.convert(post["text"])
         post["meta"] = md.Meta
 
     @classmethod
     def process(cls, post, render=True):
+        """
+        This method takes the post data and renders it
+        :param post:
+        :param render:
+        :return:
+        """
         post["slug"] = cls.create_slug(post["title"])
         post["editable"] = current_user.get_id() == post["user_id"]
         if render:
@@ -54,8 +60,10 @@ class PostProcessor(object):
     @classmethod
     def custom_process(cls, post):
         """
-        Override this method to add additional processes
-        :param post:
-        :return:
+        Override this method to add additional processes. The result is that the
+        ``post`` dict is modified or enhanced with newer key value pairs.
+
+        :param post: The post data with values for keys such as title, text, tags etc.
+        :type post: dict
+
         """
-        pass

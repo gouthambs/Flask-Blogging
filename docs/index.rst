@@ -87,7 +87,7 @@ flask_blogging.engine module
 flask_blogging.processor module
 -------------------------------
 
-.. automodule:: flask_blogging.processor
+.. autoclass:: flask_blogging.processor.PostProcessor
     :members:
     :undoc-members:
     :show-inheritance:

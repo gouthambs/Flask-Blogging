@@ -22,10 +22,19 @@ class BloggingEngine(object):
     """
     def __init__(self, app=None, storage=None, url_prefix=None, post_processors=None, config=None):
         """
-        Creates the instance
 
         :param app: Optional app to use
         :param storage: The blog storage instance that implements the ``Storage`` class interface.
+        :param url_prefix: (optional) The prefix for the URL of blog posts (default ``None``)
+        :param post_processors: (optional) The list of post processor object. If none provided, the default is used.
+        :param config: (optional) A dictionary of config values. The values
+         that can be specified are:
+
+         - SITE_NAME (str) : The brand name or site name. (defaults to "Flask-Blogging")
+         - RENDER_TEXT (bool): Whether the text should be rendered or not. (defaults to True)
+
+        :type config: dict
+        :return:
         """
         self.app = None
         self.storage = None
