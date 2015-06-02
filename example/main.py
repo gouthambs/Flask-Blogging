@@ -1,18 +1,15 @@
-from flask import Flask
-import os
-import tempfile
+from flask import Flask, render_template_string, redirect
 from sqlalchemy import create_engine
+from flask.ext.login import UserMixin, LoginManager, login_user, logout_user
 from flask_blogging import SQLAStorage, BloggingEngine
-from flask.ext.login import UserMixin, LoginManager, login_user
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "secret"
+app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
 
 # extensions
-db_dir = os.path.join(tempfile.gettempdir(), "temp.db")
-engine = create_engine('sqlite:///'+db_dir)
+engine = create_engine('sqlite:////tmp/blog.db')
 sql_storage = SQLAStorage(engine)
-blog_engine = BloggingEngine(app, sql_storage, config={'site_name': "My Site"})
+blog_engine = BloggingEngine(app, sql_storage, url_prefix="/blog")
 login_manager = LoginManager(app)
 
 
@@ -21,34 +18,42 @@ class User(UserMixin):
         self.id = user_id
 
     def get_name(self):
-        return "User "+self.id
+        return self.id  # typically the user's name
 
 @login_manager.user_loader
 @blog_engine.user_loader
 def load_user(user_id):
     return User(user_id)
 
-sample_text = """
-# An exhibit of Markdown
-
-This note demonstrates some of what [Markdown][1] is capable of doing.
-Inline math like $\\alpha_i$ would work. Blocks
-$$ \\alpha=\\beta$$
-work as well.
+index_template = """
+<!DOCTYPE html>
+<html>
+    <head> </head>
+    <body>
+        {% if current_user.is_authenticated() %}
+            <a href="/logout/"> Logout </a>
+        {% else %}
+            <a href="/login/"> Login </a>
+        {% endif %}
+    </body>
+</html>
 """
 
-@app.before_first_request
-def add_posts():
-    for i in range(20):
-        tags = ["hello"] if i < 10 else ["world"]
-        user = "testuser" if i<10 else "newuser"
-        blog_engine.storage.save_post(title="Sample Title%d" % i, text=sample_text, user_id=user, tags=tags)
-    user = User("newuser")
+@app.route("/")
+def index():
+    return render_template_string(index_template)
+
+@app.route("/login/")
+def login():
+    user = User("testuser")
     login_user(user)
+    return redirect("/blog")
+
+@app.route("/logout/")
+def logout():
+    logout_user()
+    return redirect("/")
 
 
 if __name__ == "__main__":
-    try:
-        app.run(debug=True, port=9000, use_reloader=True)
-    except KeyboardInterrupt:
-        os.remove(db_dir)
+    app.run(debug=True, port=8000, use_reloader=True)
