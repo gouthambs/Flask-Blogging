@@ -127,25 +127,7 @@ class SQLAStorage(Storage):
 
         with self._engine.begin() as conn:
             select_statement = sqla.select([self._post_table.c.id])
-            filters = []
-            if tag:
-                tag = tag.upper()
-                tag_statement = sqla.select([self._tag_table.c.id]).where(self._tag_table.c.text == tag)
-                tag_result = conn.execute(tag_statement).fetchone()
-                if tag_result is not None:
-                    tag_id = tag_result[0]
-                    tag_filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
-                                           self._post_table.c.id == self._tag_posts_table.c.post_id)
-                    filters.append(tag_filter)
-
-            if user_id:
-                user_filter = sqla.and_(self._user_posts_table.c.user_id == user_id,
-                                        self._post_table.c.id == self._user_posts_table.c.post_id)
-                filters.append(user_filter)
-
-            draft_filter = self._post_table.c.draft == 1 if include_draft else self._post_table.c.draft == 0
-            filters.append(draft_filter)
-            sql_filter = sqla.and_(*filters)
+            sql_filter = self._get_filter(tag, user_id, include_draft, conn)
 
             if sql_filter is not None:
                 select_statement = select_statement.where(sql_filter)
@@ -155,6 +137,27 @@ class SQLAStorage(Storage):
 
         posts = [self.get_post_by_id(pid[0]) for pid in result]
         return posts
+
+    def count_posts(self, tag=None, user_id=None, include_draft=False):
+        """
+        Returns the total number of posts for the give filter
+
+        :param tag: Filter by a specific tag
+        :type tag: str
+        :param user_id: Filter by a specific user
+        :type user_id: str
+        :param include_draft: Whether to include posts marked as draft or not
+        :type include_draft: bool
+        :return: The number of posts for the given filter.
+        """
+        result = 0
+        with self._engine.begin() as conn:
+            count_statement = sqla.select([sqla.func.count()]).select_from(self._post_table)
+            sql_filter = self._get_filter(tag, user_id, include_draft, conn)
+            count_statement = count_statement.where(sql_filter)
+            result = conn.execute(count_statement).scalar()
+        return result
+
 
     def delete_post(self, post_id):
         """
@@ -189,6 +192,28 @@ class SQLAStorage(Storage):
                 self._logger.exception(str(e))
         status = success == 3
         return status
+
+    def _get_filter(self, tag, user_id, include_draft, conn):
+        filters = []
+        if tag:
+            tag = tag.upper()
+            tag_statement = sqla.select([self._tag_table.c.id]).where(self._tag_table.c.text == tag)
+            tag_result = conn.execute(tag_statement).fetchone()
+            if tag_result is not None:
+                tag_id = tag_result[0]
+                tag_filter = sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
+                                       self._post_table.c.id == self._tag_posts_table.c.post_id)
+                filters.append(tag_filter)
+
+        if user_id:
+            user_filter = sqla.and_(self._user_posts_table.c.user_id == user_id,
+                                    self._post_table.c.id == self._user_posts_table.c.post_id)
+            filters.append(user_filter)
+
+        draft_filter = self._post_table.c.draft == 1 if include_draft else self._post_table.c.draft == 0
+        filters.append(draft_filter)
+        sql_filter = sqla.and_(*filters)
+        return sql_filter
 
     def _save_tags(self, tags, post_id, conn):
         tags = self.normalize_tags(tags)

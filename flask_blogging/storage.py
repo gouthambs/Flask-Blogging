@@ -54,6 +54,20 @@ class Storage(object):
         """
         raise NotImplementedError("This method needs to be implemented by the inheriting class")
 
+    def count_posts(self, tag=None, user_id=None, include_draft=False):
+        """
+        Returns the total number of posts for the give filter
+
+        :param tag: Filter by a specific tag
+        :type tag: str
+        :param user_id: Filter by a specific user
+        :type user_id: str
+        :param include_draft: Whether to include posts marked as draft or not
+        :type include_draft: bool
+        :return: The number of posts for the given filter.
+        """
+        raise NotImplementedError("This method needs to be implemented by the inheriting class")
+
     def delete_post(self, post_id):
         """
         Delete the post defined by ``post_id``

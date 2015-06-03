@@ -256,3 +256,33 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             ctr -= 1
         return
 
+
+    def test_count_posts(self):
+        for i in range(20):
+            tags = ["hello"] if i < 10 else ["world"]
+            user = "testuser" if i<10 else "newuser"
+            self.storage.save_post(title="Title%d" % i, text="Sample Text%d" % i, user_id=user,tags=tags)
+
+        count = self.storage.count_posts()
+        self.assertEqual(count, 20)
+
+        # test user
+        count = self.storage.count_posts(user_id="testuser")
+        self.assertEqual(count, 10)
+
+        count = self.storage.count_posts(user_id="newuser")
+        self.assertEqual(count, 10)
+
+        count = self.storage.count_posts(user_id="testuser")
+        self.assertEqual(count, 10)
+
+        # test tags
+        count = self.storage.count_posts(tag="hello")
+        self.assertEqual(count, 10)
+
+        count = self.storage.count_posts(tag="world")
+        self.assertEqual(count, 10)
+
+        # multiple queries
+        count = self.storage.count_posts(user_id="testuser", tag="world")
+        self.assertEqual(count, 0)

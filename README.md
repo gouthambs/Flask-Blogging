@@ -11,6 +11,16 @@ for more details.
 ### Blog Page
 ![Blog Page](/docs/_static/blog_page.png "Blog Page")
 
+## Installation
+Install the extension with the following commands:
+
+    $ easy_install flask-blogging
+    
+or alternatively if you have pip installed:
+
+    $ pip install flask-blogging
+    
+
 ## Dependencies
 
 - [Flask](https://github.com/mitsuhiko/flask)
@@ -21,4 +31,8 @@ for more details.
 - [Bootstrap](http://getbootstrap.com/)
 - [Bootstrap-Markdown](https://github.com/toopay/bootstrap-markdown)
 - [Markdown-js] (https://github.com/evilstreak/markdown-js)
+
+## License
+
+[MIT](/LICENSE)
 

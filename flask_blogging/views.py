@@ -77,6 +77,7 @@ def page_by_id(post_id, slug):
 @blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(offset=0))
 @blog_app.route("/tag/<tag>/<int:count>/<int:offset>/")
 def posts_by_tag(tag, count, offset):
+    meta = {}
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset, tag=tag)
