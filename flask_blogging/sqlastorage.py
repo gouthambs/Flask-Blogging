@@ -53,19 +53,23 @@ class SQLAStorage(Storage):
         current_datetime = datetime.datetime.utcnow()
         draft = 1 if draft is True else 0
         with self._engine.begin() as conn:
-            if post_id is not None:  # validate post_id
-                exists_statement = sqla.select([self._post_table]).where(self._post_table.c.id == post_id)
-                exists = conn.execute(exists_statement).fetchone() is not None
-                post_id = post_id if exists else None
-            post_statement = self._post_table.insert() if post_id is None else \
-                self._post_table.update().where(self._post_table.c.id == post_id)
-            post_statement = post_statement.values(title=title, text=text, post_date=current_datetime,
-                                                   last_modified_date=current_datetime, draft=draft)
+            try:
+                if post_id is not None:  # validate post_id
+                    exists_statement = sqla.select([self._post_table]).where(self._post_table.c.id == post_id)
+                    exists = conn.execute(exists_statement).fetchone() is not None
+                    post_id = post_id if exists else None
+                post_statement = self._post_table.insert() if post_id is None else \
+                    self._post_table.update().where(self._post_table.c.id == post_id)
+                post_statement = post_statement.values(title=title, text=text, post_date=current_datetime,
+                                                       last_modified_date=current_datetime, draft=draft)
 
-            post_result = conn.execute(post_statement)
-            post_id = post_result.inserted_primary_key[0] if post_id is None else post_id
-            self._save_tags(tags, post_id, conn)
-            self._save_user_post(user_id, post_id, conn)
+                post_result = conn.execute(post_statement)
+                post_id = post_result.inserted_primary_key[0] if post_id is None else post_id
+                self._save_tags(tags, post_id, conn)
+                self._save_user_post(user_id, post_id, conn)
+            except Exception as e:
+                self._logger.exception(str(e))
+                post_id = None
         return post_id
 
     def get_post_by_id(self, post_id):
@@ -126,14 +130,18 @@ class SQLAStorage(Storage):
         user_id = str(user_id) if user_id else user_id
 
         with self._engine.begin() as conn:
-            select_statement = sqla.select([self._post_table.c.id])
-            sql_filter = self._get_filter(tag, user_id, include_draft, conn)
+            try:
+                select_statement = sqla.select([self._post_table.c.id])
+                sql_filter = self._get_filter(tag, user_id, include_draft, conn)
 
-            if sql_filter is not None:
-                select_statement = select_statement.where(sql_filter)
+                if sql_filter is not None:
+                    select_statement = select_statement.where(sql_filter)
 
-            select_statement = select_statement.limit(count).offset(offset).order_by(ordering)
-            result = conn.execute(select_statement).fetchall()
+                select_statement = select_statement.limit(count).offset(offset).order_by(ordering)
+                result = conn.execute(select_statement).fetchall()
+            except Exception as e:
+                self._logger.exception(str(e))
+                result = []
 
         posts = [self.get_post_by_id(pid[0]) for pid in result]
         return posts
@@ -152,10 +160,14 @@ class SQLAStorage(Storage):
         """
         result = 0
         with self._engine.begin() as conn:
-            count_statement = sqla.select([sqla.func.count()]).select_from(self._post_table)
-            sql_filter = self._get_filter(tag, user_id, include_draft, conn)
-            count_statement = count_statement.where(sql_filter)
-            result = conn.execute(count_statement).scalar()
+            try:
+                count_statement = sqla.select([sqla.func.count()]).select_from(self._post_table)
+                sql_filter = self._get_filter(tag, user_id, include_draft, conn)
+                count_statement = count_statement.where(sql_filter)
+                result = conn.execute(count_statement).scalar()
+            except Exception as e:
+                self._logger.exception(str(e))
+                result = 0
         return result
 
 
