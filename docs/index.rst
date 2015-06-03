@@ -48,7 +48,7 @@ Quick Start Example
             self.id = user_id
 
         def get_name(self):
-            return self.id  # typically the user's name
+            return "Paul Dirac"  # typically the user's name
 
     @login_manager.user_loader
     @blog_engine.user_loader
@@ -65,6 +65,7 @@ Quick Start Example
             {% else %}
                 <a href="/login/"> Login </a>
             {% endif %}
+            &nbsp&nbsp<a href="/blog/"> Blog </a>
         </body>
     </html>
     """
@@ -126,6 +127,19 @@ object. For example::
 
 For the blog to have a readable display name, the ``User`` class must
 implement either the ``get_name`` method or the ``__str__`` method.
+
+The ``BloggingEngine`` accepts an optional ``config`` ``dict`` argument which is passed to all
+the views. The keys that are currently supported include:
+
+=================== ===================================================
+SITE_NAME           The name of the blog to be used as the brand name
+                    (default "Flask-Blogging")
+RENDER_TEXT         Boolean value to specify if the raw text should be
+                    rendered or not. (default ``True``)
+DISQUS_SITENAME     Disqus sitename for comments (default ``None``)
+GOOGLE_ANALYTICS    Google analytics code for usage tracking
+                    (default ``None``)
+=================== ===================================================
 
 Screenshots
 ===========

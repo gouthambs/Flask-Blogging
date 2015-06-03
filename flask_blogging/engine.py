@@ -31,14 +31,10 @@ class BloggingEngine(object):
         :type url_prefix: str
         :param post_processor: (optional) The post processor object. If none provided, the default is used.
         :type post_processor: object
-        :param config: (optional) A dictionary of config values. The values
-         that can be specified are:
+        :param config: (optional) A dictionary of config values. See docs for the
+         keys that can be specified.
         :type config: dict
 
-         - SITE_NAME (str) : The brand name or site name. (defaults to "Flask-Blogging")
-         - RENDER_TEXT (bool): Whether the text should be rendered or not. (defaults to True)
-
-        :type config: dict
         :return:
         """
         self.app = None

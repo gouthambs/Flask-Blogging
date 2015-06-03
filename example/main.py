@@ -9,7 +9,8 @@ app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
 # extensions
 engine = create_engine('sqlite:////tmp/blog.db')
 sql_storage = SQLAStorage(engine)
-blog_engine = BloggingEngine(app, sql_storage, url_prefix="/blog")
+blog_engine = BloggingEngine(app, sql_storage, url_prefix="/blog",
+                             config={"DISQUS_SITENAME": "test"})
 login_manager = LoginManager(app)
 
 
@@ -18,7 +19,7 @@ class User(UserMixin):
         self.id = user_id
 
     def get_name(self):
-        return self.id  # typically the user's name
+        return "Paul Dirac"  # typically the user's name
 
 @login_manager.user_loader
 @blog_engine.user_loader
@@ -35,6 +36,7 @@ index_template = """
         {% else %}
             <a href="/login/"> Login </a>
         {% endif %}
+        &nbsp&nbsp<a href="/blog/"> Blog </a>
     </body>
 </html>
 """
