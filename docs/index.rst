@@ -127,6 +127,16 @@ object. For example::
 For the blog to have a readable display name, the ``User`` class must
 implement either the ``get_name`` method or the ``__str__`` method.
 
+Screenshots
+===========
+Blog Page
+---------
+.. image:: _static/blog_page.png
+
+Blog Editor
+-----------
+.. image:: _static/blog_editor.png
+
 
 
 API Documentation

@@ -20,15 +20,20 @@ class BloggingEngine(object):
         storage = SQLAStorage(db_engine)
         blog_engine = BloggingEngine(app, storage)
     """
-    def __init__(self, app=None, storage=None, url_prefix=None, post_processors=None, config=None):
+    def __init__(self, app=None, storage=None, url_prefix=None, post_processor=None, config=None):
         """
 
         :param app: Optional app to use
+        :type app: object
         :param storage: The blog storage instance that implements the ``Storage`` class interface.
+        :type storage: object
         :param url_prefix: (optional) The prefix for the URL of blog posts (default ``None``)
-        :param post_processors: (optional) The list of post processor object. If none provided, the default is used.
+        :type url_prefix: str
+        :param post_processor: (optional) The post processor object. If none provided, the default is used.
+        :type post_processor: object
         :param config: (optional) A dictionary of config values. The values
          that can be specified are:
+        :type config: dict
 
          - SITE_NAME (str) : The brand name or site name. (defaults to "Flask-Blogging")
          - RENDER_TEXT (bool): Whether the text should be rendered or not. (defaults to True)
@@ -39,7 +44,7 @@ class BloggingEngine(object):
         self.app = None
         self.storage = None
         self.url_prefix = url_prefix
-        self.post_processors = [PostProcessor()] if post_processors is None else post_processors
+        self.post_processor = PostProcessor() if post_processor is None else post_processor
         self.user_callback = None
         self.config = {} if config is None else config
         if app is not None and storage is not None:

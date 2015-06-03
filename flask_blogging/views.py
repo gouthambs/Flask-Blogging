@@ -16,9 +16,8 @@ def _get_user_name(user):
 
 
 def _process_post(post, blogging_engine, author=None, render=True):
-    post_processors = blogging_engine.post_processors
-    for post_processor in post_processors:
-        post_processor.process(post, render)
+    post_processor = blogging_engine.post_processor
+    post_processor.process(post, render)
     if author is None:
         if blogging_engine.user_callback is None:
             raise Exception("No user_loader has been installed for this BloggingEngine."
@@ -106,13 +105,15 @@ def posts_by_author(user_id, count, offset):
 @login_required
 def editor(post_id):
     blogging_engine = _get_blogging_engine(current_app)
+    post_processor = blogging_engine.post_processor
     storage = blogging_engine.storage
     if request.method == 'POST':
         form = BlogEditor(request.form)
         if form.validate():
             pid = _store_form_data(form, storage, current_user, post_id)
             flash("Blog post posted successfully!", "info")
-            return redirect(url_for("blog_app.page_by_id", post_id=pid))
+            slug = post_processor.create_slug(form.title.data)
+            return redirect(url_for("blog_app.page_by_id", post_id=pid, slug=slug))
         else:
             flash("There were errors in the blog submission", "warning")
             return render_template("blog/editor.html", form=form, post_id=post_id, config=blogging_engine.config)
