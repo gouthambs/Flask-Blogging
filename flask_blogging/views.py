@@ -1,7 +1,7 @@
 from flask.ext.login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash
 from flask_blogging.forms import BlogEditor
-
+import math
 
 blog_app = Blueprint("blog_app", __name__, template_folder='templates')
 
@@ -37,6 +37,29 @@ def _store_form_data(blog_form, storage, user, post_id):
     return pid
 
 
+def _get_meta(storage, count, page, tag=None, user_id=None):
+    max_posts = storage.count_posts(tag=tag, user_id=user_id)
+    max_pages = math.ceil(float(max_posts)/float(count))
+    max_offset = (max_pages-1)*count
+    offset = min(max(0, (page-1)*count), max_offset)
+    if (tag is None) and (user_id is None):
+        prev_page = None if page <= 1 else url_for("blog_app.index", count=count, page=page-1)
+        next_page = None if page >= max_pages else url_for("blog_app.index", count=count, page=page+1)
+    elif tag:
+        prev_page = None if page <= 1 else url_for("blog_app.posts_by_tag", tag=tag, count=count, page=page-1)
+        next_page = None if page >= max_pages else url_for("blog_app.posts_by_tag", tag=tag, count=count, page=page+1)
+    elif user_id:
+        prev_page = None if page <= 1 else url_for("blog_app.posts_by_author", user_id=user_id, count=count, page=page-1)
+        next_page = None if page >= max_pages else url_for("blog_app.posts_by_author", user_id=user_id, count=count, page=page+1)
+    else:
+        prev_page = next_page = None
+
+    pagination = dict(prev_page=prev_page, next_page=next_page)
+    meta = dict(max_posts=max_posts, max_pages=max_pages, max_offset=max_offset,
+                offset=offset, count=count, page=page, pagination=pagination)
+    return meta
+
+
 @blog_app.route("/", defaults={"count": 10, "page": 1})
 @blog_app.route("/<int:count>/", defaults={"page": 1})
 @blog_app.route("/<int:count>/<int:page>/")
@@ -48,15 +71,18 @@ def index(count, page):
     :param offset:
     :return:
     """
-    offset = max(0, (page-1)*count)
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
+
+    meta = _get_meta(storage, count, page)
+    offset = meta["offset"]
+
     render = config.get("RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset)
     for post in posts:
-        _process_post(post, blogging_engine)
-    return render_template("blog/index.html", posts=posts, config=config)
+        _process_post(post, blogging_engine, render=render)
+    return render_template("blog/index.html", posts=posts, meta=meta, config=config)
 
 
 @blog_app.route("/page/<int:post_id>/", defaults={"slug": ""})
@@ -72,36 +98,39 @@ def page_by_id(post_id, slug):
         flash("The page you are trying to access is not valid!", "warning")
         return redirect(url_for("blog_app.index"))
 
-
-
 @blog_app.route("/tag/<tag>/", defaults=dict(count=10, page=1))
 @blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(page=1))
 @blog_app.route("/tag/<tag>/<int:count>/<int:page>/")
 def posts_by_tag(tag, count, page):
-    meta = {}
-    offset = max(0, (page-1)*count)
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
+
+    meta = _get_meta(storage, count, page, tag=tag)
+    offset = meta["offset"]
+
     posts = storage.get_posts(count=count, offset=offset, tag=tag)
     for post in posts:
         _process_post(post, blogging_engine)
-    return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
+    return render_template("blog/index.html", posts=posts, meta=meta, config=blogging_engine.config)
 
 
 @blog_app.route("/author/<user_id>/", defaults=dict(count=10, page=1))
 @blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(page=1))
 @blog_app.route("/author/<user_id>/<int:count>/<int:page>/")
 def posts_by_author(user_id, count, page):
-    offset = max(0, (page-1)*count)
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
+
+    meta = _get_meta(storage, count, page, user_id=user_id)
+    offset = meta["offset"]
+
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id)
     if len(posts):
         for post in posts:
             _process_post(post, blogging_engine)
     else:
         flash("No posts found for this user!", "warning")
-    return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
+    return render_template("blog/index.html", posts=posts, meta=meta, config=blogging_engine.config)
 
 
 @blog_app.route('/editor/', methods=["GET", "POST"], defaults={"post_id": None})

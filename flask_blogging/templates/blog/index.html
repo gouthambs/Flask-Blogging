@@ -4,41 +4,58 @@ Blog Posts
 {% endblock title %}
 
 {% block main %}
+    {% if alert %}
+        <div class="alert alert-{{alert.type}}">
+            <strong>{{ alert.type }}</strong> {{ alert.message }}
+        </div>
+    {% endif %}
 
+    {% if current_user.is_authenticated() %}
+        <div class="pull-right">
+            <a href="{{ url_for('blog_app.editor') }}" id="new">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;New
+            </a>
+        </div>
+    {% endif %}
 
-{% if alert %}
-<div class="alert alert-{{alert.type}}">
-    <strong>{{ alert.type }}</strong> {{ alert.message }}
-</div>
-{% endif %}
-
-{% if current_user.is_authenticated() %}
-    <div class="pull-right">
-        <a href="{{ url_for('blog_app.editor') }}" id="new">
-            <span class="glyphicon glyphicon-plus"></span>&nbsp;New
+    {% for post in posts %}
+        <a href="{{ url_for('blog_app.page_by_id', post_id=post.post_id, slug=post.slug) }}">
+            <h1>{{ post.title }}</h1>
         </a>
-    </div>
-{% endif %}
+        <p>Posted by <a href="{{ url_for('blog_app.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+        on {{post.post_date.strftime('%d %b, %Y')}}</p>
 
-{% for post in posts %}
-<a href="{{ url_for('blog_app.page_by_id', post_id=post.post_id, slug=post.slug) }}">
-    <h1>{{ post.title }}</h1>
-</a>
-<p>Posted by <a href="{{ url_for('blog_app.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
-on {{post.post_date.strftime('%d %b, %Y')}}</p>
+        <!-- post tags-->
+        {% if post.tags %}
+            <span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;
+            {% for tag in post.tags %}
+                <span class="label">
+                    <a href="{{ url_for('blog_app.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
+                    {{ tag }}
+                    </a>
+                </span>&nbsp;&nbsp;
+            {% endfor %}
+            <br>
+        {% endif %}
+        <hr>
+    {% endfor %}
+    {% if meta %}
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pager">
+                    {% if meta.pagination.prev_page %}
+                        <li><a href="{{meta.pagination.prev_page}}">&laquo;Prev</a></li>
+                    {% else %}
+                        <li class="disabled"><a href="#">&laquo; Prev</a></li>
+                    {% endif %}
+                    {% if meta.pagination.next_page %}
+                        <li><a href="{{meta.pagination.next_page}}">Next &raquo;</a></li>
+                    {% else %}
+                        <li class="disabled"><a href="#">Next &raquo;</a></li>
+                    {% endif %}
 
-<!-- post tags-->
-{% if post.tags %}
-<span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;
-{% for tag in post.tags %}
-<span class="label">
-    <a href="{{ url_for('blog_app.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
-    {{ tag }}
-    </a>
-</span>&nbsp;&nbsp;
-{% endfor %}
-<br>
-{% endif %}
-<hr>
-{% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 {% endblock main %}

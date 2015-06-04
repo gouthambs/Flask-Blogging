@@ -170,7 +170,6 @@ class SQLAStorage(Storage):
                 result = 0
         return result
 
-
     def delete_post(self, post_id):
         """
         Delete the post defined by ``post_id``
