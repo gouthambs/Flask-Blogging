@@ -5,6 +5,7 @@
   <url>
     <loc>{{ config.SITEURL }}{{ post.url }}</loc>
     <priority>0.8</priority>
+    <lastmod>{{post.last_modified_date.isoformat()}}</lastmod>
   </url>
 {% endfor %}
 
