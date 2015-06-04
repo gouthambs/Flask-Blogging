@@ -10,7 +10,8 @@ app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
 engine = create_engine('sqlite:////tmp/blog.db')
 sql_storage = SQLAStorage(engine)
 blog_engine = BloggingEngine(app, sql_storage, url_prefix="/blog",
-                             config={"DISQUS_SITENAME": "test"})
+                             config={"DISQUS_SITENAME": "test",
+                                     "SITEURL": "http://localhost:8000"})
 login_manager = LoginManager(app)
 
 
@@ -37,6 +38,7 @@ index_template = """
             <a href="/login/"> Login </a>
         {% endif %}
         &nbsp&nbsp<a href="/blog/"> Blog </a>
+        &nbsp&nbsp<a href="/blog/sitemap.xml"> Sitemap</a>
     </body>
 </html>
 """

@@ -136,8 +136,12 @@ class SQLAStorage(Storage):
 
                 if sql_filter is not None:
                     select_statement = select_statement.where(sql_filter)
+                if count:
+                    select_statement = select_statement.limit(count)
+                if offset:
+                    select_statement = select_statement.offset(offset)
 
-                select_statement = select_statement.limit(count).offset(offset).order_by(ordering)
+                select_statement = select_statement.order_by(ordering)
                 result = conn.execute(select_statement).fetchall()
             except Exception as e:
                 self._logger.exception(str(e))

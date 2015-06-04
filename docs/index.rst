@@ -132,8 +132,9 @@ The ``BloggingEngine`` accepts an optional ``config`` ``dict`` argument which is
 the views. The keys that are currently supported include:
 
 =================== ===================================================
-SITE_NAME           The name of the blog to be used as the brand name
+SITENAME            The name of the blog to be used as the brand name
                     (default "Flask-Blogging")
+SITEURL             The url of the site.
 RENDER_TEXT         Boolean value to specify if the raw text should be
                     rendered or not. (default ``True``)
 DISQUS_SITENAME     Disqus sitename for comments (default ``None``)

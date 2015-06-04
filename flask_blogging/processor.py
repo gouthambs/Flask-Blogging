@@ -52,6 +52,7 @@ class PostProcessor(object):
         """
         post["slug"] = cls.create_slug(post["title"])
         post["editable"] = current_user.get_id() == post["user_id"]
+        post["url"] = cls.construct_url(post)
         if render:
             cls.render_text(post)
         cls.custom_process(post)

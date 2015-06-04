@@ -1,5 +1,5 @@
 from flask.ext.login import login_required, current_user
-from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
 import math
 
@@ -180,3 +180,17 @@ def delete(post_id):
     else:
         flash("You do not have the rights to delete this post", "warning")
     return redirect(url_for("blog_app.index"))
+
+
+@blog_app.route("/sitemap.xml")
+def sitemap():
+    blogging_engine = _get_blogging_engine(current_app)
+    storage = blogging_engine.storage
+    config = blogging_engine.config
+    posts = storage.get_posts(count=None, offset=None, recent=True, user_id=None, tag=None, include_draft=False)
+    for post in posts:
+        _process_post(post, blogging_engine, render=False)
+    sitemap_xml = render_template("blog/sitemap.xml", posts=posts, config=config)
+    response= make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
