@@ -79,7 +79,7 @@ def index(count, page):
     offset = meta["offset"]
 
     render = config.get("RENDER_TEXT", True)
-    posts = storage.get_posts(count=count, offset=offset)
+    posts = storage.get_posts(count=count, offset=offset, include_draft=False, tag=None, user_id=None, recent=True)
     for post in posts:
         _process_post(post, blogging_engine, render=render)
     return render_template("blog/index.html", posts=posts, meta=meta, config=config)
@@ -108,7 +108,7 @@ def posts_by_tag(tag, count, page):
     meta = _get_meta(storage, count, page, tag=tag)
     offset = meta["offset"]
 
-    posts = storage.get_posts(count=count, offset=offset, tag=tag)
+    posts = storage.get_posts(count=count, offset=offset, tag=tag, include_draft=False, user_id=None, recent=True)
     for post in posts:
         _process_post(post, blogging_engine)
     return render_template("blog/index.html", posts=posts, meta=meta, config=blogging_engine.config)
@@ -124,7 +124,7 @@ def posts_by_author(user_id, count, page):
     meta = _get_meta(storage, count, page, user_id=user_id)
     offset = meta["offset"]
 
-    posts = storage.get_posts(count=count, offset=offset, user_id=user_id)
+    posts = storage.get_posts(count=count, offset=offset, user_id=user_id, include_draft=False, tag=None, recent=True)
     if len(posts):
         for post in posts:
             _process_post(post, blogging_engine)

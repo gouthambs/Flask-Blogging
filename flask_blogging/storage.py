@@ -36,7 +36,7 @@ class Storage(object):
         """
         Get posts given by filter criteria
 
-        :param count: The number of posts to retrieve (default 10)
+        :param count: The number of posts to retrieve (default 10). If count is ``None``, all posts are returned.
         :type count: int
         :param offset: The number of posts to offset (default 0)
         :type offset: int
@@ -49,8 +49,8 @@ class Storage(object):
         :param include_draft: Whether to include posts marked as draft or not
         :type include_draft: bool
 
-        :return: A list of posts, with each element a dict containing values for the following keys: title, text, draft
-         post_date,
+        :return: A list of posts, with each element a dict containing values for the following keys: (title, text, draft
+         post_date, last_modified_date). If count is ``None``, then all the posts are returned.
         """
         raise NotImplementedError("This method needs to be implemented by the inheriting class")
 

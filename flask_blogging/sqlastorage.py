@@ -122,8 +122,8 @@ class SQLAStorage(Storage):
         :param include_draft: Whether to include posts marked as draft or not
         :type include_draft: bool
 
-        :return: A list of posts, with each element a dict containing values for the following keys: title, text, draft
-         post_date,
+        :return: A list of posts, with each element a dict containing values for the following keys: (title, text, draft
+         post_date, last_modified_date). If count is ``None``, then all the posts are returned.
         """
         ordering = sqla.desc(self._post_table.c.post_date) if recent \
             else self._post_table.c.post_date
