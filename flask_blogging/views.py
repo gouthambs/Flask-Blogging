@@ -37,10 +37,10 @@ def _store_form_data(blog_form, storage, user, post_id):
     return pid
 
 
-@blog_app.route("/", defaults={"count": 10, "offset": 0})
-@blog_app.route("/<int:count>/", defaults={"offset": 0})
-@blog_app.route("/<int:count>/<int:offset>/")
-def index(count, offset):
+@blog_app.route("/", defaults={"count": 10, "page": 1})
+@blog_app.route("/<int:count>/", defaults={"page": 1})
+@blog_app.route("/<int:count>/<int:page>/")
+def index(count, page):
     """
     Serves the page with a list of blog posts
 
@@ -48,6 +48,7 @@ def index(count, offset):
     :param offset:
     :return:
     """
+    offset = max(0, (page-1)*count)
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
@@ -73,11 +74,12 @@ def page_by_id(post_id, slug):
 
 
 
-@blog_app.route("/tag/<tag>/", defaults=dict(count=10, offset=0))
-@blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(offset=0))
-@blog_app.route("/tag/<tag>/<int:count>/<int:offset>/")
-def posts_by_tag(tag, count, offset):
+@blog_app.route("/tag/<tag>/", defaults=dict(count=10, page=1))
+@blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(page=1))
+@blog_app.route("/tag/<tag>/<int:count>/<int:page>/")
+def posts_by_tag(tag, count, page):
     meta = {}
+    offset = max(0, (page-1)*count)
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset, tag=tag)
@@ -86,10 +88,11 @@ def posts_by_tag(tag, count, offset):
     return render_template("blog/index.html", posts=posts, config=blogging_engine.config)
 
 
-@blog_app.route("/author/<user_id>/", defaults=dict(count=10, offset=0))
-@blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(offset=0))
-@blog_app.route("/author/<user_id>/<int:count>/<int:offset>/")
-def posts_by_author(user_id, count, offset):
+@blog_app.route("/author/<user_id>/", defaults=dict(count=10, page=1))
+@blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(page=1))
+@blog_app.route("/author/<user_id>/<int:count>/<int:page>/")
+def posts_by_author(user_id, count, page):
+    offset = max(0, (page-1)*count)
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id)

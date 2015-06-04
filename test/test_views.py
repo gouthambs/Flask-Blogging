@@ -60,7 +60,10 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog")
         self.assertEqual(response.status_code, 301)
 
-        response = self.client.get("/blog/10/10/")
+        response = self.client.get("/blog/5/")
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get("/blog/5/2/")
         self.assertEqual(response.status_code, 200)
 
     def test_post_by_id(self):
@@ -80,7 +83,7 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog/tag/hello/5/")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/blog/tag/hello/5/10/")
+        response = self.client.get("/blog/tag/hello/5/2/")
         self.assertEqual(response.status_code, 200)
 
     def test_post_by_author(self):
@@ -90,7 +93,7 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog/author/newuser/5/")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/blog/author/newuser/5/10/")
+        response = self.client.get("/blog/author/newuser/5/2/")
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get("/blog/author/nonexistent_user/")
