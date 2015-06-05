@@ -142,6 +142,28 @@ GOOGLE_ANALYTICS    Google analytics code for usage tracking
                     (default ``None``)
 =================== ===================================================
 
+Blog Views
+==========
+
+There are various views that are exposed through Flask-Blogging. If the ``url_prefix``
+argument in the BloggingEngine is ``/blog``, then the URL for the various views are:
+
+- ``/blog/`` (GET): The index blog posts with the first page of articles.
+- ``/blog/page/<post_id>/<optional slug>/`` (GET): The blog post corresponding to the ``post_id`` is retrieved.
+- ``/blog/tag/<tag_name/`` (GET): The list of blog posts corresponding to ``tag_name`` is returned.
+- ``/blog/author/<user_id>/`` (GET): The list of blog posts written by the author ``user_id`` is returned.
+- ``/blog/editor/``(GET, POST): The blog editor is shown. This view needs authentication.
+- ``/blog/delete/<post_id>/`` (POST): The blog post given by ``post_id`` is deleted. This view needs authentication.
+- ``/blog/sitemap.xml`` (GET): The sitemap with a link to all the posts is returned.
+
+The view can be easily customised by the user by overriding with their own templates. The template pages that need
+to be customized are:
+
+- ``blog/index.html``: The blog index page used to serve index of posts, posts by tag, and posts by author
+- ``blog/editor.html``: The blog editor page.
+- ``blog/page.html``: The page that shows the given article.
+- ``blog/sitemap.xml``: The sitemap for the blog posts.
+
 Screenshots
 ===========
 Blog Page
