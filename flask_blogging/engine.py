@@ -20,7 +20,7 @@ class BloggingEngine(object):
         storage = SQLAStorage(db_engine)
         blog_engine = BloggingEngine(app, storage)
     """
-    def __init__(self, app=None, storage=None, url_prefix=None, post_processor=None, config=None):
+    def __init__(self, app=None, storage=None, url_prefix=None, post_processor=None, config=None, extensions=None):
         """
 
         :param app: Optional app to use
@@ -34,14 +34,18 @@ class BloggingEngine(object):
         :param config: (optional) A dictionary of config values. See docs for the
          keys that can be specified.
         :type config: dict
-
+        :param extensions: A list of markdown extensions to add to post processing step.
+        :type extensions: list
         :return:
         """
         self.app = None
         self.storage = None
         self.url_prefix = url_prefix
         self.post_processor = PostProcessor() if post_processor is None else post_processor
+        if extensions:
+            self.post_processor.set_custom_extensions(extensions)
         self.user_callback = None
+
         self.config = {} if config is None else config
         if app is not None and storage is not None:
             self.init_app(app, storage)

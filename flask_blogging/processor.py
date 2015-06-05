@@ -38,7 +38,7 @@ class PostProcessor(object):
 
     @classmethod
     def render_text(cls, post):
-        md = markdown.Markdown(extensions=cls._markdown_extensions)
+        md = markdown.Markdown(extensions=cls.all_extensions())
         post["rendered_text"] = md.convert(post["text"])
         post["meta"] = md.Meta
 
@@ -68,3 +68,15 @@ class PostProcessor(object):
         :type post: dict
 
         """
+        pass
+
+    @classmethod
+    def all_extensions(cls):
+
+        return cls._markdown_extensions
+
+    @classmethod
+    def set_custom_extensions(cls, extensions):
+        assert type(extensions) == list
+        cls._markdown_extensions.append(cls._custom_extensions)
+

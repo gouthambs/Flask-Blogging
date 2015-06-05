@@ -142,6 +142,9 @@ GOOGLE_ANALYTICS    Google analytics code for usage tracking
                     (default ``None``)
 =================== ===================================================
 
+The ``BloggingEngine`` accepts an optional ``extensions`` argument. This is a list
+of ``Markdown`` extensions objects to be used during the markdown processing step.
+
 Blog Views
 ==========
 
