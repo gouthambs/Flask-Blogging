@@ -9,7 +9,7 @@ import sqlalchemy as sqla
 
 class TestSQLiteStorage(FlaskBloggingTestCase):
 
-    def _create_storage(self, db):
+    def _create_storage(self):
         temp_dir = tempfile.gettempdir()
         self._dbfile = os.path.join(temp_dir, "temp.db")
         engine = create_engine('sqlite:///'+self._dbfile)
@@ -17,7 +17,6 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
-        self._create_db()
         self._create_storage(self._db)
 
     def tearDown(self):
