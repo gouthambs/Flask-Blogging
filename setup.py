@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 
 def get_requirements(suffix=''):
-    with open('requirements%s.txt' % suffix) as f:
+    with open('Requirements%s.txt' % suffix) as f:
         rv = f.read().splitlines()
     return rv
 

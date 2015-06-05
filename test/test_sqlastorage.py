@@ -179,7 +179,6 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         p = self.storage.get_post_by_id(pid)
         self.assertIsNotNone(p)
 
-
     def test_get_post_by_id(self):
         pid1 = self.storage.save_post(title="Title1", text="Sample Text1", user_id="testuser", tags=["hello", "world"])
         pid2 = self.storage.save_post(title="Title2", text="Sample Text2", user_id="testuser",
@@ -255,7 +254,6 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
             ctr -= 1
         return
-
 
     def test_count_posts(self):
         for i in range(20):

@@ -100,10 +100,6 @@ class TestViews(FlaskBloggingTestCase):
         assert "No posts found for this user!" in response.data
 
     def test_editor_get(self):
-        """
-
-        :return:
-        """
         user_id = "testuser"
         with self.client:
             #access to editor should be forbidden before login
