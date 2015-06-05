@@ -1,13 +1,17 @@
+from setuptools import setup, find_packages
+import os
 """
 Flask-Blogging
--------------
+--------------
 
 """
-from setuptools import setup, find_packages
+
+BASE_PATH = os.path.dirname(__file__)
+print BASE_PATH
 
 
 def get_requirements(suffix=''):
-    with open('Requirements%s.txt' % suffix) as f:
+    with open(os.path.join(BASE_PATH, 'Requirements%s.txt' % suffix)) as f:
         rv = f.read().splitlines()
     return rv
 
