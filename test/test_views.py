@@ -187,5 +187,5 @@ class TestViews(FlaskBloggingTestCase):
     def test_atom(self):
         with self.client:
             # access to editor should be forbidden before login
-            response = self.client.get("/blog/all.atom.xml")
+            response = self.client.get("/blog/feeds/all.atom.xml")
             self.assertEqual(response.status_code, 200)
