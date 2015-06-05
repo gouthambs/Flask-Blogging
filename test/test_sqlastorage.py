@@ -3,20 +3,17 @@ __author__ = 'gbalaraman'
 import tempfile
 import os
 from flask_blogging.sqlastorage import SQLAStorage
-from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 from test import FlaskBloggingTestCase
 import sqlalchemy as sqla
 
 class TestSQLiteStorage(FlaskBloggingTestCase):
 
-    def _create_db(self):
+    def _create_storage(self, db):
         temp_dir = tempfile.gettempdir()
         self._dbfile = os.path.join(temp_dir, "temp.db")
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+self._dbfile
-        self._db = SQLAlchemy(self.app)
-
-    def _create_storage(self, db):
-        self.storage = SQLAStorage(db.engine)
+        engine = create_engine('sqlite:///'+self._dbfile)
+        self.storage = SQLAStorage(engine)
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
