@@ -2,6 +2,8 @@ from flask.ext.login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
 import math
+from werkzeug.contrib.atom import AtomFeed
+
 
 blog_app = Blueprint("blog_app", __name__, template_folder='templates')
 
@@ -20,8 +22,9 @@ def _process_post(post, blogging_engine, author=None, render=True):
     post_processor.process(post, render)
     if author is None:
         if blogging_engine.user_callback is None:
-            raise Exception("No user_loader has been installed for this BloggingEngine."
-                            " Add one with the 'BloggingEngine.user_loader' decorator.")
+            raise Exception("No user_loader has been installed for this "
+                            "BloggingEngine. Add one with the "
+                            "'BloggingEngine.user_loader' decorator.")
         author = blogging_engine.user_callback(post["user_id"])
     if author is not None:
         post["user_name"] = _get_user_name(author)
@@ -194,10 +197,36 @@ def sitemap():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
-    posts = storage.get_posts(count=None, offset=None, recent=True, user_id=None, tag=None, include_draft=False)
+    posts = storage.get_posts(count=None, offset=None, recent=True,
+                              user_id=None, tag=None, include_draft=False)
     for post in posts:
         _process_post(post, blogging_engine, render=False)
-    sitemap_xml = render_template("blog/sitemap.xml", posts=posts, config=config)
-    response= make_response(sitemap_xml)
+    sitemap_xml = render_template("blog/sitemap.xml", posts=posts,
+                                  config=config)
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
+@blog_app.route('/all.atom.xml')
+def recent_feed():
+    blogging_engine = _get_blogging_engine(current_app)
+    storage = blogging_engine.storage
+    config = blogging_engine.config
+    posts = storage.get_posts(count=None, offset=None, recent=True,
+                              user_id=None, tag=None, include_draft=False)
+    feed = AtomFeed(
+        '%s - All Articles' % config.get("SITENAME", "Flask-Blogging"),
+        feed_url=request.url, url=request.url_root, generator=None)
+
+    for post in posts:
+        _process_post(post, blogging_engine, render=True)
+        feed.add(post["title"], unicode(post["rendered_text"]),
+                 content_type='html',
+                 author=post["user_name"],
+                 url=config.get("SITEURL", "")+post["url"],
+                 updated=post["last_modified_date"],
+                 published=post["post_date"])
+    response = feed.get_response()
     response.headers["Content-Type"] = "application/xml"
     return response

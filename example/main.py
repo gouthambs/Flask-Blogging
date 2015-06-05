@@ -38,7 +38,7 @@ index_template = """
             <a href="/login/"> Login </a>
         {% endif %}
         &nbsp&nbsp<a href="/blog/"> Blog </a>
-        &nbsp&nbsp<a href="/blog/sitemap.xml"> Sitemap</a>
+        &nbsp&nbsp<a href="/blog/sitemap.xml">Sitemap</a>
     </body>
 </html>
 """

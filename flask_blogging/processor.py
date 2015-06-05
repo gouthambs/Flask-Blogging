@@ -14,10 +14,12 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):
         node.text = markdown.util.AtomicString(m.group(2) + m.group(3) + m.group(2))
         return node
 
+
 class MathJaxExtension(markdown.Extension):
     def extendMarkdown(self, md, md_globals):
         # Needs to come before escape matching because \ is pretty important in LaTeX
         md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
+
 
 def makeExtension(configs=[]):
     return MathJaxExtension(configs)
@@ -33,7 +35,8 @@ class PostProcessor(object):
 
     @classmethod
     def construct_url(cls, post):
-        url = url_for("blog_app.page_by_id", post_id=post["post_id"], slug=cls.create_slug(post["title"]))
+        url = url_for("blog_app.page_by_id", post_id=post["post_id"],
+                      slug=cls.create_slug(post["title"]))
         return url
 
     @classmethod
@@ -61,18 +64,17 @@ class PostProcessor(object):
     @classmethod
     def custom_process(cls, post):
         """
-        Override this method to add additional processes. The result is that the
-        ``post`` dict is modified or enhanced with newer key value pairs.
+        Override this method to add additional processes. The result is that
+        the ``post`` dict is modified or enhanced with newer key value pairs.
 
-        :param post: The post data with values for keys such as title, text, tags etc.
+        :param post: The post data with values for keys such as title, text,
+         tags etc.
         :type post: dict
-
         """
         pass
 
     @classmethod
     def all_extensions(cls):
-
         return cls._markdown_extensions
 
     @classmethod

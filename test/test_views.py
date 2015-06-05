@@ -177,3 +177,15 @@ class TestViews(FlaskBloggingTestCase):
 
     def logout(self):
         return self.client.get("/logout/")
+
+    def test_sitemap(self):
+        with self.client:
+            # access to editor should be forbidden before login
+            response = self.client.get("/blog/sitemap.xml")
+            self.assertEqual(response.status_code, 200)
+
+    def test_atom(self):
+        with self.client:
+            # access to editor should be forbidden before login
+            response = self.client.get("/blog/all.atom.xml")
+            self.assertEqual(response.status_code, 200)

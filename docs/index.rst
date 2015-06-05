@@ -10,14 +10,26 @@ Flask-Blogging
 Flask-Blogging is a Flask extension for adding blog support to your site.
 It provides a flexible mechanism to store the data in the database
 of your choice. It is meant to work with the authentication
-provided by packages such as `Flask-Login <https://flask-login.readthedocs.org/en/latest/>`_
-or `Flask-Security <https://pythonhosted.org/Flask-Security/>`_.
+provided by packages such as
+`Flask-Login <https://flask-login.readthedocs.org/en/latest/>`_ or
+`Flask-Security <https://pythonhosted.org/Flask-Security/>`_.
 
 The philosophy behind this extension is to provide a lean app based on markdown
 to provide blog support to your existing web application. This is contrary
 to some other packages such as that are just blogs. If you already have a
 web app and you need to have a blog to communicate with your user or to
 promote your site through content based marketing.
+
+Out of the box Flask-Blogging has support for the following:
+
+- Bootstrap based site
+- Markdown based blog editor
+- Models to store blog
+- Authentication of User's choice
+- Sitemap, ATOM support
+- Disqus support for comments
+- Google analytics for usage tracking
+- Well documented, tested, and extensible design
 
 .. contents::
    :local:
@@ -30,7 +42,8 @@ Quick Start Example
 
     from flask import Flask, render_template_string, redirect
     from sqlalchemy import create_engine
-    from flask.ext.login import UserMixin, LoginManager, login_user, logout_user
+    from flask.ext.login import UserMixin, LoginManager, \
+        login_user, logout_user
     from flask_blogging import SQLAStorage, BloggingEngine
 
     app = Flask(__name__)
@@ -61,11 +74,12 @@ Quick Start Example
         <head> </head>
         <body>
             {% if current_user.is_authenticated() %}
-                <a href="/logout/"> Logout </a>
+                <a href="/logout/">Logout</a>
             {% else %}
-                <a href="/login/"> Login </a>
+                <a href="/login/">Login</a>
             {% endif %}
-            &nbsp&nbsp<a href="/blog/"> Blog </a>
+            &nbsp&nbsp<a href="/blog/">Blog</a>
+            &nbsp&nbsp<a href="/blog/sitemap.xml">Sitemap</a>
         </body>
     </html>
     """
@@ -107,8 +121,8 @@ You also need to pick the storage for blog. That can be done as::
     engine = create_engine("sqlite:////tmp/sqlite.db")
     storage = SQLAStorage(engine)
 
-Once you have created the blogging engine and the storage, you can connect with your app using
-the `init_app` method as shown below::
+Once you have created the blogging engine and the storage, you can connect
+with your app using the `init_app` method as shown below::
 
    blogging_engine.init_app(app, storage)
 
