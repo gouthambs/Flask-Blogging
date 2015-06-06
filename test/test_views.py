@@ -8,6 +8,7 @@ from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
 from flask_login import UserMixin
 
+
 class TestUser(UserMixin):
     def __init__(self, user_id):
         self.id = user_id
@@ -25,7 +26,8 @@ class TestViews(FlaskBloggingTestCase):
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
-        self.engine = BloggingEngine(self.app, self.storage, url_prefix="/blog")
+        self.engine = BloggingEngine(self.app, self.storage,
+                                     url_prefix="/blog")
         self.login_manager = LoginManager(self.app)
 
         @self.login_manager.user_loader
@@ -46,8 +48,9 @@ class TestViews(FlaskBloggingTestCase):
 
         for i in range(20):
             tags = ["hello"] if i < 10 else ["world"]
-            user = "testuser" if i<10 else "newuser"
-            self.storage.save_post(title="Sample Title%d" % i, text="Sample Text%d" % i,
+            user = "testuser" if i < 10 else "newuser"
+            self.storage.save_post(title="Sample Title%d" % i,
+                                   text="Sample Text%d" % i,
                                    user_id=user, tags=tags)
 
     def tearDown(self):
@@ -115,11 +118,13 @@ class TestViews(FlaskBloggingTestCase):
             assert response.status_code == 200
 
             for i in range(1, 21):
-                # logged in user can edit their post, and will be redirected if they try to edit other's post
+                # logged in user can edit their post, and will be redirected
+                # if they try to edit other's post
                 response = self.client.get("/blog/editor/%d/" % i)
-                expected_status_code = 200 if i<=10 else 302
-                self.assertEqual(response.status_code, expected_status_code, "Error for item %d %d"\
-                                 % (i, response.status_code))
+                expected_status_code = 200 if i <= 10 else 302
+                self.assertEqual(response.status_code, expected_status_code,
+                                 "Error for item %d %d" %
+                                 (i, response.status_code))
             # logout and the access should be gone again
             self.logout()
             response = self.client.get("/blog/editor/")
@@ -132,8 +137,10 @@ class TestViews(FlaskBloggingTestCase):
         user_id = "testuser"
         with self.client:
             # access to editor should be forbidden before login
-            response = self.client.get("/blog/page/21/", follow_redirects=True)
-            assert "The page you are trying to access is not valid!" in response.data
+            response = self.client.get("/blog/page/21/",
+                                       follow_redirects=True)
+            assert "The page you are trying to access is not valid!" \
+                   in response.data
 
             response = self.client.post("/blog/editor/")
             self.assertEqual(response.status_code, 401)
@@ -144,11 +151,16 @@ class TestViews(FlaskBloggingTestCase):
             self.login(user_id)
             self.assertEquals(current_user.get_id(), user_id)
 
-            response = self.client.post("/blog/editor/", data=dict(text="Test Text", tags="tag1, tag2"))
-            self.assertEqual(response.status_code, 200)  # should give back the editor page
+            response = self.client.post("/blog/editor/",
+                                        data=dict(text="Test Text",
+                                                  tags="tag1, tag2"))
+            # should give back the editor page
+            self.assertEqual(response.status_code, 200)
 
             response = self.client.post("/blog/editor/",
-                                        data=dict(title="Test Title",text="Test Text", tags="tag1, tag2"))
+                                        data=dict(title="Test Title",
+                                                  text="Test Text",
+                                                  tags="tag1, tag2"))
             self.assertEqual(response.status_code, 302)
 
             response = self.client.get("/blog/page/21/")
@@ -165,11 +177,14 @@ class TestViews(FlaskBloggingTestCase):
             # a user cannot delete another person's post
             self.login(user_id)
             self.assertEquals(current_user.get_id(), user_id)
-            response = self.client.post("/blog/delete/11/", follow_redirects=True)
-            assert "You do not have the rights to delete this post" in response.data
+            response = self.client.post("/blog/delete/11/",
+                                        follow_redirects=True)
+            assert "You do not have the rights to delete this post" in \
+                   response.data
 
             # a user can delete his posts
-            response = self.client.post("/blog/delete/1/", follow_redirects=True)
+            response = self.client.post("/blog/delete/1/",
+                                        follow_redirects=True)
             assert "Your post was successfully deleted" in response.data
 
     def login(self, user_id):

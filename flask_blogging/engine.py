@@ -20,28 +20,34 @@ class BloggingEngine(object):
         storage = SQLAStorage(db_engine)
         blog_engine = BloggingEngine(app, storage)
     """
-    def __init__(self, app=None, storage=None, url_prefix=None, post_processor=None, config=None, extensions=None):
+    def __init__(self, app=None, storage=None, url_prefix=None,
+                 post_processor=None, config=None, extensions=None):
         """
 
         :param app: Optional app to use
         :type app: object
-        :param storage: The blog storage instance that implements the ``Storage`` class interface.
+        :param storage: The blog storage instance that implements the
+         ``Storage`` class interface.
         :type storage: object
-        :param url_prefix: (optional) The prefix for the URL of blog posts (default ``None``)
+        :param url_prefix: (optional) The prefix for the URL of blog posts
+         (default ``None``)
         :type url_prefix: str
-        :param post_processor: (optional) The post processor object. If none provided, the default is used.
+        :param post_processor: (optional) The post processor object. If none
+         provided, the default post processor is used.
         :type post_processor: object
-        :param config: (optional) A dictionary of config values. See docs for the
-         keys that can be specified.
+        :param config: (optional) A dictionary of config values. See docs for
+         the keys that can be specified.
         :type config: dict
-        :param extensions: A list of markdown extensions to add to post processing step.
+        :param extensions: A list of markdown extensions to add to post
+         processing step.
         :type extensions: list
         :return:
         """
         self.app = None
         self.storage = None
         self.url_prefix = url_prefix
-        self.post_processor = PostProcessor() if post_processor is None else post_processor
+        self.post_processor = PostProcessor() if post_processor is None \
+            else post_processor
         if extensions:
             self.post_processor.set_custom_extensions(extensions)
         self.user_callback = None
@@ -55,7 +61,8 @@ class BloggingEngine(object):
         Initialize the engine.
 
         :param app: The app to use
-        :param storage: The blog storage instance that implements the ``Storage`` class interface.
+        :param storage: The blog storage instance that implements the
+         ``Storage`` class interface.
         """
         self.app = app
         self.storage = storage
@@ -67,7 +74,8 @@ class BloggingEngine(object):
         """
         The decorator for loading the user.
 
-        :param callback: The callback function that can load a user given a unicode ``user_id``.
+        :param callback: The callback function that can load a user given a
+         unicode ``user_id``.
         :return: The callback function
         """
         self.user_callback = callback

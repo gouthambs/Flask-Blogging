@@ -2,8 +2,9 @@
 [![Build Status](https://travis-ci.org/gouthambs/Flask-Blogging.svg?branch=master)](https://travis-ci.org/gouthambs/Flask-Blogging)
 
 
-This is a Flask extension for adding blog support to your site. Please
-see [Flask-Blogging documentation](http://flask-blogging.readthedocs.org/en/latest/)
+This is a Flask extension for adding blog support to your site using Markdown.
+Please see
+[Flask-Blogging documentation](http://flask-blogging.readthedocs.org/en/latest/)
 for more details.
 
 ## Screenshots

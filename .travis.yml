@@ -5,3 +5,4 @@ install:
   - pip install -e . --use-mirrors
 script:
   - nosetests -v
+  - pep8 --repeat flask_blogging/ test/

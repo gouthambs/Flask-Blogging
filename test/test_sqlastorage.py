@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from test import FlaskBloggingTestCase
 import sqlalchemy as sqla
 
+
 class TestSQLiteStorage(FlaskBloggingTestCase):
 
     def _create_storage(self):
@@ -30,7 +31,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             metadata.reflect(bind=self._engine)
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
-            expected_columns = ['id', 'title', 'text', 'post_date', 'last_modified_date', 'draft']
+            expected_columns = ['id', 'title', 'text', 'post_date',
+                                'last_modified_date', 'draft']
             self.assertListEqual(columns, expected_columns)
 
     def test_tag_table_exists(self):
@@ -68,7 +70,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
 
     def test_user_post_table_consistency(self):
         # check if the user post table updates the user_id
-        user_id = 1; post_id = 5
+        user_id = 1
+        post_id = 5
         with self._engine.begin() as conn:
             self.storage._save_user_post(user_id, post_id, conn)
             statement = sqla.select([self.storage._user_posts_table])
@@ -102,14 +105,14 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         with self._engine.begin() as conn:
             self.storage._save_tags(tags, post_id, conn)
             statement = sqla.select([self.storage._tag_posts_table]).\
-                where(self.storage._tag_posts_table.c.post_id==post_id)
+                where(self.storage._tag_posts_table.c.post_id == post_id)
             result = conn.execute(statement).fetchall()
             self.assertEqual(len(result), 2)
 
             tags.pop()
             self.storage._save_tags(tags, post_id, conn)
             statement = sqla.select([self.storage._tag_posts_table]).\
-                where(self.storage._tag_posts_table.c.post_id==post_id)
+                where(self.storage._tag_posts_table.c.post_id == post_id)
             result = conn.execute(statement).fetchall()
             self.assertEqual(len(result), 1)
 
@@ -147,13 +150,19 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.test_user_post_table_exists()
 
     def test_save_post(self):
-        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"])
-        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"], post_id=1)
+        pid = self.storage.save_post(title="Title1", text="Sample Text",
+                                     user_id="testuser",
+                                     tags=["hello", "world"])
+        pid = self.storage.save_post(title="Title1", text="Sample Text",
+                                     user_id="testuser",
+                                     tags=["hello", "world"], post_id=1)
         p = self.storage.get_post_by_id(2)
         self.assertIsNone(p)
 
         # invalid post_id will be treated as inserts
-        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"],
+        pid = self.storage.save_post(title="Title1", text="Sample Text",
+                                     user_id="testuser",
+                                     tags=["hello", "world"],
                                      post_id=5)
         self.assertNotEqual(pid, 5)
         self.assertEqual(pid, 2)
@@ -162,7 +171,9 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
 
     def test_delete_post(self):
         # insert, check exists, delete, check doesn't exist anymore
-        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"])
+        pid = self.storage.save_post(title="Title1", text="Sample Text",
+                                     user_id="testuser",
+                                     tags=["hello", "world"])
         p = self.storage.get_post_by_id(pid)
         self.assertIsNotNone(p)
         self.storage.delete_post(pid)
@@ -170,21 +181,28 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.assertIsNone(p)
 
         # insert again.
-        pid = self.storage.save_post(title="Title1", text="Sample Text", user_id="testuser",tags=["hello", "world"],
+        pid = self.storage.save_post(title="Title1", text="Sample Text",
+                                     user_id="testuser",
+                                     tags=["hello", "world"],
                                      post_id=1)
         p = self.storage.get_post_by_id(pid)
         self.assertIsNotNone(p)
 
     def test_get_post_by_id(self):
-        pid1 = self.storage.save_post(title="Title1", text="Sample Text1", user_id="testuser", tags=["hello", "world"])
-        pid2 = self.storage.save_post(title="Title2", text="Sample Text2", user_id="testuser",
+        pid1 = self.storage.save_post(title="Title1", text="Sample Text1",
+                                      user_id="testuser",
+                                      tags=["hello", "world"])
+        pid2 = self.storage.save_post(title="Title2", text="Sample Text2",
+                                      user_id="testuser",
                                       tags=["hello", "my", "world"])
 
         post = self.storage.get_post_by_id(pid1)
-        self._assert_post(post, "Title1", "Sample Text1", "testuser", ["HELLO", "WORLD"])
+        self._assert_post(post, "Title1", "Sample Text1", "testuser",
+                          ["HELLO", "WORLD"])
 
         post = self.storage.get_post_by_id(pid2)
-        self._assert_post(post, "Title2", "Sample Text2", "testuser", ["HELLO", "MY", "WORLD"])
+        self._assert_post(post, "Title2", "Sample Text2", "testuser",
+                          ["HELLO", "MY", "WORLD"])
 
     def _assert_post(self, post, title, text, user_id, tags):
         tags = set([t.upper() for t in tags])
@@ -196,21 +214,25 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
     def test_get_posts(self):
         for i in range(20):
             tags = ["hello"] if i < 10 else ["world"]
-            user = "testuser" if i<10 else "newuser"
-            self.storage.save_post(title="Title%d" % i, text="Sample Text%d" % i, user_id=user,tags=tags)
+            user = "testuser" if i < 10 else "newuser"
+            self.storage.save_post(title="Title%d" % i,
+                                   text="Sample Text%d" % i,
+                                   user_id=user, tags=tags)
         # test default queries
         posts = self.storage.get_posts()
         self.assertEqual(len(posts), 10)
         ctr = 19
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "newuser", ["world"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "newuser", ["world"])
             ctr -= 1
 
         posts = self.storage.get_posts(recent=False)
         self.assertEqual(len(posts), 10)
         ctr = 0
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "testuser", ["hello"])
             ctr += 1
 
         # test count and offset
@@ -218,7 +240,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.assertEqual(len(posts), 5)
         ctr = 5
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "testuser", ["hello"])
             ctr += 1
 
         # test tag feature
@@ -226,13 +249,15 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.assertEqual(len(posts), 10)
         ctr = 0
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "testuser", ["hello"])
             ctr += 1
         posts = self.storage.get_posts(tag="world", recent=False)
         self.assertEqual(len(posts), 10)
         ctr = 10
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "newuser", ["world"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "newuser", ["world"])
             ctr += 1
 
         # test user_id feature
@@ -240,22 +265,26 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.assertEqual(len(posts), 10)
         ctr = 19
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "newuser", ["world"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "newuser", ["world"])
             ctr -= 1
 
         posts = self.storage.get_posts(user_id="testuser", recent=True)
         self.assertEqual(len(posts), 10)
         ctr = 9
         for post in posts:
-            self._assert_post(post, "Title%d" % ctr, "Sample Text%d" % ctr, "testuser", ["hello"])
+            self._assert_post(post, "Title%d" % ctr,
+                              "Sample Text%d" % ctr, "testuser", ["hello"])
             ctr -= 1
         return
 
     def test_count_posts(self):
         for i in range(20):
             tags = ["hello"] if i < 10 else ["world"]
-            user = "testuser" if i<10 else "newuser"
-            self.storage.save_post(title="Title%d" % i, text="Sample Text%d" % i, user_id=user,tags=tags)
+            user = "testuser" if i < 10 else "newuser"
+            self.storage.save_post(title="Title%d" % i,
+                                   text="Sample Text%d" % i,
+                                   user_id=user, tags=tags)
 
         count = self.storage.count_posts()
         self.assertEqual(count, 20)
