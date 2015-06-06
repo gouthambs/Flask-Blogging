@@ -1,7 +1,7 @@
-__author__ = 'gbalaraman'
-
 import unittest
 from flask import Flask
+
+__author__ = 'gbalaraman'
 
 
 class FlaskBloggingTestCase(unittest.TestCase):

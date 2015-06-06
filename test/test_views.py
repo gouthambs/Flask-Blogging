@@ -105,7 +105,7 @@ class TestViews(FlaskBloggingTestCase):
     def test_editor_get(self):
         user_id = "testuser"
         with self.client:
-            #access to editor should be forbidden before login
+            # access to editor should be forbidden before login
             response = self.client.get("/blog/editor/")
             self.assertEqual(response.status_code, 401)
 

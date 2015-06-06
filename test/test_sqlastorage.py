@@ -1,5 +1,3 @@
-__author__ = 'gbalaraman'
-
 import tempfile
 import os
 from flask_blogging.sqlastorage import SQLAStorage
