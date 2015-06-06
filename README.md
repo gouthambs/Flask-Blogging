@@ -20,7 +20,7 @@ for more details.
 from flask import Flask, render_template_string, redirect
 from sqlalchemy import create_engine
 from flask.ext.login import UserMixin, LoginManager, login_user, logout_user
-from flask_blogging import SQLAStorage, BloggingEngine
+from flask.ext.blogging import SQLAStorage, BloggingEngine
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
