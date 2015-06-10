@@ -2,7 +2,7 @@ language: python
 python:
   - 2.7
 before_script:
-  - mysql -e 'create database track_blogging;'
+  - mysql -e 'create database flask_blogging;'
 install:
   - pip install -e .
   - pip install coverage pep8 mysql-python
