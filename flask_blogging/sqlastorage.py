@@ -284,7 +284,7 @@ class SQLAStorage(Storage):
                 tag_post_statement = self._tag_posts_table.insert().values(
                     tag_id=tag_id, post_id=post_id)
                 conn.execute(tag_post_statement)
-            except sqla.exc.IntegrityError:
+            except sqla.exc.IntegrityError as e:
                 pass
             except Exception as e:
                 self._logger.exception(str(e))
