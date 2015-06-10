@@ -104,20 +104,18 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         # check that when tag is updated, the posts get updated
         tags = ["hello", "world"]
         pid = self.storage.save_post(title="Title", text="Sample Text",
-                               user_id="user", tags=tags)
+                                     user_id="user", tags=tags)
         post = self.storage.get_post_by_id(pid)
         self.assertEqual(len(post["tags"]), 2)
         tags.pop()
         pid = self.storage.save_post(title="Title", text="Sample Text",
-                               user_id="user", tags=tags, post_id=pid)
+                                     user_id="user", tags=tags, post_id=pid)
         post = self.storage.get_post_by_id(pid)
         self.assertEqual(len(post["tags"]), 1)
 
-
     def test_tag_post_uniqueness(self):
-        self.storage.save_post(title="Title",
-                                   text="Sample Text",
-                                   user_id="user", tags=["tags"])
+        self.storage.save_post(title="Title", text="Sample Text",
+                               user_id="user", tags=["tags"])
         table_name = "tag_posts"
         metadata = sqla.MetaData()
         metadata.reflect(bind=self._engine)
@@ -210,15 +208,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.assertEqual(post["user_id"], user_id)
 
     def test_get_posts(self):
-        #for i in range(20):
-        #    tags = ["hello"] if i < 10 else ["world"]
-        #    user = "testuser" if i < 10 else "newuser"
-        #    self.storage.save_post(title="Title%d" % i,
-        #                           text="Sample Text%d" % i,
-        #                           user_id=user, tags=tags)
-
         self._create_dummy_data()
-
 
         # test default queries
         posts = self.storage.get_posts()
@@ -281,13 +271,6 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         return
 
     def test_count_posts(self):
-        #for i in range(20):
-        #    tags = ["hello"] if i < 10 else ["world"]
-        #    user = "testuser" if i < 10 else "newuser"
-        #    self.storage.save_post(title="Title%d" % i,
-        #                           text="Sample Text%d" % i,
-        #                           user_id=user, tags=tags)
-
         self._create_dummy_data()
 
         count = self.storage.count_posts()
