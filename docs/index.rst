@@ -192,7 +192,13 @@ Blog Editor
 -----------
 .. image:: _static/blog_editor.png
 
+Useful Tips
+===========
+- If you use ``psycopg2`` driver for Postgres while using the ``SQLAStorage``
+  you would need to have ``autocommit`` turned on while creating the engine::
 
+    create_engine("postgresql+psycopg2://postgres:@localhost/flask_blogging",
+                  isolation_level="AUTOCOMMIT")
 
 API Documentation
 =================

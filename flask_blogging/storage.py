@@ -18,10 +18,11 @@ class Storage(object):
         :type tags: list
         :param draft: If the post is a draft of if needs to be published.
         :type draft: bool
-        :param post_date: (Optional) The date the blog was posted
+        :param post_date: (Optional) The date the blog was posted (default
+         datetime.datetime.utcnow())
         :type post_date: datetime.datetime
         :param last_modified_date: (Optional) The date when blog was last
-         modified
+         modified  (default datetime.datetime.utcnow())
         :type last_modified_date: datetime.datetime
         :param meta_data: The meta data for the blog post
         :type meta_data: dict

@@ -48,10 +48,11 @@ class SQLAStorage(Storage):
         :param draft: (Optional) If the post is a draft of if needs to be
          published. (default ``False``)
         :type draft: bool
-        :param post_date: (Optional) The date the blog was posted
+        :param post_date: (Optional) The date the blog was posted (default
+         datetime.datetime.utcnow() )
         :type post_date: datetime.datetime
         :param last_modified_date: (Optional) The date when blog was last
-         modified
+         modified  (default datetime.datetime.utcnow() )
         :type last_modified_date: datetime.datetime
         :param post_id: (Optional) The post identifier. This should be ``None``
          for an insert call,
