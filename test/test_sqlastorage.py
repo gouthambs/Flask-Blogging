@@ -11,7 +11,11 @@ try:
     HAS_MYSQL = True
 except ImportError:
     HAS_MYSQL = False
-
+try:
+    import psycopg2
+    HAS_POSTGRES = True
+except ImportError:
+    HAS_POSTGRES = False
 
 class TestSQLiteStorage(FlaskBloggingTestCase):
 
@@ -314,6 +318,20 @@ class TestMySQLStorage(TestSQLiteStorage):
     def _create_storage(self):
         self._engine = create_engine(
             "mysql+mysqldb://root:@localhost/flask_blogging")
+        self.storage = SQLAStorage(self._engine)
+
+    def tearDown(self):
+        metadata = sqla.MetaData()
+        metadata.reflect(bind=self._engine)
+        metadata.drop_all(bind=self._engine)
+
+
+@unittest.skipUnless(HAS_POSTGRES, "Requires psycopg2 Postgres package")
+class TestPostgresStorage(TestSQLiteStorage):
+
+    def _create_storage(self):
+        self._engine = create_engine(
+            "postgresql+psycopg2://postgres:@localhost/flask_blogging")
         self.storage = SQLAStorage(self._engine)
 
     def tearDown(self):
