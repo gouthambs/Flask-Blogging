@@ -29,7 +29,9 @@ class SQLAStorage(Storage):
         self._table_prefix = table_prefix
         self._create_all_tables()
 
-    def save_post(self, title, text, user_id, tags, draft=False, post_id=None):
+    def save_post(self, title, text, user_id, tags, draft=False,
+                  post_date=None, last_modified_date=None, meta_data=None,
+                  post_id=None):
         """
         Persist the blog post data. If ``post_id`` is ``None`` or ``post_id``
         is invalid, the post must be inserted into the storage. If ``post_id``
@@ -46,6 +48,11 @@ class SQLAStorage(Storage):
         :param draft: (Optional) If the post is a draft of if needs to be
          published. (default ``False``)
         :type draft: bool
+        :param post_date: (Optional) The date the blog was posted
+        :type post_date: datetime.datetime
+        :param last_modified_date: (Optional) The date when blog was last
+         modified
+        :type last_modified_date: datetime.datetime
         :param post_id: (Optional) The post identifier. This should be ``None``
          for an insert call,
          and a valid value for update. (default ``None``)
@@ -57,6 +64,10 @@ class SQLAStorage(Storage):
         new_post = post_id is None
         current_datetime = datetime.datetime.utcnow()
         draft = 1 if draft is True else 0
+        post_date = post_date if post_date is not None else current_datetime
+        last_modified_date = last_modified_date if last_modified_date is not \
+            None else current_datetime
+
         with self._engine.begin() as conn:
             try:
                 if post_id is not None:  # validate post_id
@@ -70,8 +81,8 @@ class SQLAStorage(Storage):
                     self._post_table.update().where(
                         self._post_table.c.id == post_id)
                 post_statement = post_statement.values(
-                    title=title, text=text, post_date=current_datetime,
-                    last_modified_date=current_datetime, draft=draft
+                    title=title, text=text, post_date=post_date,
+                    last_modified_date=last_modified_date, draft=draft
                 )
 
                 post_result = conn.execute(post_statement)

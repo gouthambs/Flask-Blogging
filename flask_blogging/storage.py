@@ -1,6 +1,8 @@
 class Storage(object):
 
-    def save_post(self, title, text, user_id, tags, draft=False, post_id=None):
+    def save_post(self, title, text, user_id, tags, draft=False,
+                  post_date=None, last_modified_date=None, meta_data=None,
+                  post_id=None):
         """
         Persist the blog post data. If ``post_id`` is ``None`` or ``post_id``
         is invalid, the post must be inserted into the storage. If ``post_id``
@@ -16,6 +18,13 @@ class Storage(object):
         :type tags: list
         :param draft: If the post is a draft of if needs to be published.
         :type draft: bool
+        :param post_date: (Optional) The date the blog was posted
+        :type post_date: datetime.datetime
+        :param last_modified_date: (Optional) The date when blog was last
+         modified
+        :type last_modified_date: datetime.datetime
+        :param meta_data: The meta data for the blog post
+        :type meta_data: dict
         :param post_id: The post identifier. This should be ``None`` for an
          insert call, and a valid value for update.
         :type post_id: int

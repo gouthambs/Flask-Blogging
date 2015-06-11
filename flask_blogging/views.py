@@ -4,6 +4,7 @@ from flask import Blueprint, current_app, render_template, request, redirect, \
 from flask_blogging.forms import BlogEditor
 import math
 from werkzeug.contrib.atom import AtomFeed
+import datetime
 
 
 blog_app = Blueprint("blog_app", __name__, template_folder='templates')
@@ -31,13 +32,18 @@ def _process_post(post, blogging_engine, author=None, render=True):
         post["user_name"] = _get_user_name(author)
 
 
-def _store_form_data(blog_form, storage, user, post_id):
+def _store_form_data(blog_form, storage, user, post):
     title = blog_form.title.data
     text = blog_form.text.data
     tags = blog_form.tags.data.split(",")
     draft = blog_form.draft.data
     user_id = user.get_id()
-    pid = storage.save_post(title, text, user_id, tags, draft, post_id)
+    current_datetime = datetime.datetime.utcnow()
+    post_date = post.get("post_date", current_datetime)
+    last_modified_date = datetime.datetime.utcnow()
+    post_id = post.get("post_id")
+    pid = storage.save_post(title, text, user_id, tags, draft, post_date,
+                            last_modified_date, post_id)
     return pid
 
 
@@ -171,8 +177,15 @@ def editor(post_id):
     if request.method == 'POST':
         form = BlogEditor(request.form)
         if form.validate():
-            pid = _store_form_data(form, storage, current_user, post_id)
-            flash("Blog post posted successfully!", "info")
+            post = storage.get_post_by_id(post_id)
+            if (post is not None) and \
+                    (current_user.get_id() == post["user_id"]) and \
+                    (post["post_id"] == post_id):
+                pass
+            else:
+                post = {}
+            pid = _store_form_data(form, storage, current_user, post)
+            flash("Blog posted successfully!", "info")
             slug = post_processor.create_slug(form.title.data)
             return redirect(url_for("blog_app.page_by_id", post_id=pid,
                                     slug=slug))
