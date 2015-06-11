@@ -17,6 +17,7 @@ try:
 except ImportError:
     HAS_POSTGRES = False
 
+
 class TestSQLiteStorage(FlaskBloggingTestCase):
 
     def _create_storage(self):

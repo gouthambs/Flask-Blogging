@@ -275,6 +275,7 @@ class SQLAStorage(Storage):
                 result = conn.execute(tag_insert_statement)
                 tag_id = result.inserted_primary_key[0]
             except sqla.exc.IntegrityError as e:
+                conn.rollback()
                 tag_select_statement = sqla.select([self._tag_table]).where(
                     self._tag_table.c.text == tag)
                 result = conn.execute(tag_select_statement).fetchone()
@@ -285,6 +286,7 @@ class SQLAStorage(Storage):
                     tag_id=tag_id, post_id=post_id)
                 conn.execute(tag_post_statement)
             except sqla.exc.IntegrityError as e:
+                conn.rollback()
                 pass
             except Exception as e:
                 self._logger.exception(str(e))
