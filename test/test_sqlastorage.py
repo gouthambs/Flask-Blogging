@@ -332,7 +332,8 @@ class TestPostgresStorage(TestSQLiteStorage):
 
     def _create_storage(self):
         self._engine = create_engine(
-            "postgresql+psycopg2://postgres:@localhost/flask_blogging")
+            "postgresql+psycopg2://postgres:@localhost/flask_blogging",
+            isolation_level="AUTOCOMMIT")
         self.storage = SQLAStorage(self._engine)
 
     def tearDown(self):
