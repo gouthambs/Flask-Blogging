@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 import os
+import flask_blogging
 """
 Flask-Blogging
 --------------
@@ -36,7 +37,7 @@ def get_requirements(suffix=''):
 
 setup(
     name='Flask-Blogging',
-    version='0.1.0',
+    version=flask_blogging.__version__,
     url='https://github.com/gouthambs/Flask-Blogging',
     license='MIT',
     author='Gouthaman Balaraman',
