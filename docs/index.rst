@@ -168,7 +168,7 @@ argument in the BloggingEngine is ``/blog``, then the URL for the various views 
 
 - ``/blog/`` (GET): The index blog posts with the first page of articles.
 - ``/blog/page/<post_id>/<optional slug>/`` (GET): The blog post corresponding to the ``post_id`` is retrieved.
-- ``/blog/tag/<tag_name/`` (GET): The list of blog posts corresponding to ``tag_name`` is returned.
+- ``/blog/tag/<tag_name>/`` (GET): The list of blog posts corresponding to ``tag_name`` is returned.
 - ``/blog/author/<user_id>/`` (GET): The list of blog posts written by the author ``user_id`` is returned.
 - ``/blog/editor/`` (GET, POST): The blog editor is shown. This view needs authentication.
 - ``/blog/delete/<post_id>/`` (POST): The blog post given by ``post_id`` is deleted. This view needs authentication.
