@@ -36,7 +36,7 @@ def get_requirements(suffix=''):
 
 setup(
     name='Flask-Blogging',
-    version="0.1.1",
+    version="0.1.1.post1",
     url='https://github.com/gouthambs/Flask-Blogging',
     license='MIT',
     author='Gouthaman Balaraman',
