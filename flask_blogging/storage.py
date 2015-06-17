@@ -1,3 +1,4 @@
+from builtins import object
 class Storage(object):
 
     def save_post(self, title, text, user_id, tags, draft=False,

@@ -1,3 +1,4 @@
+from builtins import range
 import unittest
 import tempfile
 import os

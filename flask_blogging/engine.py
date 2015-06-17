@@ -1,6 +1,7 @@
 """
 The BloggingEngine module.
 """
+from builtins import object
 from .processor import PostProcessor
 
 
