@@ -127,6 +127,6 @@ License
 
 `MIT </LICENSE>`_
 
-.. include:: docs/Releases.rst
+.. include:: docs/releases.rst
 
 .. include:: docs/authors.rst
