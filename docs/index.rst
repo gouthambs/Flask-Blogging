@@ -279,7 +279,7 @@ Release Notes
 - Version 0.1.0:
 
   *Released June 1, 2015*
-  
+
   - Initial Release
   - Adds detailed documentation
   - Supports Markdown based blog editor
