@@ -127,3 +127,4 @@ License
 
 `MIT </LICENSE>`_
 
+.. include:: docs/authors.rst
