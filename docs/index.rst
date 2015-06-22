@@ -263,6 +263,6 @@ flask_blogging.forms module
     :undoc-members:
 
 
-.. include:: Releases.rst
+.. include:: releases.rst
 
 .. include:: authors.rst
