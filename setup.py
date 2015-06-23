@@ -36,13 +36,13 @@ def get_requirements(suffix=''):
 
 setup(
     name='Flask-Blogging',
-    version="0.1.1.post1",
+    version="0.1.2",
     url='https://github.com/gouthambs/Flask-Blogging',
     license='MIT',
     author='Gouthaman Balaraman',
     author_email='gouthaman.balaraman@gmail.com',
     description='A flask extension for adding blog support to your site',
-    long_description=__doc__,
+        long_description=__doc__,
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
