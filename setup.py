@@ -26,7 +26,6 @@ Links
 """
 
 BASE_PATH = os.path.dirname(__file__)
-print BASE_PATH
 
 
 def get_requirements(suffix=''):
