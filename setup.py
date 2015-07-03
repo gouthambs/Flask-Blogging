@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-from __future__ import print_function
 import os
 """
 Flask-Blogging
