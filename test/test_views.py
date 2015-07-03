@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import range
 import os
 import tempfile
 from flask import redirect
@@ -100,7 +102,7 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get("/blog/author/nonexistent_user/")
-        assert "No posts found for this user!" in response.data
+        assert "No posts found for this user!" in str(response.data)
 
     def test_editor_get(self):
         user_id = "testuser"
@@ -139,8 +141,8 @@ class TestViews(FlaskBloggingTestCase):
             # access to editor should be forbidden before login
             response = self.client.get("/blog/page/21/",
                                        follow_redirects=True)
-            assert "The page you are trying to access is not valid!" \
-                   in response.data
+            assert "The page you are trying to access is not valid!" in \
+                   str(response.data)
 
             response = self.client.post("/blog/editor/")
             self.assertEqual(response.status_code, 401)
@@ -180,12 +182,12 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.post("/blog/delete/11/",
                                         follow_redirects=True)
             assert "You do not have the rights to delete this post" in \
-                   response.data
+                   str(response.data)
 
             # a user can delete his posts
             response = self.client.post("/blog/delete/1/",
                                         follow_redirects=True)
-            assert "Your post was successfully deleted" in response.data
+            assert "Your post was successfully deleted" in str(response.data)
 
     def login(self, user_id):
         return self.client.post("/login/%s/" % user_id, follow_redirects=True)

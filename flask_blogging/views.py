@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 from flask.ext.login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
@@ -49,7 +52,7 @@ def _store_form_data(blog_form, storage, user, post):
 
 def _get_meta(storage, count, page, tag=None, user_id=None):
     max_posts = storage.count_posts(tag=tag, user_id=user_id)
-    max_pages = math.ceil(float(max_posts)/float(count))
+    max_pages = math.ceil(old_div(float(max_posts),float(count)))
     max_offset = (max_pages-1)*count
     offset = min(max(0, (page-1)*count), max_offset)
     if (tag is None) and (user_id is None):
@@ -259,7 +262,7 @@ def recent_feed():
 
     for post in posts:
         _process_post(post, blogging_engine, render=True)
-        feed.add(post["title"], unicode(post["rendered_text"]),
+        feed.add(post["title"], str(post["rendered_text"]),
                  content_type='html',
                  author=post["user_name"],
                  url=config.get("SITEURL", "")+post["url"],
