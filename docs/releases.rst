@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+- Version 0.1.2:
+
+  *Released July 4, 2015*
+
+  - Added Python 3.4 support
+
 - Version 0.1.1:
 
   *Released June 15, 2015*
