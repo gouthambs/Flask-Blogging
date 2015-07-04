@@ -1,4 +1,7 @@
-from builtins import str
+try:
+    from builtins import str
+except ImportError:
+    pass
 import logging
 import sqlalchemy as sqla
 import datetime

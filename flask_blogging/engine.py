@@ -1,7 +1,10 @@
 """
 The BloggingEngine module.
 """
-from builtins import object
+try:
+    from builtins import object
+except ImportError:
+    pass
 from .processor import PostProcessor
 
 

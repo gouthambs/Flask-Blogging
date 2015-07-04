@@ -1,4 +1,7 @@
-from builtins import range
+try:
+    from builtins import range
+except ImportError:
+    pass
 import unittest
 import tempfile
 import os

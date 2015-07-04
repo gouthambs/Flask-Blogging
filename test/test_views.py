@@ -1,5 +1,7 @@
-from builtins import str
-from builtins import range
+try:
+    from builtins import str, range
+except ImportError:
+    pass
 import os
 import tempfile
 from flask import redirect

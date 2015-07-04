@@ -1,4 +1,9 @@
-from builtins import object
+try:
+    from builtins import object
+except ImportError:
+    pass
+
+
 class Storage(object):
 
     def save_post(self, title, text, user_id, tags, draft=False,

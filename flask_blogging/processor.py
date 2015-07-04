@@ -1,4 +1,7 @@
-from builtins import object
+try:
+    from builtins import object
+except ImportError:
+    pass
 import markdown
 from markdown.extensions.meta import MetaExtension
 from flask import url_for
