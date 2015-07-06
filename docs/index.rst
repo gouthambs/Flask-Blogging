@@ -194,11 +194,73 @@ Blog Editor
 
 Useful Tips
 ===========
-- If you use ``psycopg2`` driver for Postgres while using the ``SQLAStorage``
+- **Postgres using psycopg2**:
+  If you use ``psycopg2`` driver for Postgres while using the ``SQLAStorage``
   you would need to have ``autocommit`` turned on while creating the engine::
 
     create_engine("postgresql+psycopg2://postgres:@localhost/flask_blogging",
                   isolation_level="AUTOCOMMIT")
+
+- **Migrations with Alembic**: If you have migrations part of your project
+  using Alembic, or extensions such as ``Flask-Migrate`` which uses Alembic, then
+  you have to modify the ``Alembic`` configuration in order for it to ignore
+  the ``Flask-Blogging`` related tables. If you don't set these modifications,
+  then every time you run migrations, ``Alembic`` will not recognize the
+  tables and mark them for deletion. And if you happen to ``upgrade`` by mistake
+  then all your blog tables will be deleted. What we will do here is ask
+  Alembic to ``exclude`` the tables used by ``Flask-Blogging``. In your
+  ``alembic.ini`` file, add a line::
+
+    [alembic:exclude]
+    tables = tag, post, tag_posts, user_posts
+
+  And in your ``env.py``, we have to mark these tables as the ones to be
+  ignored.
+
+  ::
+
+    def exclude_tables_from_config(config_):
+        tables_ = config_.get("tables", None)
+        if tables_ is not None:
+            tables = tables_.split(",")
+        return tables
+
+    exclude_tables = exclude_tables_from_config(config.get_section('alembic:exclude'))
+
+    def include_object(object, name, type_, reflected, compare_to):
+        if type_ == "table" and name in exclude_tables:
+            return False
+        else:
+            return True
+
+    def run_migrations_online():
+        """Run migrations in 'online' mode.
+
+        In this scenario we need to create an Engine
+        and associate a connection with the context.
+
+        """
+        engine = engine_from_config(
+                    config.get_section(config.config_ini_section),
+                    prefix='sqlalchemy.',
+                    poolclass=pool.NullPool)
+
+        connection = engine.connect()
+        context.configure(
+                    connection=connection,
+                    target_metadata=target_metadata,
+                    include_object=include_object,
+                    compare_type=True
+                    )
+
+        try:
+            with context.begin_transaction():
+                context.run_migrations()
+        finally:
+            connection.close()
+
+  In the above, we are using ``include_object`` in ``context.configure(...)``
+  to be specified based on the ``include_object`` function.
 
 API Documentation
 =================
