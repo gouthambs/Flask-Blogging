@@ -65,7 +65,7 @@ class BloggingEngine(object):
         self.storage = storage
         from flask_blogging.views import blog_app
         self.app.register_blueprint(
-            blog_app, url_prefix=self.config["BLOGGING_URL_PREFIX"])
+            blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
 
     def user_loader(self, callback):
@@ -78,4 +78,3 @@ class BloggingEngine(object):
         """
         self.user_callback = callback
         return callback
-
