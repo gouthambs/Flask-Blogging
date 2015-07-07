@@ -165,7 +165,7 @@ keys that are currently supported include:
 =========================== ===================================================
 BLOGGING_SITENAME           The name of the blog to be used as the brand name.
                             This is also used in the feed heading.
-                            (default "Flask-Blogging" or "")
+                            (default "Flask-Blogging")
 BLOGGING_SITEURL            The url of the site.
 BLOGGING_RENDER_TEXT        Boolean value to specify if the raw text should be
                             rendered or not. (default ``True``)
@@ -174,6 +174,9 @@ BLOGGING_GOOGLE_ANALYTICS   Google analytics code for usage tracking
                             (default ``None``)
 BLOGGING_URL_PREFIX         The prefix for the URL of blog posts
                             (default ``None``)
+BLOGGING_FEED_LIMIT         The number of posts to limit to in the feed. If
+                            ``None``, then all are shown, else will be limited
+                            to this number. (default ``None``)
 =========================== ===================================================
 
 

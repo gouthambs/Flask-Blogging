@@ -93,3 +93,5 @@ class BloggingEngine(object):
             self.app.config.get("BLOGGING_GOOGLE_ANALYTICS", None)
         self.config["URL_PREFIX"] = \
             self.app.config.get("BLOGGING_URL_PREFIX", None)
+        self.config["FEED_LIMIT"] = \
+            self.app.config.get("BLOGGING_FEED_LIMIT", None)

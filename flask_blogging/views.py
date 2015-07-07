@@ -256,7 +256,8 @@ def recent_feed():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
-    posts = storage.get_posts(count=None, offset=None, recent=True,
+    count = config.get("FEED_LIMIT")
+    posts = storage.get_posts(count=count, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
     feed = AtomFeed(
         '%s - All Articles' % config.get("SITENAME", ""),
