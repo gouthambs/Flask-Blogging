@@ -30,8 +30,8 @@ class TestViews(FlaskBloggingTestCase):
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
-        self.engine = BloggingEngine(self.app, self.storage,
-                                     url_prefix="/blog")
+        self.app.config["BLOGGING_URL_PREFIX"] = "/blog"
+        self.engine = BloggingEngine(self.app, self.storage)
         self.login_manager = LoginManager(self.app)
 
         @self.login_manager.user_loader

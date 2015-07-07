@@ -7,20 +7,22 @@
 Flask-Blogging
 ==============
 
-Flask-Blogging is a Flask extension for adding blog support to your site.
+Flask-Blogging is a Flask extension for adding Markdown based blog support to your site.
 It provides a flexible mechanism to store the data in the database
 of your choice. It is meant to work with the authentication
 provided by packages such as
 `Flask-Login <https://flask-login.readthedocs.org/en/latest/>`_ or
 `Flask-Security <https://pythonhosted.org/Flask-Security/>`_.
 
-The philosophy behind this extension is to provide a lean app based on markdown
+The philosophy behind this extension is to provide a lean app based on Markdown
 to provide blog support to your existing web application. This is contrary
-to some other packages such as that are just blogs. If you already have a
+to some other packages such as `Flask-Blog <https://github.com/dmaslov/flask-blog>`_
+that are just blogs. If you already have a
 web app and you need to have a blog to communicate with your user or to
-promote your site through content based marketing.
+promote your site through content based marketing, then Flask-Blogging would help
+you quickly get a blog up and running.
 
-Out of the box Flask-Blogging has support for the following:
+Out of the box, Flask-Blogging has support for the following:
 
 - Bootstrap based site
 - Markdown based blog editor
@@ -48,11 +50,14 @@ Quick Start Example
 
     app = Flask(__name__)
     app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
+    app.config["BLOGGING_URL_PREFIX"] = "/blog"
+    app.config["BLOGGING_DISQUS_SITENAME"] = "test"
+    app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
 
     # extensions
     engine = create_engine('sqlite:////tmp/blog.db')
     sql_storage = SQLAStorage(engine)
-    blog_engine = BloggingEngine(app, sql_storage, url_prefix="/blog")
+    blog_engine = BloggingEngine(app, sql_storage)
     login_manager = LoginManager(app)
 
     # user class for providing authentication
@@ -143,22 +148,34 @@ object. For example::
 For the blog to have a readable display name, the ``User`` class must
 implement either the ``get_name`` method or the ``__str__`` method.
 
-The ``BloggingEngine`` accepts an optional ``config`` ``dict`` argument which is passed to all
-the views. The keys that are currently supported include:
-
-=================== ===================================================
-SITENAME            The name of the blog to be used as the brand name
-                    (default "Flask-Blogging")
-SITEURL             The url of the site.
-RENDER_TEXT         Boolean value to specify if the raw text should be
-                    rendered or not. (default ``True``)
-DISQUS_SITENAME     Disqus sitename for comments (default ``None``)
-GOOGLE_ANALYTICS    Google analytics code for usage tracking
-                    (default ``None``)
-=================== ===================================================
-
 The ``BloggingEngine`` accepts an optional ``extensions`` argument. This is a list
 of ``Markdown`` extensions objects to be used during the markdown processing step.
+
+The ``BloggingEngine`` also accepts ``post_processor`` argument, which can be
+used to provide a custom post processor object to handle the processing
+of Markdown text. An ideal way to do this would be to inherit the default
+``PostProcessor`` object and override custom methods. There is a
+``custom_process`` method that can be overridden to add extra functionality
+to the post processing step.
+
+The ``BloggingEngine`` can be configured by setting the following app
+config variables. These arguments are passed to all the views. The
+keys that are currently supported include:
+
+=========================== ===================================================
+BLOGGING_SITENAME           The name of the blog to be used as the brand name
+                            (default "Flask-Blogging")
+BLOGGING_SITEURL            The url of the site.
+BLOGGING_RENDER_TEXT        Boolean value to specify if the raw text should be
+                            rendered or not. (default ``True``)
+BLOGGING_DISQUS_SITENAME    Disqus sitename for comments (default ``None``)
+BLOGGING_GOOGLE_ANALYTICS   Google analytics code for usage tracking
+                            (default ``None``)
+BLOGGING_URL_PREFIX         The prefix for the URL of blog posts
+                            (default ``None``)
+=========================== ===================================================
+
+
 
 Blog Views
 ==========
@@ -199,6 +216,11 @@ Useful Tips
 
     create_engine("postgresql+psycopg2://postgres:@localhost/flask_blogging",
                   isolation_level="AUTOCOMMIT")
+
+
+Compatibility Notes
+===================
+- In version 0.2.0
 
 API Documentation
 =================

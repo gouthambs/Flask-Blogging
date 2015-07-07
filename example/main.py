@@ -5,13 +5,14 @@ from flask.ext.blogging import SQLAStorage, BloggingEngine
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
+app.config["BLOGGING_URL_PREFIX"] = "/blog"
+app.config["BLOGGING_DISQUS_SITENAME"] = "test"
+app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
 
 # extensions
 engine = create_engine('sqlite:////tmp/blog.db')
 sql_storage = SQLAStorage(engine)
-blog_engine = BloggingEngine(app, sql_storage, url_prefix="/blog",
-                             config={"DISQUS_SITENAME": "test",
-                                     "SITEURL": "http://localhost:8000"})
+blog_engine = BloggingEngine(app, sql_storage)
 login_manager = LoginManager(app)
 
 

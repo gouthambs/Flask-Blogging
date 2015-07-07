@@ -24,8 +24,8 @@ class BloggingEngine(object):
         storage = SQLAStorage(db_engine)
         blog_engine = BloggingEngine(app, storage)
     """
-    def __init__(self, app=None, storage=None, url_prefix=None,
-                 post_processor=None, config=None, extensions=None):
+    def __init__(self, app=None, storage=None, post_processor=None,
+                 extensions=None):
         """
 
         :param app: Optional app to use
@@ -33,15 +33,9 @@ class BloggingEngine(object):
         :param storage: The blog storage instance that implements the
          ``Storage`` class interface.
         :type storage: object
-        :param url_prefix: (optional) The prefix for the URL of blog posts
-         (default ``None``)
-        :type url_prefix: str
         :param post_processor: (optional) The post processor object. If none
          provided, the default post processor is used.
         :type post_processor: object
-        :param config: (optional) A dictionary of config values. See docs for
-         the keys that can be specified.
-        :type config: dict
         :param extensions: A list of markdown extensions to add to post
          processing step.
         :type extensions: list
@@ -49,14 +43,12 @@ class BloggingEngine(object):
         """
         self.app = None
         self.storage = None
-        self.url_prefix = url_prefix
         self.post_processor = PostProcessor() if post_processor is None \
             else post_processor
         if extensions:
             self.post_processor.set_custom_extensions(extensions)
         self.user_callback = None
 
-        self.config = {} if config is None else config
         if app is not None and storage is not None:
             self.init_app(app, storage)
 
@@ -69,9 +61,11 @@ class BloggingEngine(object):
          ``Storage`` class interface.
         """
         self.app = app
+        self._set_config()
         self.storage = storage
         from flask_blogging.views import blog_app
-        self.app.register_blueprint(blog_app, url_prefix=self.url_prefix)
+        self.app.register_blueprint(blog_app,
+                                    url_prefix=self.config["URL_PREFIX"])
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
 
     def user_loader(self, callback):
@@ -84,3 +78,18 @@ class BloggingEngine(object):
         """
         self.user_callback = callback
         return callback
+
+    def _set_config(self):
+        self.config = {}
+        self.config["SITENAME"] = \
+            self.app.config.get("BLOGGING_SITENAME", "Flask-Blogging")
+        self.config["SITEURL"] = \
+            self.app.config.get("BLOGGING_SITEURL", "")
+        self.config["RENDER_TEXT"] = \
+            self.app.config.get("BLOGGING_RENDER_TEXT", True)
+        self.config["DISQUS_SITENAME"] = \
+            self.app.config.get("BLOGGING_DISQUS_SITENAME", None)
+        self.config["GOOGLE_ANALYTICS"] = \
+            self.app.config.get("BLOGGING_GOOGLE_ANALYTICS", None)
+        self.config["URL_PREFIX"] = \
+            self.app.config.get("BLOGGING_URL_PREFIX", None)

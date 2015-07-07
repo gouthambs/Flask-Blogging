@@ -1,5 +1,3 @@
-from setuptools import setup, find_packages
-import os
 """
 Flask-Blogging
 --------------
@@ -25,6 +23,10 @@ Links
 
 """
 
+from setuptools import setup, find_packages
+import os
+
+
 BASE_PATH = os.path.dirname(__file__)
 
 
@@ -35,13 +37,13 @@ def get_requirements(suffix=''):
 
 setup(
     name='Flask-Blogging',
-    version="0.1.2.post1",
+    version="0.2.0",
     url='https://github.com/gouthambs/Flask-Blogging',
     license='MIT',
     author='Gouthaman Balaraman',
     author_email='gouthaman.balaraman@gmail.com',
     description='A flask extension for adding Markdown blog support to your site',
-        long_description=__doc__,
+    long_description=__doc__,
     packages=find_packages(),
     zip_safe=False,
     include_package_data=True,
