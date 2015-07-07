@@ -284,6 +284,10 @@ Useful Tips
   to be specified based on the ``include_object`` function.
 
 
+
+.. include:: releases.rst
+
+
 API Documentation
 =================
 
@@ -347,6 +351,5 @@ flask_blogging.forms module
     :undoc-members:
 
 
-.. include:: releases.rst
 
 .. include:: authors.rst
