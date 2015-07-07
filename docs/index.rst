@@ -163,8 +163,9 @@ config variables. These arguments are passed to all the views. The
 keys that are currently supported include:
 
 =========================== ===================================================
-BLOGGING_SITENAME           The name of the blog to be used as the brand name
-                            (default "Flask-Blogging")
+BLOGGING_SITENAME           The name of the blog to be used as the brand name.
+                            This is also used in the feed heading.
+                            (default "Flask-Blogging" or "")
 BLOGGING_SITEURL            The url of the site.
 BLOGGING_RENDER_TEXT        Boolean value to specify if the raw text should be
                             rendered or not. (default ``True``)

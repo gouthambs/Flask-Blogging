@@ -259,7 +259,7 @@ def recent_feed():
     posts = storage.get_posts(count=None, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
     feed = AtomFeed(
-        '%s - All Articles' % config.get("SITENAME", "Flask-Blogging"),
+        '%s - All Articles' % config.get("SITENAME", ""),
         feed_url=request.url, url=request.url_root, generator=None)
 
     for post in posts:
