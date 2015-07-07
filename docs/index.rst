@@ -235,6 +235,10 @@ Useful Tips
     [alembic:exclude]
     tables = tag, post, tag_posts, user_posts
 
+  If you have a value set for ``table_prefix`` argument while creating the ``SQLAStorage``, 
+  then the table names will contain that prefix in their names. In which case, you have 
+  to use appropriate names in the table names.
+
   And in your ``env.py``, we have to mark these tables as the ones to be
   ignored.
 
