@@ -25,6 +25,15 @@ Links
 
 from setuptools import setup, find_packages
 import os
+import re
+import ast
+
+_version_re = re.compile(r'__version__\s+=\s+(.*)')
+
+with open('flask_blogging/__init__.py', 'rb') as f:
+    version = str(ast.literal_eval(_version_re.search(
+        f.read().decode('utf-8')).group(1)))
+
 
 
 BASE_PATH = os.path.dirname(__file__)
@@ -37,7 +46,7 @@ def get_requirements(suffix=''):
 
 setup(
     name='Flask-Blogging',
-    version="0.2.0",
+    version=version,
     url='https://github.com/gouthambs/Flask-Blogging',
     license='MIT',
     author='Gouthaman Balaraman',
