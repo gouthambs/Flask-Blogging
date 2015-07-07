@@ -102,7 +102,7 @@ def index(count, page):
     meta = _get_meta(storage, count, page)
     offset = meta["offset"]
 
-    render = config.get("RENDER_TEXT", True)
+    render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, include_draft=False,
                               tag=None, user_id=None, recent=True)
     for post in posts:
@@ -119,7 +119,7 @@ def page_by_id(post_id, slug):
     config = blogging_engine.config
     post = storage.get_post_by_id(post_id)
 
-    render = config.get("RENDER_TEXT", True)
+    render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
         _process_post(post, blogging_engine, render=render)
         return render_template("blog/page.html", post=post, config=config)
@@ -138,7 +138,7 @@ def posts_by_tag(tag, count, page):
     meta = _get_meta(storage, count, page, tag=tag)
     offset = meta["offset"]
 
-    render = config.get("RENDER_TEXT", True)
+    render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
                               include_draft=False, user_id=None, recent=True)
     for post in posts:
@@ -160,7 +160,7 @@ def posts_by_author(user_id, count, page):
 
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id,
                               include_draft=False, tag=None, recent=True)
-    render = config.get("RENDER_TEXT", True)
+    render = config.get("BLOGGING_RENDER_TEXT", True)
     if len(posts):
         for post in posts:
             _process_post(post, blogging_engine, render=render)
@@ -256,11 +256,12 @@ def recent_feed():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
-    count = config.get("FEED_LIMIT")
+    count = config.get("BLOGGING_FEED_LIMIT")
     posts = storage.get_posts(count=count, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
     feed = AtomFeed(
-        '%s - All Articles' % config.get("SITENAME", ""),
+        '%s - All Articles' % config.get("BLOGGING_SITENAME",
+                                         "Flask-Blogging"),
         feed_url=request.url, url=request.url_root, generator=None)
 
     for post in posts:
@@ -268,7 +269,7 @@ def recent_feed():
         feed.add(post["title"], str(post["rendered_text"]),
                  content_type='html',
                  author=post["user_name"],
-                 url=config.get("SITEURL", "")+post["url"],
+                 url=config.get("BLOGGING_SITEURL", "")+post["url"],
                  updated=post["last_modified_date"],
                  published=post["post_date"])
     response = feed.get_response()

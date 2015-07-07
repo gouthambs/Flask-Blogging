@@ -61,11 +61,11 @@ class BloggingEngine(object):
          ``Storage`` class interface.
         """
         self.app = app
-        self._set_config()
+        self.config = self.app.config
         self.storage = storage
         from flask_blogging.views import blog_app
-        self.app.register_blueprint(blog_app,
-                                    url_prefix=self.config["URL_PREFIX"])
+        self.app.register_blueprint(
+            blog_app, url_prefix=self.config["BLOGGING_URL_PREFIX"])
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
 
     def user_loader(self, callback):
@@ -79,19 +79,3 @@ class BloggingEngine(object):
         self.user_callback = callback
         return callback
 
-    def _set_config(self):
-        self.config = {}
-        self.config["SITENAME"] = \
-            self.app.config.get("BLOGGING_SITENAME", "Flask-Blogging")
-        self.config["SITEURL"] = \
-            self.app.config.get("BLOGGING_SITEURL", "")
-        self.config["RENDER_TEXT"] = \
-            self.app.config.get("BLOGGING_RENDER_TEXT", True)
-        self.config["DISQUS_SITENAME"] = \
-            self.app.config.get("BLOGGING_DISQUS_SITENAME", None)
-        self.config["GOOGLE_ANALYTICS"] = \
-            self.app.config.get("BLOGGING_GOOGLE_ANALYTICS", None)
-        self.config["URL_PREFIX"] = \
-            self.app.config.get("BLOGGING_URL_PREFIX", None)
-        self.config["FEED_LIMIT"] = \
-            self.app.config.get("BLOGGING_FEED_LIMIT", None)
