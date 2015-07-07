@@ -8,6 +8,7 @@ app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
 app.config["BLOGGING_URL_PREFIX"] = "/blog"
 app.config["BLOGGING_DISQUS_SITENAME"] = "test"
 app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
+app.config["BLOGGING_SITENAME"] = "My Site"
 
 # extensions
 engine = create_engine('sqlite:////tmp/blog.db')
