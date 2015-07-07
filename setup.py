@@ -3,7 +3,7 @@ Flask-Blogging
 --------------
 
 Flask-Blogging is a Flask extension for adding blogging support to
-your web application. Flask-Login comes with the following
+your web application. Flask-Blogging comes with the following
 features out of the box:
 
 - Bootstrap based site
