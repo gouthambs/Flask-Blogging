@@ -42,7 +42,7 @@ class BloggingEngine(object):
         :return:
         """
         self.app = None
-        self.storage = None
+        self.storage = storage
         self.post_processor = PostProcessor() if post_processor is None \
             else post_processor
         if extensions:
@@ -52,7 +52,7 @@ class BloggingEngine(object):
         if app is not None and storage is not None:
             self.init_app(app, storage)
 
-    def init_app(self, app, storage):
+    def init_app(self, app, storage=None):
         """
         Initialize the engine.
 
@@ -62,7 +62,7 @@ class BloggingEngine(object):
         """
         self.app = app
         self.config = self.app.config
-        self.storage = storage
+        self.storage = storage or self.storage
         from flask_blogging.views import blog_app
         self.app.register_blueprint(
             blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
