@@ -1,6 +1,7 @@
-flask
-flask-login
-flask-wtf
-sqlalchemy
-markdown
-werkzeug
+Flask
+Flask-WTF
+Flask-Login
+Flask-Principal
+SQLAlchemy
+Markdown
+Werkzeug
