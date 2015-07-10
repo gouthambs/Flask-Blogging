@@ -58,6 +58,8 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=get_requirements(),
+    tests_require=["nose", "mysqlclient", "psycopg2"],
+    test_suite='nose.collector',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
