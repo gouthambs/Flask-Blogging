@@ -1,8 +1,14 @@
 Release Notes
 =============
+- **Version 0.2.1**:
+  *Released July 10, 2015*
+
+  - ``BloggingEngine`` ``init_app`` method can be called without having to
+    pass a ``storage`` object.
+  - Hook tests to ``setup.py`` script.
 
 - **Version 0.2.0**:
-    *Released July 6, 2015*
+  *Released July 6, 2015*
     
     - ``BloggingEngine`` configuration moved to the ``app`` config setting.
       This breaks backward compatibility. See compatibility notes below.
@@ -12,12 +18,12 @@ Release Notes
       consistency.
 
 - **Version 0.1.2**:
-    *Released July 4, 2015*
+  *Released July 4, 2015*
     
     - Added Python 3.4 support
 
 - **Version 0.1.1**:
-    *Released June 15, 2015*
+  *Released June 15, 2015*
     
     - Fixed PEP8 errors
     - Expanded SQLAStorage to include Postgres and MySQL flavors
@@ -26,7 +32,7 @@ Release Notes
 
 
 - **Version 0.1.0**:
-    *Released June 1, 2015*
+  *Released June 1, 2015*
     
     - Initial Release
     - Adds detailed documentation
