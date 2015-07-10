@@ -15,4 +15,4 @@ Date: June 1, 2015
 """
 
 __author__ = 'Gouthaman Balaraman'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
