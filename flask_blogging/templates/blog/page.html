@@ -22,7 +22,7 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-{% if current_user.is_authenticated() %}
+{% if meta.is_user_blogger %}
     <div class="pull-right">
     {% if post.editable %}
         <a href="#" id="delete">

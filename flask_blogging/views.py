@@ -10,7 +10,7 @@ from flask_blogging.forms import BlogEditor
 import math
 from werkzeug.contrib.atom import AtomFeed
 import datetime
-
+from flask.ext.principal import PermissionDenied
 
 blog_app = Blueprint("blog_app", __name__, template_folder='templates')
 
@@ -84,6 +84,11 @@ def _get_meta(storage, count, page, tag=None, user_id=None):
     return meta
 
 
+def _is_blogger(blogger_permission):
+    is_blogger = blogger_permission.require().can()
+    return is_blogger
+
+
 @blog_app.route("/", defaults={"count": 10, "page": 1})
 @blog_app.route("/<int:count>/", defaults={"page": 1})
 @blog_app.route("/<int:count>/<int:page>/")
@@ -101,6 +106,7 @@ def index(count, page):
 
     meta = _get_meta(storage, count, page)
     offset = meta["offset"]
+    meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, include_draft=False,
@@ -118,11 +124,13 @@ def page_by_id(post_id, slug):
     storage = blogging_engine.storage
     config = blogging_engine.config
     post = storage.get_post_by_id(post_id)
+    meta = {}
+    meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
         _process_post(post, blogging_engine, render=render)
-        return render_template("blog/page.html", post=post, config=config)
+        return render_template("blog/page.html", post=post, config=config, meta=meta)
     else:
         flash("The page you are trying to access is not valid!", "warning")
         return redirect(url_for("blog_app.index"))
@@ -137,6 +145,7 @@ def posts_by_tag(tag, count, page):
     config = blogging_engine.config
     meta = _get_meta(storage, count, page, tag=tag)
     offset = meta["offset"]
+    meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
@@ -157,6 +166,7 @@ def posts_by_author(user_id, count, page):
 
     meta = _get_meta(storage, count, page, user_id=user_id)
     offset = meta["offset"]
+    meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id,
                               include_draft=False, tag=None, recent=True)
@@ -176,63 +186,73 @@ def posts_by_author(user_id, count, page):
 @login_required
 def editor(post_id):
     blogging_engine = _get_blogging_engine(current_app)
-    post_processor = blogging_engine.post_processor
-    config = blogging_engine.config
-    storage = blogging_engine.storage
-    if request.method == 'POST':
-        form = BlogEditor(request.form)
-        if form.validate():
-            post = storage.get_post_by_id(post_id)
-            if (post is not None) and \
-                    (current_user.get_id() == post["user_id"]) and \
-                    (post["post_id"] == post_id):
-                pass
+    try:
+        with blogging_engine.blogger_permission.require():
+            post_processor = blogging_engine.post_processor
+            config = blogging_engine.config
+            storage = blogging_engine.storage
+            if request.method == 'POST':
+                form = BlogEditor(request.form)
+                if form.validate():
+                    post = storage.get_post_by_id(post_id)
+                    if (post is not None) and \
+                            (current_user.get_id() == post["user_id"]) and \
+                            (post["post_id"] == post_id):
+                        pass
+                    else:
+                        post = {}
+                    pid = _store_form_data(form, storage, current_user, post)
+                    flash("Blog posted successfully!", "info")
+                    slug = post_processor.create_slug(form.title.data)
+                    return redirect(url_for("blog_app.page_by_id", post_id=pid,
+                                            slug=slug))
+                else:
+                    flash("There were errors in the blog submission", "warning")
+                    return render_template("blog/editor.html", form=form,
+                                           post_id=post_id, config=config)
             else:
-                post = {}
-            pid = _store_form_data(form, storage, current_user, post)
-            flash("Blog posted successfully!", "info")
-            slug = post_processor.create_slug(form.title.data)
-            return redirect(url_for("blog_app.page_by_id", post_id=pid,
-                                    slug=slug))
-        else:
-            flash("There were errors in the blog submission", "warning")
-            return render_template("blog/editor.html", form=form,
-                                   post_id=post_id, config=config)
-    else:
-        if post_id is not None:
-            post = storage.get_post_by_id(post_id)
-            if (post is not None) and \
-                    (current_user.get_id() == post["user_id"]):
-                tags = ", ".join(post["tags"])
-                form = BlogEditor(title=post["title"], text=post["text"],
-                                  tags=tags)
-                return render_template("blog/editor.html", form=form,
-                                       post_id=post_id, config=config)
-            else:
-                flash("You do not have the rights to edit this post",
-                      "warning")
-                return redirect(url_for("blog_app.editor", post_id=None))
+                if post_id is not None:
+                    post = storage.get_post_by_id(post_id)
+                    if (post is not None) and \
+                            (current_user.get_id() == post["user_id"]):
+                        tags = ", ".join(post["tags"])
+                        form = BlogEditor(title=post["title"], text=post["text"],
+                                          tags=tags)
+                        return render_template("blog/editor.html", form=form,
+                                               post_id=post_id, config=config)
+                    else:
+                        flash("You do not have the rights to edit this post",
+                              "warning")
+                        return redirect(url_for("blog_app.index", post_id=None))
 
-    form = BlogEditor()
-    return render_template("blog/editor.html", form=form, post_id=post_id,
-                           config=config)
+            form = BlogEditor()
+            return render_template("blog/editor.html", form=form, post_id=post_id,
+                                   config=config)
+    except PermissionDenied:
+        flash("You do not have permissions to create or edit posts", "warning")
+        return redirect(url_for("blog_app.index", post_id=None))
 
 
 @blog_app.route("/delete/<int:post_id>/", methods=["POST"])
 @login_required
 def delete(post_id):
     blogging_engine = _get_blogging_engine(current_app)
-    storage = blogging_engine.storage
-    post = storage.get_post_by_id(post_id)
-    if (post is not None) and (current_user.get_id() == post["user_id"]):
-        success = storage.delete_post(post_id)
-        if success:
-            flash("Your post was successfully deleted", "info")
-        else:
-            flash("Something went wrong while deleting your post", "warning")
-    else:
-        flash("You do not have the rights to delete this post", "warning")
-    return redirect(url_for("blog_app.index"))
+    try:
+        with blogging_engine.blogger_permission.require():
+            storage = blogging_engine.storage
+            post = storage.get_post_by_id(post_id)
+            if (post is not None) and (current_user.get_id() == post["user_id"]):
+                success = storage.delete_post(post_id)
+                if success:
+                    flash("Your post was successfully deleted", "info")
+                else:
+                    flash("Something went wrong while deleting your post", "warning")
+            else:
+                flash("You do not have the rights to delete this post", "warning")
+            return redirect(url_for("blog_app.index"))
+    except PermissionDenied:
+        flash("You do not have permissions to delete posts", "warning")
+        return redirect(url_for("blog_app.index", post_id=None))
 
 
 @blog_app.route("/sitemap.xml")

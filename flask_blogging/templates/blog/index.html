@@ -10,7 +10,7 @@ Blog Posts
         </div>
     {% endif %}
 
-    {% if current_user.is_authenticated() %}
+    {% if meta.is_user_blogger %}
         <div class="pull-right">
             <a href="{{ url_for('blog_app.editor') }}" id="new">
                 <span class="glyphicon glyphicon-plus"></span>&nbsp;New

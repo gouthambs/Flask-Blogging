@@ -6,6 +6,7 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
+from flask.ext.principal import Principal, Permission, RoleNeed
 
 
 class BloggingEngine(object):
@@ -67,6 +68,11 @@ class BloggingEngine(object):
         self.app.register_blueprint(
             blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
+        self.principal = Principal(self.app)
+        if self.config.get("BLOGGING_PERMISSIONS"):
+            self.blogger_permission = Permission(RoleNeed("blogger"))
+        else:
+            self.blogger_permission = Permission()
 
     def user_loader(self, callback):
         """
@@ -78,3 +84,6 @@ class BloggingEngine(object):
         """
         self.user_callback = callback
         return callback
+
+    def is_user_blogger(self):
+        return self.blogger_permission.require().can()
