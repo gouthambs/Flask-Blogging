@@ -113,7 +113,7 @@ def index(count, page):
                               tag=None, user_id=None, recent=True)
     for post in posts:
         _process_post(post, blogging_engine, render=render)
-    return render_template("blog/index.html", posts=posts, meta=meta,
+    return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
 
@@ -130,7 +130,7 @@ def page_by_id(post_id, slug):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
         _process_post(post, blogging_engine, render=render)
-        return render_template("blog/page.html", post=post, config=config,
+        return render_template("blogging/page.html", post=post, config=config,
                                meta=meta)
     else:
         flash("The page you are trying to access is not valid!", "warning")
@@ -153,7 +153,7 @@ def posts_by_tag(tag, count, page):
                               include_draft=False, user_id=None, recent=True)
     for post in posts:
         _process_post(post, blogging_engine, render=render)
-    return render_template("blog/index.html", posts=posts, meta=meta,
+    return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
 
@@ -177,7 +177,7 @@ def posts_by_author(user_id, count, page):
             _process_post(post, blogging_engine, render=render)
     else:
         flash("No posts found for this user!", "warning")
-    return render_template("blog/index.html", posts=posts, meta=meta,
+    return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
 
@@ -209,7 +209,7 @@ def editor(post_id):
                                             slug=slug))
                 else:
                     flash("There were errors in blog submission", "warning")
-                    return render_template("blog/editor.html", form=form,
+                    return render_template("blogging/editor.html", form=form,
                                            post_id=post_id, config=config)
             else:
                 if post_id is not None:
@@ -219,7 +219,7 @@ def editor(post_id):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
                                           text=post["text"], tags=tags)
-                        return render_template("blog/editor.html", form=form,
+                        return render_template("blogging/editor.html", form=form,
                                                post_id=post_id, config=config)
                     else:
                         flash("You do not have the rights to edit this post",
@@ -228,7 +228,7 @@ def editor(post_id):
                                                 post_id=None))
 
             form = BlogEditor()
-            return render_template("blog/editor.html", form=form,
+            return render_template("blogging/editor.html", form=form,
                                    post_id=post_id, config=config)
     except PermissionDenied:
         flash("You do not have permissions to create or edit posts", "warning")
@@ -269,7 +269,7 @@ def sitemap():
                               user_id=None, tag=None, include_draft=False)
     for post in posts:
         _process_post(post, blogging_engine, render=False)
-    sitemap_xml = render_template("blog/sitemap.xml", posts=posts,
+    sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
