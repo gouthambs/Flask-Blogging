@@ -213,10 +213,10 @@ argument in the BloggingEngine is ``/blog``, then the URL for the various views 
 The view can be easily customised by the user by overriding with their own templates. The template pages that need
 to be customized are:
 
-- ``blog/index.html``: The blog index page used to serve index of posts, posts by tag, and posts by author
-- ``blog/editor.html``: The blog editor page.
-- ``blog/page.html``: The page that shows the given article.
-- ``blog/sitemap.xml``: The sitemap for the blog posts.
+- ``blogging/index.html``: The blog index page used to serve index of posts, posts by tag, and posts by author
+- ``blogging/editor.html``: The blog editor page.
+- ``blogging/page.html``: The page that shows the given article.
+- ``blogging/sitemap.xml``: The sitemap for the blog posts.
 
 Permissions
 ===========
