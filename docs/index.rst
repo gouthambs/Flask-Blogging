@@ -193,22 +193,22 @@ Blog Views
 There are various views that are exposed through Flask-Blogging. If the ``url_prefix``
 argument in the BloggingEngine is ``/blog``, then the URL for the various views are:
 
-- ``/blog/`` / ``url_for('blogging.index')`` (GET): The index blog posts with
+- ``/blog/`` or ``url_for('blogging.index')`` (GET): The index blog posts with
   the first page of articles.
-- ``/blog/page/<post_id>/<optional slug>/`` / ``url_for('blogging.page_by_id(<post_id>)')`` (GET):
+- ``/blog/page/<post_id>/<optional slug>/`` or ``url_for('blogging.page_by_id(<post_id>)')`` (GET):
   The blog post corresponding to the ``post_id`` is retrieved.
-- ``/blog/tag/<tag_name>/`` / ``url_for('blogging.posts_by_tag(<tag_name>)')`` (GET):
+- ``/blog/tag/<tag_name>/`` or ``url_for('blogging.posts_by_tag(<tag_name>)')`` (GET):
   The list of blog posts corresponding to ``tag_name`` is returned.
-- ``/blog/author/<user_id>/`` / ``url_for('blogging.posts_by_author(<user_id>)')`` (GET):
+- ``/blog/author/<user_id>/`` or ``url_for('blogging.posts_by_author(<user_id>)')`` (GET):
   The list of blog posts written by the author ``user_id`` is returned.
-- ``/blog/editor/`` / ``url_for('blogging.editor')`` (GET, POST): The blog editor
+- ``/blog/editor/`` or ``url_for('blogging.editor')`` (GET, POST): The blog editor
   is shown. This view needs authentication and permissions (if enabled).
-- ``/blog/delete/<post_id>/`` / ``url_for('blogging.delete(<post_id>)')`` (POST):
+- ``/blog/delete/<post_id>/`` or ``url_for('blogging.delete(<post_id>)')`` (POST):
   The blog post given by ``post_id`` is deleted. This view needs authentication
   and permissions (if enabled).
-- ``/blog/sitemap.xml`` / ``url_for('blogging.sitemap')`` (GET): The sitemap
+- ``/blog/sitemap.xml`` or ``url_for('blogging.sitemap')`` (GET): The sitemap
   with a link to all the posts is returned.
-- ``/blog/feeds/all.atom.xml`` / ``url_for('blogging.feed')`` (GET): Returns ATOM feed.
+- ``/blog/feeds/all.atom.xml`` or ``url_for('blogging.feed')`` (GET): Returns ATOM feed.
 
 The view can be easily customised by the user by overriding with their own templates. The template pages that need
 to be customized are:
