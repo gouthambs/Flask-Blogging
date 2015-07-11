@@ -31,6 +31,7 @@ Out of the box, Flask-Blogging has support for the following:
 - Sitemap, ATOM support
 - Disqus support for comments
 - Google analytics for usage tracking
+- Permissions enabled to control which users can create/edit blogs
 - Well documented, tested, and extensible design
 
 .. contents::
@@ -158,27 +159,32 @@ of Markdown text. An ideal way to do this would be to inherit the default
 ``custom_process`` method that can be overridden to add extra functionality
 to the post processing step.
 
-The ``BloggingEngine`` can be configured by setting the following app
+
+Configuration Variables
+=======================
+
+The Flask-Blogging extension can be configured by setting the following app
 config variables. These arguments are passed to all the views. The
 keys that are currently supported include:
 
-=========================== ===================================================
-BLOGGING_SITENAME           The name of the blog to be used as the brand name.
-                            This is also used in the feed heading.
-                            (default "Flask-Blogging")
-BLOGGING_SITEURL            The url of the site.
-BLOGGING_RENDER_TEXT        Boolean value to specify if the raw text should be
-                            rendered or not. (default ``True``)
-BLOGGING_DISQUS_SITENAME    Disqus sitename for comments (default ``None``)
-BLOGGING_GOOGLE_ANALYTICS   Google analytics code for usage tracking
-                            (default ``None``)
-BLOGGING_URL_PREFIX         The prefix for the URL of blog posts
-                            (default ``None``)
-BLOGGING_FEED_LIMIT         The number of posts to limit to in the feed. If
-                            ``None``, then all are shown, else will be limited
-                            to this number. (default ``None``)
-=========================== ===================================================
-
+- ``BLOGGING_SITENAME`` (*str*): The name of the blog to be used as the brand
+  name.This is also used in the feed heading. (default "Flask-Blogging")
+- ``BLOGGING_SITEURL`` (*str*): The url of the site.
+- ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text should be
+  rendered or not. (default ``True``)
+- ``BLOGGING_DISQUS_SITENAME`` (*str*): Disqus sitename for comments.
+  A ``None`` value will disable comments. (default ``None``)
+- ``BLOGGING_GOOGLE_ANALYTICS`` (*str*): Google analytics code for usage
+  tracking. A ``None`` value will disable google analytics. (default ``None``)
+- ``BLOGGING_URL_PREFIX`` (*str*) : The prefix for the URL of blog posts. A
+  ``None`` value will have no prefix (default ``None``).
+- ``BLOGGING_FEED_LIMIT`` (*int*): The number of posts to limit to in the feed.
+  If ``None``, then all are shown, else will be limited to this number. (default ``None``)
+- ``BLOGGING_PERMISSIONS`` (*bool*): if ``True``, this will enable permissions
+  for the blogging engine. With permissions enabled, the user will need to have
+  "blogger" ``Role`` to edit or create blog posts. Other authenticated
+  users will not have blog editing permissions. The concepts here derive
+  from ``Flask-Principal`` (default ``False``)
 
 
 Blog Views
@@ -202,6 +208,16 @@ to be customized are:
 - ``blog/editor.html``: The blog editor page.
 - ``blog/page.html``: The page that shows the given article.
 - ``blog/sitemap.xml``: The sitemap for the blog posts.
+
+Permissions
+===========
+
+In version 0.3.0 Flask-Blogging, enables permissions based on Flask-Principal.
+This addresses the issue of controlling which of the authenticated users can
+have access to edit or create blog posts. Permissions are enabled by setting
+``BLOGGING_PERMISSIONS`` to ``True``. Only users that have access to
+``Role`` "blogger" will have permissions to create or edit blog posts.
+
 
 Screenshots
 ===========
