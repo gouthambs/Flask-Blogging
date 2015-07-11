@@ -12,7 +12,7 @@ from werkzeug.contrib.atom import AtomFeed
 import datetime
 from flask.ext.principal import PermissionDenied
 
-blog_app = Blueprint("blog_app", __name__, template_folder='templates')
+blog_app = Blueprint("blogging", __name__, template_folder='templates')
 
 
 def _get_blogging_engine(app):
@@ -59,20 +59,20 @@ def _get_meta(storage, count, page, tag=None, user_id=None):
     offset = min(max(0, (page-1)*count), max_offset)
     if (tag is None) and (user_id is None):
         prev_page = None if page <= 1 else url_for(
-            "blog_app.index", count=count, page=page-1)
+            "blogging.index", count=count, page=page-1)
         next_page = None if page >= max_pages else url_for(
-            "blog_app.index", count=count, page=page+1)
+            "blogging.index", count=count, page=page+1)
     elif tag:
         prev_page = None if page <= 1 else url_for(
-            "blog_app.posts_by_tag", tag=tag, count=count, page=page-1)
+            "blogging.posts_by_tag", tag=tag, count=count, page=page-1)
         next_page = None if page >= max_pages else url_for(
-            "blog_app.posts_by_tag", tag=tag, count=count, page=page+1)
+            "blogging.posts_by_tag", tag=tag, count=count, page=page+1)
     elif user_id:
         prev_page = None if page <= 1 else url_for(
-            "blog_app.posts_by_author", user_id=user_id, count=count,
+            "blogging.posts_by_author", user_id=user_id, count=count,
             page=page-1)
         next_page = None if page >= max_pages else url_for(
-            "blog_app.posts_by_author", user_id=user_id, count=count,
+            "blogging.posts_by_author", user_id=user_id, count=count,
             page=page+1)
     else:
         prev_page = next_page = None
@@ -134,7 +134,7 @@ def page_by_id(post_id, slug):
                                meta=meta)
     else:
         flash("The page you are trying to access is not valid!", "warning")
-        return redirect(url_for("blog_app.index"))
+        return redirect(url_for("blogging.index"))
 
 
 @blog_app.route("/tag/<tag>/", defaults=dict(count=10, page=1))
@@ -205,7 +205,7 @@ def editor(post_id):
                     pid = _store_form_data(form, storage, current_user, post)
                     flash("Blog posted successfully!", "info")
                     slug = post_processor.create_slug(form.title.data)
-                    return redirect(url_for("blog_app.page_by_id", post_id=pid,
+                    return redirect(url_for("blogging.page_by_id", post_id=pid,
                                             slug=slug))
                 else:
                     flash("There were errors in blog submission", "warning")
@@ -224,7 +224,7 @@ def editor(post_id):
                     else:
                         flash("You do not have the rights to edit this post",
                               "warning")
-                        return redirect(url_for("blog_app.index",
+                        return redirect(url_for("blogging.index",
                                                 post_id=None))
 
             form = BlogEditor()
@@ -232,7 +232,7 @@ def editor(post_id):
                                    post_id=post_id, config=config)
     except PermissionDenied:
         flash("You do not have permissions to create or edit posts", "warning")
-        return redirect(url_for("blog_app.index", post_id=None))
+        return redirect(url_for("blogging.index", post_id=None))
 
 
 @blog_app.route("/delete/<int:post_id>/", methods=["POST"])
@@ -254,10 +254,10 @@ def delete(post_id):
             else:
                 flash("You do not have the rights to delete this post",
                       "warning")
-            return redirect(url_for("blog_app.index"))
+            return redirect(url_for("blogging.index"))
     except PermissionDenied:
         flash("You do not have permissions to delete posts", "warning")
-        return redirect(url_for("blog_app.index", post_id=None))
+        return redirect(url_for("blogging.index", post_id=None))
 
 
 @blog_app.route("/sitemap.xml")
