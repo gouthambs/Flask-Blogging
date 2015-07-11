@@ -277,7 +277,7 @@ def sitemap():
 
 
 @blog_app.route('/feeds/all.atom.xml')
-def recent_feed():
+def feed():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
