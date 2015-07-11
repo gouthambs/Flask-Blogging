@@ -39,19 +39,19 @@ Blog Posts
         {% endif %}
         <hr>
     {% endfor %}
-    {% if meta %}
+    {% if ((meta)  and (meta.max_pages>1)) %}
         <div class="row">
             <div class="col-md-12">
                 <ul class="pager">
                     {% if meta.pagination.prev_page %}
                         <li><a href="{{meta.pagination.prev_page}}">&laquo;Prev</a></li>
                     {% else %}
-                        <li class="disabled"><a href="#">&laquo; Prev</a></li>
+                        <li class="disabled"><a href="">&laquo; Prev</a></li>
                     {% endif %}
                     {% if meta.pagination.next_page %}
                         <li><a href="{{meta.pagination.next_page}}">Next &raquo;</a></li>
                     {% else %}
-                        <li class="disabled"><a href="#">Next &raquo;</a></li>
+                        <li class="disabled"><a href="">Next &raquo;</a></li>
                     {% endif %}
 
                 </ul>
