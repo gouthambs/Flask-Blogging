@@ -130,7 +130,8 @@ def page_by_id(post_id, slug):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
         _process_post(post, blogging_engine, render=render)
-        return render_template("blog/page.html", post=post, config=config, meta=meta)
+        return render_template("blog/page.html", post=post, config=config,
+                               meta=meta)
     else:
         flash("The page you are trying to access is not valid!", "warning")
         return redirect(url_for("blog_app.index"))
@@ -207,7 +208,7 @@ def editor(post_id):
                     return redirect(url_for("blog_app.page_by_id", post_id=pid,
                                             slug=slug))
                 else:
-                    flash("There were errors in the blog submission", "warning")
+                    flash("There were errors in blog submission", "warning")
                     return render_template("blog/editor.html", form=form,
                                            post_id=post_id, config=config)
             else:
@@ -216,18 +217,19 @@ def editor(post_id):
                     if (post is not None) and \
                             (current_user.get_id() == post["user_id"]):
                         tags = ", ".join(post["tags"])
-                        form = BlogEditor(title=post["title"], text=post["text"],
-                                          tags=tags)
+                        form = BlogEditor(title=post["title"],
+                                          text=post["text"], tags=tags)
                         return render_template("blog/editor.html", form=form,
                                                post_id=post_id, config=config)
                     else:
                         flash("You do not have the rights to edit this post",
                               "warning")
-                        return redirect(url_for("blog_app.index", post_id=None))
+                        return redirect(url_for("blog_app.index",
+                                                post_id=None))
 
             form = BlogEditor()
-            return render_template("blog/editor.html", form=form, post_id=post_id,
-                                   config=config)
+            return render_template("blog/editor.html", form=form,
+                                   post_id=post_id, config=config)
     except PermissionDenied:
         flash("You do not have permissions to create or edit posts", "warning")
         return redirect(url_for("blog_app.index", post_id=None))
@@ -241,14 +243,17 @@ def delete(post_id):
         with blogging_engine.blogger_permission.require():
             storage = blogging_engine.storage
             post = storage.get_post_by_id(post_id)
-            if (post is not None) and (current_user.get_id() == post["user_id"]):
+            if (post is not None) and \
+                    (current_user.get_id() == post["user_id"]):
                 success = storage.delete_post(post_id)
                 if success:
                     flash("Your post was successfully deleted", "info")
                 else:
-                    flash("Something went wrong while deleting your post", "warning")
+                    flash("There were errors while deleting your post",
+                          "warning")
             else:
-                flash("You do not have the rights to delete this post", "warning")
+                flash("You do not have the rights to delete this post",
+                      "warning")
             return redirect(url_for("blog_app.index"))
     except PermissionDenied:
         flash("You do not have permissions to delete posts", "warning")
