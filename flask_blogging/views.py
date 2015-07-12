@@ -219,8 +219,9 @@ def editor(post_id):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
                                           text=post["text"], tags=tags)
-                        return render_template("blogging/editor.html", form=form,
-                                               post_id=post_id, config=config)
+                        return render_template("blogging/editor.html",
+                                               form=form, post_id=post_id,
+                                               config=config)
                     else:
                         flash("You do not have the rights to edit this post",
                               "warning")
