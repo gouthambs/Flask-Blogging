@@ -228,7 +228,7 @@ class TestViews(FlaskBloggingTestCase):
         posts_per_page = 5
         self.app.config["BLOGGING_POSTS_PER_PAGE"] = posts_per_page
         with self.client:
-            pattern = re.compile("<h1>.*</h1>")
+            pattern = re.compile(b"<h1>.*</h1>")
             # index page
             response = self.client.get("/blog/")
             headings = pattern.findall(response.data)
