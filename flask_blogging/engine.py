@@ -69,7 +69,7 @@ class BloggingEngine(object):
             blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
         self.principal = Principal(self.app)
-        if self.config.get("BLOGGING_PERMISSIONS"):
+        if self.config.get("BLOGGING_PERMISSIONS", False):
             self.blogger_permission = Permission(RoleNeed("blogger"))
         else:
             self.blogger_permission = Permission()

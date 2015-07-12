@@ -185,7 +185,8 @@ keys that are currently supported include:
   "blogger" ``Role`` to edit or create blog posts. Other authenticated
   users will not have blog editing permissions. The concepts here derive
   from ``Flask-Principal`` (default ``False``)
-
+- ``BLOGGING_POSTS_PER_PAGE`` (*int*): This sets the default number of pages
+   to be displayed per page. (default 10)
 
 Blog Views
 ==========

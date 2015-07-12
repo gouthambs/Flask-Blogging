@@ -89,7 +89,7 @@ def _is_blogger(blogger_permission):
     return is_blogger
 
 
-@blog_app.route("/", defaults={"count": 10, "page": 1})
+@blog_app.route("/", defaults={"count": None, "page": 1})
 @blog_app.route("/<int:count>/", defaults={"page": 1})
 @blog_app.route("/<int:count>/<int:page>/")
 def index(count, page):
@@ -103,6 +103,7 @@ def index(count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
+    count = count or config.get("BLOGGING_POST_PER_PAGE", 10)
 
     meta = _get_meta(storage, count, page)
     offset = meta["offset"]
@@ -137,13 +138,14 @@ def page_by_id(post_id, slug):
         return redirect(url_for("blogging.index"))
 
 
-@blog_app.route("/tag/<tag>/", defaults=dict(count=10, page=1))
+@blog_app.route("/tag/<tag>/", defaults=dict(count=None, page=1))
 @blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(page=1))
 @blog_app.route("/tag/<tag>/<int:count>/<int:page>/")
 def posts_by_tag(tag, count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
+    count = count or config.get("BLOGGING_POST_PER_PAGE", 10)
     meta = _get_meta(storage, count, page, tag=tag)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
@@ -157,14 +159,14 @@ def posts_by_tag(tag, count, page):
                            config=config)
 
 
-@blog_app.route("/author/<user_id>/", defaults=dict(count=10, page=1))
+@blog_app.route("/author/<user_id>/", defaults=dict(count=None, page=1))
 @blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(page=1))
 @blog_app.route("/author/<user_id>/<int:count>/<int:page>/")
 def posts_by_author(user_id, count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
-
+    count = count or config.get("BLOGGING_POST_PER_PAGE", 10)
     meta = _get_meta(storage, count, page, user_id=user_id)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
