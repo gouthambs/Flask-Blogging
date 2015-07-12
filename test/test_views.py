@@ -11,7 +11,7 @@ from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
 from flask_login import UserMixin
-
+import re
 
 class TestUser(UserMixin):
     def __init__(self, user_id):
@@ -208,3 +208,24 @@ class TestViews(FlaskBloggingTestCase):
             # access to editor should be forbidden before login
             response = self.client.get("/blog/feeds/all.atom.xml")
             self.assertEqual(response.status_code, 200)
+
+    def test_posts_per_page(self):
+        posts_per_page = 5
+        self.app.config["BLOGGING_POSTS_PER_PAGE"] = posts_per_page
+        with self.client:
+            pattern = re.compile("<h1>.*</h1>")
+            # index page
+            response = self.client.get("/blog/")
+            headings = pattern.findall(response.data)
+            self.assertEqual(len(headings), posts_per_page)
+
+            # tag page
+            response = self.client.get("/blog/tag/hello/")
+            headings = pattern.findall(response.data)
+            self.assertEqual(len(headings), posts_per_page)
+
+            # author page
+            response = self.client.get("/blog/author/testuser/")
+            headings = pattern.findall(response.data)
+            self.assertEqual(len(headings), posts_per_page)
+
