@@ -12,8 +12,8 @@ from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
 from flask_login import UserMixin
 import re
-from flask.ext.principal import identity_changed, Identity, AnonymousIdentity, \
-    identity_loaded, RoleNeed, UserNeed
+from flask.ext.principal import identity_changed, Identity, \
+    AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 
 
 class TestUser(UserMixin):
@@ -328,7 +328,7 @@ class TestViews(FlaskBloggingTestCase):
             self.login(user_id)
             # non blogger cannot delete posts
             response = self.client.post("/blog/delete/1/")
-            self.assertEqual(response.status_code, 302) # will be redirected
+            self.assertEqual(response.status_code, 302)  # will be redirected
             self.logout()
 
             self.login(user_id, blogger=True)
@@ -342,4 +342,3 @@ class TestViews(FlaskBloggingTestCase):
                                         follow_redirects=True)
             assert "You do not have the rights to delete this post" in \
                    str(response.data)
-
