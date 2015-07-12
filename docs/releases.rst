@@ -1,5 +1,16 @@
 Release Notes
 =============
+- **Version 0.3.0**:
+
+  *Released July 11, 2015*
+
+  - Permissions is a new feature introduced in this version. By setting
+    ``BLOGGING_PERMISSIONS`` to ``True``, one can restrict which of the users
+    can create, edit or delete posts.
+  - Added ``BLOGGING_POSTS_PER_PAGE`` configuration variable to control
+    the number of posts in a page.
+  - Documented the url construction procedure.
+
 - **Version 0.2.1**:
 
   *Released July 10, 2015*
@@ -46,6 +57,11 @@ Release Notes
 
 Compatibility Notes
 ===================
+- **Version 0.3.0**:
+
+    In this release, the templates folder was renamed from ``blog`` to
+    ``blogging``. To override the existing templates, you will need to
+    create your templates in the ``blogging`` folder.
 
 - **Version 0.2.0**:
 
