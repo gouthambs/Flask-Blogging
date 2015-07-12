@@ -4,7 +4,7 @@ except ImportError:
     pass
 import os
 import tempfile
-from flask import redirect
+from flask import redirect, url_for
 from flask.ext.login import LoginManager, login_user, logout_user, current_user
 from sqlalchemy import create_engine
 from flask_blogging.sqlastorage import SQLAStorage
@@ -229,3 +229,37 @@ class TestViews(FlaskBloggingTestCase):
             headings = pattern.findall(response.data)
             self.assertEqual(len(headings), posts_per_page)
 
+    def test_url_construction(self):
+        ctx = self.app.test_request_context()
+        ctx.push()
+        index_url = url_for("blogging.index")
+        self.assertEqual(index_url, "/blog/")
+
+        # index url
+        index_url = url_for("blogging.index", count=10)
+        self.assertEqual(index_url, "/blog/10/")
+
+        index_url = url_for("blogging.index", count=10, page=2)
+        self.assertEqual(index_url, "/blog/10/2/")
+
+        # page by id
+        page_url = url_for("blogging.page_by_id", post_id=5)
+        self.assertEqual(page_url, "/blog/page/5/")
+
+        # posts by tag
+        tag_url = url_for("blogging.posts_by_tag", tag="hello")
+        self.assertEqual(tag_url, "/blog/tag/hello/")
+
+        # posts by author
+        author_url = url_for("blogging.posts_by_author", user_id="newuser")
+        self.assertEqual(author_url, "/blog/author/newuser/")
+
+        # sitemap
+        sitemap_url = url_for("blogging.sitemap")
+        self.assertEqual(sitemap_url, "/blog/sitemap.xml")
+
+        # feeds
+        feed_url = url_for("blogging.feed")
+        self.assertEqual(feed_url, "/blog/feeds/all.atom.xml")
+
+        ctx.pop()
