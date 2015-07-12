@@ -191,25 +191,25 @@ keys that are currently supported include:
 Blog Views
 ==========
 
-There are various views that are exposed through Flask-Blogging. If the ``url_prefix``
-argument in the BloggingEngine is ``/blog``, then the URL for the various views are:
+There are various views that are exposed through Flask-Blogging. The URL for
+the various views are:
 
-- ``/blog/`` or ``url_for('blogging.index')`` (GET): The index blog posts with
-  the first page of articles.
-- ``/blog/page/<post_id>/<optional slug>/`` or ``url_for('blogging.page_by_id(<post_id>)')`` (GET):
-  The blog post corresponding to the ``post_id`` is retrieved.
-- ``/blog/tag/<tag_name>/`` or ``url_for('blogging.posts_by_tag(<tag_name>)')`` (GET):
-  The list of blog posts corresponding to ``tag_name`` is returned.
-- ``/blog/author/<user_id>/`` or ``url_for('blogging.posts_by_author(<user_id>)')`` (GET):
-  The list of blog posts written by the author ``user_id`` is returned.
-- ``/blog/editor/`` or ``url_for('blogging.editor')`` (GET, POST): The blog editor
+- ``url_for('blogging.index')`` (GET): The index blog posts with the first
+  page of articles.
+- ``url_for('blogging.page_by_id', post_id=<post_id>)`` (GET): The blog post
+  corresponding to the ``post_id`` is retrieved.
+- ``url_for('blogging.posts_by_tag', tag=<tag_name>)`` (GET): The list of blog
+  posts corresponding to ``tag_name`` is returned.
+- ``url_for('blogging.posts_by_author', user_id=<user_id>)`` (GET): The list of
+  blog posts written by the author ``user_id`` is returned.
+- ``url_for('blogging.editor')`` (GET, POST): The blog editor
   is shown. This view needs authentication and permissions (if enabled).
-- ``/blog/delete/<post_id>/`` or ``url_for('blogging.delete(<post_id>)')`` (POST):
-  The blog post given by ``post_id`` is deleted. This view needs authentication
-  and permissions (if enabled).
-- ``/blog/sitemap.xml`` or ``url_for('blogging.sitemap')`` (GET): The sitemap
+- ``url_for('blogging.delete', post_id=<post_id>)`` (POST): The blog post
+  given by ``post_id`` is deleted. This view needs authentication and
+  permissions (if enabled).
+- ``url_for('blogging.sitemap')`` (GET): The sitemap
   with a link to all the posts is returned.
-- ``/blog/feeds/all.atom.xml`` or ``url_for('blogging.feed')`` (GET): Returns ATOM feed.
+- ``url_for('blogging.feed')`` (GET): Returns ATOM feed URL.
 
 The view can be easily customised by the user by overriding with their own templates. The template pages that need
 to be customized are:
