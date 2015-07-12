@@ -44,6 +44,7 @@ class BloggingEngine(object):
         """
         self.app = None
         self.storage = storage
+        self._blogger_permission = None
         self.post_processor = PostProcessor() if post_processor is None \
             else post_processor
         if extensions:
@@ -69,10 +70,15 @@ class BloggingEngine(object):
             blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
         self.principal = Principal(self.app)
-        if self.config.get("BLOGGING_PERMISSIONS", False):
-            self.blogger_permission = Permission(RoleNeed("blogger"))
-        else:
-            self.blogger_permission = Permission()
+
+    @property
+    def blogger_permission(self):
+        if self._blogger_permission is None:
+            if self.config.get("BLOGGING_PERMISSIONS", False):
+                self._blogger_permission = Permission(RoleNeed("blogger"))
+            else:
+                self._blogger_permission = Permission()
+        return self._blogger_permission
 
     def user_loader(self, callback):
         """

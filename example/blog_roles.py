@@ -34,7 +34,7 @@ def on_identity_loaded(sender, identity):
     identity.user = current_user
     if hasattr(current_user, "id"):
         identity.provides.add(UserNeed(current_user.id))
-    #identity.provides.add(RoleNeed("blogger"))
+    identity.provides.add(RoleNeed("blogger"))
 
 
 @login_manager.user_loader
@@ -69,7 +69,8 @@ def login():
     login_user(user)
 
     # notify the change of role
-    identity_changed.send(current_app._get_current_object(), identity=Identity("testuser"))
+    identity_changed.send(current_app._get_current_object(),
+                          identity=Identity("testuser"))
     return redirect("/blog")
 
 @app.route("/logout/")

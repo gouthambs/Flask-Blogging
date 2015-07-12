@@ -4,7 +4,7 @@ except ImportError:
     pass
 import os
 import tempfile
-from flask import redirect, url_for
+from flask import redirect, url_for, current_app
 from flask.ext.login import LoginManager, login_user, logout_user, current_user
 from sqlalchemy import create_engine
 from flask_blogging.sqlastorage import SQLAStorage
@@ -12,6 +12,9 @@ from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
 from flask_login import UserMixin
 import re
+from flask.ext.principal import identity_changed, Identity, AnonymousIdentity, \
+    identity_loaded, RoleNeed, UserNeed
+
 
 class TestUser(UserMixin):
     def __init__(self, user_id):
@@ -39,15 +42,22 @@ class TestViews(FlaskBloggingTestCase):
         def load_user(user_id):
             return TestUser(user_id)
 
-        @self.app.route("/login/<username>/", methods=["POST"])
-        def login(username):
+        @self.app.route("/login/<username>/", methods=["POST"],
+                        defaults={"blogger": 0})
+        @self.app.route("/login/<username>/<int:blogger>/", methods=["POST"])
+        def login(username, blogger):
             this_user = TestUser(username)
             login_user(this_user)
+            if blogger:
+                identity_changed.send(current_app._get_current_object(),
+                                      identity=Identity(username))
             return redirect("/")
 
         @self.app.route("/logout/")
         def logout():
             logout_user()
+            identity_changed.send(current_app._get_current_object(),
+                                  identity=AnonymousIdentity())
             return redirect("/")
 
         for i in range(20):
@@ -191,8 +201,13 @@ class TestViews(FlaskBloggingTestCase):
                                         follow_redirects=True)
             assert "Your post was successfully deleted" in str(response.data)
 
-    def login(self, user_id):
-        return self.client.post("/login/%s/" % user_id, follow_redirects=True)
+    def login(self, user_id, blogger=False):
+        if blogger:
+            return self.client.post("/login/%s/1/" % user_id,
+                                    follow_redirects=True)
+        else:
+            return self.client.post("/login/%s/" % user_id,
+                                    follow_redirects=True)
 
     def logout(self):
         return self.client.get("/logout/")
@@ -263,3 +278,68 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(feed_url, "/blog/feeds/all.atom.xml")
 
         ctx.pop()
+
+    def _set_identity_loader(self):
+        @identity_loaded.connect_via(self.app)
+        def on_identity_loaded(sender, identity):
+            identity.user = current_user
+            if hasattr(current_user, "id"):
+                identity.provides.add(UserNeed(current_user.id))
+            identity.provides.add(RoleNeed("blogger"))
+
+    def test_permissions_editor(self):
+        self.app.config["BLOGGING_PERMISSIONS"] = True
+        user_id = "newuser"
+        self._set_identity_loader()
+
+        with self.client:
+            response = self.client.post("/blog/editor/")
+            self.assertEqual(response.status_code, 401)
+
+            response = self.client.post("/blog/editor/1/")
+            self.assertEqual(response.status_code, 401)
+
+            self.login(user_id)
+            response = self.client.post("/blog/editor/")
+            self.assertEqual(response.status_code, 302)
+
+            response = self.client.post("/blog/editor/1/")
+            self.assertEqual(response.status_code, 302)
+
+            self.logout()
+
+            self.login(user_id, blogger=True)
+            response = self.client.post("/blog/editor/")
+            self.assertEqual(response.status_code, 200)
+
+            response = self.client.post("/blog/editor/1/")
+            self.assertEqual(response.status_code, 200)
+
+    def test_permissions_delete(self):
+        self.app.config["BLOGGING_PERMISSIONS"] = True
+        user_id = "testuser"
+        self._set_identity_loader()
+
+        with self.client:
+            # Anonymous user cannot delete
+            response = self.client.post("/blog/delete/1/")
+            self.assertEqual(response.status_code, 401)
+
+            self.login(user_id)
+            # non blogger cannot delete posts
+            response = self.client.post("/blog/delete/1/")
+            self.assertEqual(response.status_code, 302) # will be redirected
+            self.logout()
+
+            self.login(user_id, blogger=True)
+            response = self.client.post("/blog/delete/1/",
+                                        follow_redirects=True)
+            assert "Your post was successfully deleted" in str(response.data)
+
+            # a user cannot delete another person's post
+            self.assertEquals(current_user.get_id(), user_id)
+            response = self.client.post("/blog/delete/11/",
+                                        follow_redirects=True)
+            assert "You do not have the rights to delete this post" in \
+                   str(response.data)
+
