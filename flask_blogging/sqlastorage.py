@@ -17,7 +17,7 @@ class SQLAStorage(Storage):
     _db = None
     _logger = logging.getLogger("flask-blogging")
 
-    def __init__(self, engine, table_prefix="", metadata=None):
+    def __init__(self, engine=None, table_prefix="", metadata=None, db=None):
         """
         The constructor for the ``SQLAStorage`` class.
 
@@ -28,12 +28,27 @@ class SQLAStorage(Storage):
         :param table_prefix: (Optional) Prefix to use for the tables created
          (default ``""``).
         :type table_prefix: str
+        :param metadata: (Optional) The SQLAlchemy MetaData object
+        :type metadata: object
+        :param db: (Optional) The Flask-SQLAlchemy SQLAlchemy object
+        :param db: object
+        :param
         """
-        self._engine = engine
+        if db:
+            self._engine = db.engine
+            self._metadata = db.metadata
+        else:
+            if engine is None:
+                raise ValueError("Both db and engine args cannot be None")
+            self._engine = engine
+            self._metadata = metadata or sqla.MetaData()
         self._table_prefix = table_prefix
-        self._metadata = metadata or sqla.MetaData()
-        self._metadata.reflect(bind=engine)
+        self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     def save_post(self, title, text, user_id, tags, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,

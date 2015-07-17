@@ -125,15 +125,33 @@ to your web app. You should create the `BloggingEngine` instance like this::
 
 You also need to pick the storage for blog. That can be done as::
 
-    from sqlalchemy import create_engine
+    from sqlalchemy import create_engine, MetaData
 
     engine = create_engine("sqlite:////tmp/sqlite.db")
-    storage = SQLAStorage(engine)
+    meta = MetaData()
+    storage = SQLAStorage(engine, metadata=meta)
+    meta.create_all(bind=engine)
 
-Once you have created the blogging engine and the storage, you can connect
+Here we have created the storage, and created all the tables
+in the metadata. Once you have created the blogging engine,
+storage, and all the tables in the storage, you can connect
 with your app using the `init_app` method as shown below::
 
    blogging_engine.init_app(app, storage)
+
+If you are using ``Flask-Sqlalchemy``, you can do the following::
+
+    from flask.ext.sqlalchemy import SQLAlchemy
+
+    db = SQLAlchemy(app)
+    storage = SQLAStorage(db=db)
+    db.create_all()
+
+One of the changes in version 0.3.1 is the ability for the user
+to provide the ``metadata`` object. This has the benefit of the
+table creation being passed to the user. Also, this gives the user
+the ability to use the common metadata object, and hence helps
+with the tables showing up in migrations while using Alembic.
 
 *Flask-Blogging* lets the developer pick the authentication
 that is suitable, and hence requires her to provide a way to load user
@@ -250,7 +268,8 @@ Useful Tips
     create_engine("postgresql+psycopg2://postgres:@localhost/flask_blogging",
                   isolation_level="AUTOCOMMIT")
 
-- **Migrations with Alembic**: If you have migrations part of your project
+- **Migrations with Alembic**: (Applies to versions 0.3.0 and earlier)
+  If you have migrations part of your project
   using Alembic, or extensions such as ``Flask-Migrate`` which uses Alembic, then
   you have to modify the ``Alembic`` configuration in order for it to ignore
   the ``Flask-Blogging`` related tables. If you don't set these modifications,

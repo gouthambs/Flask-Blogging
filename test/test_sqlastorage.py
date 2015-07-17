@@ -323,7 +323,6 @@ class TestMySQLStorage(TestSQLiteStorage):
         self.storage = SQLAStorage(self._engine, metadata=self._meta)
         self._meta.create_all(bind=self._engine)
 
-
     def tearDown(self):
         metadata = sqla.MetaData()
         metadata.reflect(bind=self._engine)
