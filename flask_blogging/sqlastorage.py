@@ -17,7 +17,7 @@ class SQLAStorage(Storage):
     _db = None
     _logger = logging.getLogger("flask-blogging")
 
-    def __init__(self, engine, table_prefix=""):
+    def __init__(self, engine, table_prefix="", metadata=None):
         """
         The constructor for the ``SQLAStorage`` class.
 
@@ -31,6 +31,8 @@ class SQLAStorage(Storage):
         """
         self._engine = engine
         self._table_prefix = table_prefix
+        self._metadata = metadata or sqla.MetaData()
+        self._metadata.reflect(bind=engine)
         self._create_all_tables()
 
     def save_post(self, title, text, user_id, tags, draft=False,
@@ -356,11 +358,10 @@ class SQLAStorage(Storage):
         :return:
         """
         with self._engine.begin() as conn:
-            metadata = sqla.MetaData()
             post_table_name = self._table_name("post")
             if not conn.dialect.has_table(conn, post_table_name):
                 self._post_table = sqla.Table(
-                    post_table_name, metadata,
+                    post_table_name, self._metadata,
                     sqla.Column("id", sqla.Integer, primary_key=True),
                     sqla.Column("title", sqla.String(256)),
                     sqla.Column("text", sqla.Text),
@@ -370,12 +371,10 @@ class SQLAStorage(Storage):
                     sqla.Column("draft", sqla.SmallInteger, default=0)
 
                 )
-                metadata.create_all(self._engine)
                 self._logger.debug("Created table with table name %s" %
                                    post_table_name)
             else:
-                metadata.reflect(bind=self._engine)
-                self._post_table = metadata.tables[post_table_name]
+                self._post_table = self._metadata.tables[post_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    post_table_name)
 
@@ -385,21 +384,18 @@ class SQLAStorage(Storage):
         :return:
         """
         with self._engine.begin() as conn:
-            metadata = sqla.MetaData()
             tag_table_name = self._table_name("tag")
             if not conn.dialect.has_table(conn, tag_table_name):
                 self._tag_table = sqla.Table(
-                    tag_table_name, metadata,
+                    tag_table_name, self._metadata,
                     sqla.Column("id", sqla.Integer, primary_key=True),
                     sqla.Column("text", sqla.String(128), unique=True,
                                 index=True)
                 )
-                metadata.create_all(self._engine)
                 self._logger.debug("Created table with table name %s" %
                                    tag_table_name)
             else:
-                metadata.reflect(bind=self._engine)
-                self._tag_table = metadata.tables[tag_table_name]
+                self._tag_table = self._metadata.tables[tag_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    tag_table_name)
 
@@ -409,15 +405,13 @@ class SQLAStorage(Storage):
         tags.
         :return:
         """
-        metadata = sqla.MetaData()
-        metadata.reflect(bind=self._engine)
         with self._engine.begin() as conn:
             tag_posts_table_name = self._table_name("tag_posts")
             if not conn.dialect.has_table(conn, tag_posts_table_name):
                 tag_id_key = self._table_name("tag") + ".id"
                 post_id_key = self._table_name("post") + ".id"
                 self._tag_posts_table = sqla.Table(
-                    tag_posts_table_name, metadata,
+                    tag_posts_table_name, self._metadata,
                     sqla.Column('tag_id', sqla.Integer,
                                 sqla.ForeignKey(tag_id_key, onupdate="CASCADE",
                                                 ondelete="CASCADE"),
@@ -429,11 +423,10 @@ class SQLAStorage(Storage):
                                 index=True),
                     sqla.UniqueConstraint('tag_id', 'post_id', name='uix_1')
                 )
-                metadata.create_all(self._engine)
                 self._logger.debug("Created table with table name %s" %
                                    tag_posts_table_name)
             else:
-                self._tag_posts_table = metadata.tables[tag_posts_table_name]
+                self._tag_posts_table = self._metadata.tables[tag_posts_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    tag_posts_table_name)
 
@@ -443,14 +436,12 @@ class SQLAStorage(Storage):
         posts.
         :return:
         """
-        metadata = sqla.MetaData()
-        metadata.reflect(bind=self._engine)
         with self._engine.begin() as conn:
             user_posts_table_name = self._table_name("user_posts")
             if not conn.dialect.has_table(conn, user_posts_table_name):
                 post_id_key = self._table_name("post") + ".id"
                 self._user_posts_table = sqla.Table(
-                    user_posts_table_name, metadata,
+                    user_posts_table_name, self._metadata,
                     sqla.Column("user_id", sqla.String(128), index=True),
                     sqla.Column("post_id", sqla.Integer,
                                 sqla.ForeignKey(post_id_key,
@@ -459,10 +450,9 @@ class SQLAStorage(Storage):
                                 index=True),
                     sqla.UniqueConstraint('user_id', 'post_id', name='uix_2')
                 )
-                metadata.create_all(self._engine)
                 self._logger.debug("Created table with table name %s" %
                                    user_posts_table_name)
             else:
-                self._user_posts_table = metadata.tables[user_posts_table_name]
+                self._user_posts_table = self._metadata.tables[user_posts_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    user_posts_table_name)

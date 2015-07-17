@@ -1,5 +1,5 @@
 from flask import Flask, render_template_string, redirect, current_app
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from flask.ext.login import UserMixin, LoginManager, login_user, logout_user, current_user
 from flask.ext.blogging import SQLAStorage, BloggingEngine
 from flask.ext.principal import identity_changed, Identity, AnonymousIdentity, identity_loaded, \
@@ -16,10 +16,11 @@ app.config["BLOGGING_PERMISSIONS"] = False  # Enable blogger permissions
 
 # extensions
 engine = create_engine('sqlite:////tmp/blog.db')
-sql_storage = SQLAStorage(engine)
+meta = MetaData()
+sql_storage = SQLAStorage(engine, metadata=meta)
 blog_engine = BloggingEngine(app, sql_storage)
 login_manager = LoginManager(app)
-
+meta.create_all(bind=engine)
 
 class User(UserMixin):
     def __init__(self, user_id):
