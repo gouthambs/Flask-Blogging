@@ -118,11 +118,13 @@ Dependencies
 - `Flask <https://github.com/mitsuhiko/flask>`_
 - `SQLAlchemy <https://github.com/zzzeek/sqlalchemy>`_
 - `Flask-Login <https://github.com/maxcountryman/flask-login>`_
+- `Flask-Principal <https://github.com/mattupstate/flask-principal>`_
 - `Flask-WTF <https://github.com/lepture/flask-wtf>`_
 - `Markdown <https://pythonhosted.org/Markdown/>`_
 - `Bootstrap <http://getbootstrap.com/>`_
 - `Bootstrap-Markdown <https://github.com/toopay/bootstrap-markdown>`_
 - `Markdown-js <https://github.com/evilstreak/markdown-js>`_
+
 
 License
 -------

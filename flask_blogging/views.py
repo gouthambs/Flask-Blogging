@@ -12,7 +12,7 @@ from werkzeug.contrib.atom import AtomFeed
 import datetime
 from flask.ext.principal import PermissionDenied
 
-blog_app = Blueprint("blog_app", __name__, template_folder='templates')
+blog_app = Blueprint("blogging", __name__, template_folder='templates')
 
 
 def _get_blogging_engine(app):
@@ -59,20 +59,20 @@ def _get_meta(storage, count, page, tag=None, user_id=None):
     offset = min(max(0, (page-1)*count), max_offset)
     if (tag is None) and (user_id is None):
         prev_page = None if page <= 1 else url_for(
-            "blog_app.index", count=count, page=page-1)
+            "blogging.index", count=count, page=page-1)
         next_page = None if page >= max_pages else url_for(
-            "blog_app.index", count=count, page=page+1)
+            "blogging.index", count=count, page=page+1)
     elif tag:
         prev_page = None if page <= 1 else url_for(
-            "blog_app.posts_by_tag", tag=tag, count=count, page=page-1)
+            "blogging.posts_by_tag", tag=tag, count=count, page=page-1)
         next_page = None if page >= max_pages else url_for(
-            "blog_app.posts_by_tag", tag=tag, count=count, page=page+1)
+            "blogging.posts_by_tag", tag=tag, count=count, page=page+1)
     elif user_id:
         prev_page = None if page <= 1 else url_for(
-            "blog_app.posts_by_author", user_id=user_id, count=count,
+            "blogging.posts_by_author", user_id=user_id, count=count,
             page=page-1)
         next_page = None if page >= max_pages else url_for(
-            "blog_app.posts_by_author", user_id=user_id, count=count,
+            "blogging.posts_by_author", user_id=user_id, count=count,
             page=page+1)
     else:
         prev_page = next_page = None
@@ -89,7 +89,7 @@ def _is_blogger(blogger_permission):
     return is_blogger
 
 
-@blog_app.route("/", defaults={"count": 10, "page": 1})
+@blog_app.route("/", defaults={"count": None, "page": 1})
 @blog_app.route("/<int:count>/", defaults={"page": 1})
 @blog_app.route("/<int:count>/<int:page>/")
 def index(count, page):
@@ -103,6 +103,7 @@ def index(count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
+    count = count or config.get("BLOGGING_POSTS_PER_PAGE", 10)
 
     meta = _get_meta(storage, count, page)
     offset = meta["offset"]
@@ -113,7 +114,7 @@ def index(count, page):
                               tag=None, user_id=None, recent=True)
     for post in posts:
         _process_post(post, blogging_engine, render=render)
-    return render_template("blog/index.html", posts=posts, meta=meta,
+    return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
 
@@ -130,19 +131,21 @@ def page_by_id(post_id, slug):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
         _process_post(post, blogging_engine, render=render)
-        return render_template("blog/page.html", post=post, config=config, meta=meta)
+        return render_template("blogging/page.html", post=post, config=config,
+                               meta=meta)
     else:
         flash("The page you are trying to access is not valid!", "warning")
-        return redirect(url_for("blog_app.index"))
+        return redirect(url_for("blogging.index"))
 
 
-@blog_app.route("/tag/<tag>/", defaults=dict(count=10, page=1))
+@blog_app.route("/tag/<tag>/", defaults=dict(count=None, page=1))
 @blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(page=1))
 @blog_app.route("/tag/<tag>/<int:count>/<int:page>/")
 def posts_by_tag(tag, count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
+    count = count or config.get("BLOGGING_POSTS_PER_PAGE", 10)
     meta = _get_meta(storage, count, page, tag=tag)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
@@ -152,18 +155,18 @@ def posts_by_tag(tag, count, page):
                               include_draft=False, user_id=None, recent=True)
     for post in posts:
         _process_post(post, blogging_engine, render=render)
-    return render_template("blog/index.html", posts=posts, meta=meta,
+    return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
 
-@blog_app.route("/author/<user_id>/", defaults=dict(count=10, page=1))
+@blog_app.route("/author/<user_id>/", defaults=dict(count=None, page=1))
 @blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(page=1))
 @blog_app.route("/author/<user_id>/<int:count>/<int:page>/")
 def posts_by_author(user_id, count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config
-
+    count = count or config.get("BLOGGING_POSTS_PER_PAGE", 10)
     meta = _get_meta(storage, count, page, user_id=user_id)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
@@ -176,7 +179,7 @@ def posts_by_author(user_id, count, page):
             _process_post(post, blogging_engine, render=render)
     else:
         flash("No posts found for this user!", "warning")
-    return render_template("blog/index.html", posts=posts, meta=meta,
+    return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
 
@@ -204,11 +207,11 @@ def editor(post_id):
                     pid = _store_form_data(form, storage, current_user, post)
                     flash("Blog posted successfully!", "info")
                     slug = post_processor.create_slug(form.title.data)
-                    return redirect(url_for("blog_app.page_by_id", post_id=pid,
+                    return redirect(url_for("blogging.page_by_id", post_id=pid,
                                             slug=slug))
                 else:
-                    flash("There were errors in the blog submission", "warning")
-                    return render_template("blog/editor.html", form=form,
+                    flash("There were errors in blog submission", "warning")
+                    return render_template("blogging/editor.html", form=form,
                                            post_id=post_id, config=config)
             else:
                 if post_id is not None:
@@ -216,21 +219,23 @@ def editor(post_id):
                     if (post is not None) and \
                             (current_user.get_id() == post["user_id"]):
                         tags = ", ".join(post["tags"])
-                        form = BlogEditor(title=post["title"], text=post["text"],
-                                          tags=tags)
-                        return render_template("blog/editor.html", form=form,
-                                               post_id=post_id, config=config)
+                        form = BlogEditor(title=post["title"],
+                                          text=post["text"], tags=tags)
+                        return render_template("blogging/editor.html",
+                                               form=form, post_id=post_id,
+                                               config=config)
                     else:
                         flash("You do not have the rights to edit this post",
                               "warning")
-                        return redirect(url_for("blog_app.index", post_id=None))
+                        return redirect(url_for("blogging.index",
+                                                post_id=None))
 
             form = BlogEditor()
-            return render_template("blog/editor.html", form=form, post_id=post_id,
-                                   config=config)
+            return render_template("blogging/editor.html", form=form,
+                                   post_id=post_id, config=config)
     except PermissionDenied:
         flash("You do not have permissions to create or edit posts", "warning")
-        return redirect(url_for("blog_app.index", post_id=None))
+        return redirect(url_for("blogging.index", post_id=None))
 
 
 @blog_app.route("/delete/<int:post_id>/", methods=["POST"])
@@ -241,18 +246,21 @@ def delete(post_id):
         with blogging_engine.blogger_permission.require():
             storage = blogging_engine.storage
             post = storage.get_post_by_id(post_id)
-            if (post is not None) and (current_user.get_id() == post["user_id"]):
+            if (post is not None) and \
+                    (current_user.get_id() == post["user_id"]):
                 success = storage.delete_post(post_id)
                 if success:
                     flash("Your post was successfully deleted", "info")
                 else:
-                    flash("Something went wrong while deleting your post", "warning")
+                    flash("There were errors while deleting your post",
+                          "warning")
             else:
-                flash("You do not have the rights to delete this post", "warning")
-            return redirect(url_for("blog_app.index"))
+                flash("You do not have the rights to delete this post",
+                      "warning")
+            return redirect(url_for("blogging.index"))
     except PermissionDenied:
         flash("You do not have permissions to delete posts", "warning")
-        return redirect(url_for("blog_app.index", post_id=None))
+        return redirect(url_for("blogging.index", post_id=None))
 
 
 @blog_app.route("/sitemap.xml")
@@ -264,7 +272,7 @@ def sitemap():
                               user_id=None, tag=None, include_draft=False)
     for post in posts:
         _process_post(post, blogging_engine, render=False)
-    sitemap_xml = render_template("blog/sitemap.xml", posts=posts,
+    sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
@@ -272,7 +280,7 @@ def sitemap():
 
 
 @blog_app.route('/feeds/all.atom.xml')
-def recent_feed():
+def feed():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
     config = blogging_engine.config

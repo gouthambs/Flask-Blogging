@@ -31,6 +31,7 @@ Out of the box, Flask-Blogging has support for the following:
 - Sitemap, ATOM support
 - Disqus support for comments
 - Google analytics for usage tracking
+- Permissions enabled to control which users can create/edit blogs
 - Well documented, tested, and extensible design
 
 .. contents::
@@ -158,50 +159,75 @@ of Markdown text. An ideal way to do this would be to inherit the default
 ``custom_process`` method that can be overridden to add extra functionality
 to the post processing step.
 
-The ``BloggingEngine`` can be configured by setting the following app
+
+Configuration Variables
+=======================
+
+The Flask-Blogging extension can be configured by setting the following app
 config variables. These arguments are passed to all the views. The
 keys that are currently supported include:
 
-=========================== ===================================================
-BLOGGING_SITENAME           The name of the blog to be used as the brand name.
-                            This is also used in the feed heading.
-                            (default "Flask-Blogging")
-BLOGGING_SITEURL            The url of the site.
-BLOGGING_RENDER_TEXT        Boolean value to specify if the raw text should be
-                            rendered or not. (default ``True``)
-BLOGGING_DISQUS_SITENAME    Disqus sitename for comments (default ``None``)
-BLOGGING_GOOGLE_ANALYTICS   Google analytics code for usage tracking
-                            (default ``None``)
-BLOGGING_URL_PREFIX         The prefix for the URL of blog posts
-                            (default ``None``)
-BLOGGING_FEED_LIMIT         The number of posts to limit to in the feed. If
-                            ``None``, then all are shown, else will be limited
-                            to this number. (default ``None``)
-=========================== ===================================================
-
-
+- ``BLOGGING_SITENAME`` (*str*): The name of the blog to be used as the brand
+  name.This is also used in the feed heading. (default "Flask-Blogging")
+- ``BLOGGING_SITEURL`` (*str*): The url of the site.
+- ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text should be
+  rendered or not. (default ``True``)
+- ``BLOGGING_DISQUS_SITENAME`` (*str*): Disqus sitename for comments.
+  A ``None`` value will disable comments. (default ``None``)
+- ``BLOGGING_GOOGLE_ANALYTICS`` (*str*): Google analytics code for usage
+  tracking. A ``None`` value will disable google analytics. (default ``None``)
+- ``BLOGGING_URL_PREFIX`` (*str*) : The prefix for the URL of blog posts. A
+  ``None`` value will have no prefix (default ``None``).
+- ``BLOGGING_FEED_LIMIT`` (*int*): The number of posts to limit to in the feed.
+  If ``None``, then all are shown, else will be limited to this number. (default ``None``)
+- ``BLOGGING_PERMISSIONS`` (*bool*): if ``True``, this will enable permissions
+  for the blogging engine. With permissions enabled, the user will need to have
+  "blogger" ``Role`` to edit or create blog posts. Other authenticated
+  users will not have blog editing permissions. The concepts here derive
+  from ``Flask-Principal`` (default ``False``)
+- ``BLOGGING_POSTS_PER_PAGE`` (*int*): This sets the default number of pages
+   to be displayed per page. (default 10)
 
 Blog Views
 ==========
 
-There are various views that are exposed through Flask-Blogging. If the ``url_prefix``
-argument in the BloggingEngine is ``/blog``, then the URL for the various views are:
+There are various views that are exposed through Flask-Blogging. The URL for
+the various views are:
 
-- ``/blog/`` (GET): The index blog posts with the first page of articles.
-- ``/blog/page/<post_id>/<optional slug>/`` (GET): The blog post corresponding to the ``post_id`` is retrieved.
-- ``/blog/tag/<tag_name>/`` (GET): The list of blog posts corresponding to ``tag_name`` is returned.
-- ``/blog/author/<user_id>/`` (GET): The list of blog posts written by the author ``user_id`` is returned.
-- ``/blog/editor/`` (GET, POST): The blog editor is shown. This view needs authentication.
-- ``/blog/delete/<post_id>/`` (POST): The blog post given by ``post_id`` is deleted. This view needs authentication.
-- ``/blog/sitemap.xml`` (GET): The sitemap with a link to all the posts is returned.
+- ``url_for('blogging.index')`` (GET): The index blog posts with the first
+  page of articles.
+- ``url_for('blogging.page_by_id', post_id=<post_id>)`` (GET): The blog post
+  corresponding to the ``post_id`` is retrieved.
+- ``url_for('blogging.posts_by_tag', tag=<tag_name>)`` (GET): The list of blog
+  posts corresponding to ``tag_name`` is returned.
+- ``url_for('blogging.posts_by_author', user_id=<user_id>)`` (GET): The list of
+  blog posts written by the author ``user_id`` is returned.
+- ``url_for('blogging.editor')`` (GET, POST): The blog editor
+  is shown. This view needs authentication and permissions (if enabled).
+- ``url_for('blogging.delete', post_id=<post_id>)`` (POST): The blog post
+  given by ``post_id`` is deleted. This view needs authentication and
+  permissions (if enabled).
+- ``url_for('blogging.sitemap')`` (GET): The sitemap
+  with a link to all the posts is returned.
+- ``url_for('blogging.feed')`` (GET): Returns ATOM feed URL.
 
 The view can be easily customised by the user by overriding with their own templates. The template pages that need
 to be customized are:
 
-- ``blog/index.html``: The blog index page used to serve index of posts, posts by tag, and posts by author
-- ``blog/editor.html``: The blog editor page.
-- ``blog/page.html``: The page that shows the given article.
-- ``blog/sitemap.xml``: The sitemap for the blog posts.
+- ``blogging/index.html``: The blog index page used to serve index of posts, posts by tag, and posts by author
+- ``blogging/editor.html``: The blog editor page.
+- ``blogging/page.html``: The page that shows the given article.
+- ``blogging/sitemap.xml``: The sitemap for the blog posts.
+
+Permissions
+===========
+
+In version 0.3.0 Flask-Blogging, enables permissions based on Flask-Principal.
+This addresses the issue of controlling which of the authenticated users can
+have access to edit or create blog posts. Permissions are enabled by setting
+``BLOGGING_PERMISSIONS`` to ``True``. Only users that have access to
+``Role`` "blogger" will have permissions to create or edit blog posts.
+
 
 Screenshots
 ===========

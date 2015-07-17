@@ -1,4 +1,4 @@
-{% extends "blog/base.html" %}
+{% extends "blogging/base.html" %}
 {% block title %}
 Blog Posts
 {% endblock title %}
@@ -12,7 +12,7 @@ Blog Posts
 
     {% if meta.is_user_blogger %}
         <div class="pull-right">
-            <a href="{{ url_for('blog_app.editor') }}" id="new">
+            <a href="{{ url_for('blogging.editor') }}" id="new">
                 <span class="glyphicon glyphicon-plus"></span>&nbsp;New
             </a>
         </div>
@@ -22,7 +22,7 @@ Blog Posts
         <a href="{{ post.url }}">
             <h1>{{ post.title }}</h1>
         </a>
-        <p>Posted by <a href="{{ url_for('blog_app.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+        <p>Posted by <a href="{{ url_for('blogging.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
         on {{post.post_date.strftime('%d %b, %Y')}}</p>
 
         <!-- post tags-->
@@ -30,7 +30,7 @@ Blog Posts
             <span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;
             {% for tag in post.tags %}
                 <span class="label">
-                    <a href="{{ url_for('blog_app.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
+                    <a href="{{ url_for('blogging.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
                     {{ tag }}
                     </a>
                 </span>&nbsp;&nbsp;
@@ -39,19 +39,19 @@ Blog Posts
         {% endif %}
         <hr>
     {% endfor %}
-    {% if meta %}
+    {% if ((meta)  and (meta.max_pages>1)) %}
         <div class="row">
             <div class="col-md-12">
                 <ul class="pager">
                     {% if meta.pagination.prev_page %}
                         <li><a href="{{meta.pagination.prev_page}}">&laquo;Prev</a></li>
                     {% else %}
-                        <li class="disabled"><a href="#">&laquo; Prev</a></li>
+                        <li class="disabled"><a href="">&laquo; Prev</a></li>
                     {% endif %}
                     {% if meta.pagination.next_page %}
                         <li><a href="{{meta.pagination.next_page}}">Next &raquo;</a></li>
                     {% else %}
-                        <li class="disabled"><a href="#">Next &raquo;</a></li>
+                        <li class="disabled"><a href="">Next &raquo;</a></li>
                     {% endif %}
 
                 </ul>

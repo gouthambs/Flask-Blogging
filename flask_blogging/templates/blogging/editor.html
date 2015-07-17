@@ -1,10 +1,10 @@
-{% extends 'blog/base.html' %}
+{% extends 'blogging/base.html' %}
 {% block extrastyle %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/css/bootstrap-markdown.min.css"
       rel="stylesheet"/>
 {% endblock extrastyle %}
 {% block main %}
-<form class="form-horizontal" action="{{url_for('blog_app.editor', post_id=post_id or None)}}" method="POST">
+<form class="form-horizontal" action="{{url_for('blogging.editor', post_id=post_id or None)}}" method="POST">
 
     {{ form.hidden_tag() }}
 

@@ -42,7 +42,7 @@ class PostProcessor(object):
 
     @classmethod
     def construct_url(cls, post):
-        url = url_for("blog_app.page_by_id", post_id=post["post_id"],
+        url = url_for("blogging.page_by_id", post_id=post["post_id"],
                       slug=cls.create_slug(post["title"]))
         return url
 
