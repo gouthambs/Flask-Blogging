@@ -29,7 +29,7 @@ class TestViews(FlaskBloggingTestCase):
         conn_string = 'sqlite:///'+self._dbfile
         engine = create_engine(conn_string)
         meta = MetaData()
-        self.storage = SQLAStorage(engine, metadata==meta)
+        self.storage = SQLAStorage(engine, metadata=meta)
         meta.create_all(bind=engine)
 
     def setUp(self):

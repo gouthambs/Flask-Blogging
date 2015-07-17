@@ -43,8 +43,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         table_name = "post"
         with self._engine.begin() as conn:
             self.assertTrue(conn.dialect.has_table(conn, table_name))
-            metadata = sqla.MetaData()
-            metadata.reflect(bind=self._engine)
+            metadata = self._meta
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
             expected_columns = ['id', 'title', 'text', 'post_date',
@@ -55,8 +54,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         table_name = "tag"
         with self._engine.begin() as conn:
             self.assertTrue(conn.dialect.has_table(conn, table_name))
-            metadata = sqla.MetaData()
-            metadata.reflect(bind=self._engine)
+            metadata = self._meta
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
             expected_columns = ['id', 'text']
@@ -66,8 +64,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         table_name = "tag_posts"
         with self._engine.begin() as conn:
             self.assertTrue(conn.dialect.has_table(conn, table_name))
-            metadata = sqla.MetaData()
-            metadata.reflect(bind=self._engine)
+            metadata = self._meta
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
             expected_columns = ['tag_id', 'post_id']
@@ -77,8 +74,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         table_name = "user_posts"
         with self._engine.begin() as conn:
             self.assertTrue(conn.dialect.has_table(conn, table_name))
-            metadata = sqla.MetaData()
-            metadata.reflect(bind=self._engine)
+            metadata = self._meta
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
             expected_columns = ['user_id', 'post_id']
@@ -100,8 +96,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
 
     def test_tags_uniqueness(self):
         table_name = "tag"
-        metadata = sqla.MetaData()
-        metadata.reflect(bind=self._engine)
+        metadata = self._meta
         table = metadata.tables[table_name]
         with self._engine.begin() as conn:
             statement = table.insert().values(text="test_tag")
@@ -128,8 +123,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.storage.save_post(title="Title", text="Sample Text",
                                user_id="user", tags=["tags"])
         table_name = "tag_posts"
-        metadata = sqla.MetaData()
-        metadata.reflect(bind=self._engine)
+        metadata = self._meta
         table = metadata.tables[table_name]
         with self._engine.begin() as conn:
             statement = table.insert().values(tag_id=1, post_id=1)
@@ -150,7 +144,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             self.assertRaises(sqla.exc.IntegrityError, conn.execute, statement)
 
     def test_bind_database(self):
-        self.storage._create_all_tables()
+        # self.storage._create_all_tables()
         self.test_post_table_exists()
         self.test_tag_table_exists()
         self.test_tag_post_table_exists()
