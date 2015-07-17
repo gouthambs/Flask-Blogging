@@ -62,7 +62,7 @@ Quick Start Example
     blog_engine = BloggingEngine(app, sql_storage)
     login_manager = LoginManager(app)
     meta.create_all(bind=engine)
-    
+
     # user class for providing authentication
     class User(UserMixin):
         def __init__(self, user_id):

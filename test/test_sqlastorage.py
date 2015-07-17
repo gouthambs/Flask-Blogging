@@ -28,7 +28,9 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         temp_dir = tempfile.gettempdir()
         self._dbfile = os.path.join(temp_dir, "temp.db")
         self._engine = create_engine('sqlite:///'+self._dbfile)
-        self.storage = SQLAStorage(self._engine)
+        self._meta = sqla.MetaData()
+        self.storage = SQLAStorage(self._engine, metadata=self._meta)
+        self._meta.create_all(bind=self._engine)
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)

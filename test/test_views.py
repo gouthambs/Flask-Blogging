@@ -6,7 +6,7 @@ import os
 import tempfile
 from flask import redirect, url_for, current_app
 from flask.ext.login import LoginManager, login_user, logout_user, current_user
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase
@@ -28,7 +28,9 @@ class TestViews(FlaskBloggingTestCase):
         self._dbfile = os.path.join(temp_dir, "temp.db")
         conn_string = 'sqlite:///'+self._dbfile
         engine = create_engine(conn_string)
-        self.storage = SQLAStorage(engine)
+        meta = MetaData()
+        self.storage = SQLAStorage(engine, metadata==meta)
+        meta.create_all(bind=engine)
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
