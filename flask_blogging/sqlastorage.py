@@ -426,7 +426,8 @@ class SQLAStorage(Storage):
                 self._logger.debug("Created table with table name %s" %
                                    tag_posts_table_name)
             else:
-                self._tag_posts_table = self._metadata.tables[tag_posts_table_name]
+                self._tag_posts_table = \
+                    self._metadata.tables[tag_posts_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    tag_posts_table_name)
 
@@ -453,6 +454,7 @@ class SQLAStorage(Storage):
                 self._logger.debug("Created table with table name %s" %
                                    user_posts_table_name)
             else:
-                self._user_posts_table = self._metadata.tables[user_posts_table_name]
+                self._user_posts_table = \
+                    self._metadata.tables[user_posts_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    user_posts_table_name)

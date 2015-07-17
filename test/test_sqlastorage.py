@@ -319,7 +319,10 @@ class TestMySQLStorage(TestSQLiteStorage):
     def _create_storage(self):
         self._engine = create_engine(
             "mysql+mysqldb://root:@localhost/flask_blogging")
-        self.storage = SQLAStorage(self._engine)
+        self._meta = sqla.MetaData()
+        self.storage = SQLAStorage(self._engine, metadata=self._meta)
+        self._meta.create_all(bind=self._engine)
+
 
     def tearDown(self):
         metadata = sqla.MetaData()
@@ -334,7 +337,9 @@ class TestPostgresStorage(TestSQLiteStorage):
         self._engine = create_engine(
             "postgresql+psycopg2://postgres:@localhost/flask_blogging",
             isolation_level="AUTOCOMMIT")
-        self.storage = SQLAStorage(self._engine)
+        self._meta = sqla.MetaData()
+        self.storage = SQLAStorage(self._engine, metadata=self._meta)
+        self._meta.create_all(bind=self._engine)
 
     def tearDown(self):
         metadata = sqla.MetaData()
