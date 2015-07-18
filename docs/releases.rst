@@ -1,5 +1,14 @@
 Release Notes
 =============
+- **Version 0.3.1**:
+
+  *Released July 17, 2015*
+
+  - The ``SQLAStorage`` accepts metadata, and ``SQLAlchemy`` object as inputs.
+    This adds the ability to keep the blogging table metadata synced up with
+    other models. This feature adds compatibility with ``Alembic`` autogenerate.
+  - Update docs to reflect the correct version number.
+
 - **Version 0.3.0**:
 
   *Released July 11, 2015*
@@ -57,11 +66,19 @@ Release Notes
 
 Compatibility Notes
 ===================
+- **Version 0.3.1**:
+
+    The ``SQLAStorage`` will accept metadata and set it internally. The database
+    tables will not be created automatically. The user would need to invoke
+    ``create_all`` in the metadata or ``SQLAlchemy`` object in ``Flask-SQLAlchemy``.
+
 - **Version 0.3.0**:
 
-    In this release, the templates folder was renamed from ``blog`` to
-    ``blogging``. To override the existing templates, you will need to
-    create your templates in the ``blogging`` folder.
+    - In this release, the templates folder was renamed from ``blog`` to
+      ``blogging``. To override the existing templates, you will need to
+      create your templates in the ``blogging`` folder.
+
+    - The blueprint name was renamed from ``blog_api`` to ``blogging``.
 
 - **Version 0.2.0**:
 
