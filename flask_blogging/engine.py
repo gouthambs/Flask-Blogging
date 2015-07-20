@@ -22,7 +22,8 @@ class BloggingEngine(object):
 
         app = Flask(__name__)
         db_engine = create_engine("sqlite:////tmp/sqlite.db")
-        storage = SQLAStorage(db_engine)
+        meta = MetaData()
+        storage = SQLAStorage(db_engine, metadata=meta)
         blog_engine = BloggingEngine(app, storage)
     """
     def __init__(self, app=None, storage=None, post_processor=None,
