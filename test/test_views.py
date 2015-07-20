@@ -186,12 +186,10 @@ class TestViews(FlaskBloggingTestCase):
         user_id = "testuser"
         with self.client:
             self.login(user_id)
-            response = self.client.post("/blog/editor/1/",
-                                        data=dict(
-                                            title="Sample Title0-Edited",
-                                             text="Sample Text0-Edited",
-                                             tags="tag1, tag2"
-                                        ))
+            response = self.client.post(
+                "/blog/editor/1/",
+                data=dict(title="Sample Title0-Edited",
+                          text="Sample Text0-Edited", tags="tag1, tag2"))
 
             response = self.client.get("/blog/100/")
             self.assertEqual(response.status_code, 200)
