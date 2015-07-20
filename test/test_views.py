@@ -197,7 +197,7 @@ class TestViews(FlaskBloggingTestCase):
             pattern = re.compile(b"<h1>.*</h1>")
             headings = pattern.findall(response.data)
             self.assertEqual(len(headings), 20)
-            self.assertEqual(headings[-1], "<h1>Sample Title0-Edited</h1>")
+            self.assertEqual(headings[-1], b"<h1>Sample Title0-Edited</h1>")
 
             return
 
