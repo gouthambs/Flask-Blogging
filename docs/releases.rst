@@ -1,5 +1,12 @@
 Release Notes
 =============
+- **Version 0.3.2**:
+
+  * Released July 20, 2015*
+
+  - Fixed a bug in the edit post routines. The edited post would end up as a
+    new one instead.
+
 - **Version 0.3.1**:
 
   *Released July 17, 2015*
