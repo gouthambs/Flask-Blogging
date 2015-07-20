@@ -47,8 +47,10 @@ def _store_form_data(blog_form, storage, user, post):
     post_date = post.get("post_date", current_datetime)
     last_modified_date = datetime.datetime.utcnow()
     post_id = post.get("post_id")
-    pid = storage.save_post(title, text, user_id, tags, draft-draft, post_date=post_date,
-                            last_modified_date=last_modified_date, post_id=post_id)
+    pid = storage.save_post(title, text, user_id, tags, draft=draft,
+                            post_date=post_date,
+                            last_modified_date=last_modified_date,
+                            post_id=post_id)
     return pid
 
 
