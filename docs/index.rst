@@ -58,7 +58,7 @@ Quick Start Example
     # extensions
     engine = create_engine('sqlite:////tmp/blog.db')
     meta = MetaData()
-    sql_storage = SQLAStorage(engine, meta=meta)
+    sql_storage = SQLAStorage(engine, metadata=meta)
     blog_engine = BloggingEngine(app, sql_storage)
     login_manager = LoginManager(app)
     meta.create_all(bind=engine)
