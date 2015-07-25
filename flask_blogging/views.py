@@ -85,7 +85,8 @@ def _get_meta(storage, count, page, tag=None, user_id=None):
 
 
 def _is_blogger(blogger_permission):
-    is_blogger = current_user.is_authenticated() and blogger_permission.require().can()
+    is_blogger = current_user.is_authenticated() and \
+                 blogger_permission.require().can()
     return is_blogger
 
 
@@ -332,7 +333,6 @@ def create_blueprint(import_name):
     # register delete
     blog_app.add_url_rule("/delete/<int:post_id>/", methods=["POST"],
                           view_func=delete)
-
 
     # register sitemap
     blog_app.add_url_rule("/sitemap.xml", view_func=sitemap)
