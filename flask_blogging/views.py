@@ -289,55 +289,69 @@ def feed():
     return response
 
 
-def create_blueprint(import_name):
+def cached_func(cache, cache_timeout, func):
+    return func if cache is None else \
+        cache.memoize(timeout=cache_timeout)(func)
+
+
+def create_blueprint(import_name, cache, config):
     blog_app = Blueprint("blogging", import_name, template_folder='templates')
+    cache_timeout = config.get("BLOGGING_CACHE_TIMEOUT", 60)  # 60 seconds
 
     # register index
+    index_func =  cached_func(cache, cache_timeout, index)
     blog_app.add_url_rule("/", defaults={"count": None, "page": 1},
-                          view_func=index)
+                          view_func=index_func)
     blog_app.add_url_rule("/<int:count>/", defaults={"page": 1},
-                          view_func=index)
-    blog_app.add_url_rule("/<int:count>/<int:page>/", view_func=index)
+                          view_func=index_func)
+    blog_app.add_url_rule("/<int:count>/<int:page>/", view_func=index_func)
 
     # register page_by_id
+    page_by_id_func = cached_func(cache, cache_timeout, page_by_id)
     blog_app.add_url_rule("/page/<int:post_id>/", defaults={"slug": ""},
-                          view_func=page_by_id)
+                          view_func=page_by_id_func)
     blog_app.add_url_rule("/page/<int:post_id>/<slug>/",
-                          view_func=page_by_id)
+                          view_func=page_by_id_func)
 
     # register posts_by_tag
+    posts_by_tag_func = cached_func(cache, cache_timeout, posts_by_tag)
     blog_app.add_url_rule("/tag/<tag>/", defaults=dict(count=None, page=1),
-                          view_func=posts_by_tag)
+                          view_func=posts_by_tag_func)
     blog_app.add_url_rule("/tag/<tag>/<int:count>/", defaults=dict(page=1),
-                          view_func=posts_by_tag)
+                          view_func=posts_by_tag_func)
     blog_app.add_url_rule("/tag/<tag>/<int:count>/<int:page>/",
-                          view_func=posts_by_tag)
+                          view_func=posts_by_tag_func)
 
     # register posts_by_author
+    posts_by_author_func = cached_func(cache, cache_timeout, posts_by_author)
     blog_app.add_url_rule("/author/<user_id>/",
                           defaults=dict(count=None, page=1),
-                          view_func=posts_by_author)
+                          view_func=posts_by_author_func)
     blog_app.add_url_rule("/author/<user_id>/<int:count>/",
                           defaults=dict(page=1),
-                          view_func=posts_by_author)
+                          view_func=posts_by_author_func)
     blog_app.add_url_rule("/author/<user_id>/<int:count>/<int:page>/",
-                          view_func=posts_by_author)
+                          view_func=posts_by_author_func)
 
     # register editor
+    editor_func = editor  # For now lets not cache this
     blog_app.add_url_rule('/editor/', methods=["GET", "POST"],
                           defaults={"post_id": None},
-                          view_func=editor)
+                          view_func=editor_func)
     blog_app.add_url_rule('/editor/<int:post_id>/', methods=["GET", "POST"],
-                          view_func=editor)
+                          view_func=editor_func)
 
     # register delete
+    delete_func = delete  # For now lets not cache this
     blog_app.add_url_rule("/delete/<int:post_id>/", methods=["POST"],
-                          view_func=delete)
+                          view_func=delete_func)
 
     # register sitemap
-    blog_app.add_url_rule("/sitemap.xml", view_func=sitemap)
+    sitemap_func = cached_func(cache, cache_timeout, sitemap)
+    blog_app.add_url_rule("/sitemap.xml", view_func=sitemap_func)
 
     # register feed
-    blog_app.add_url_rule('/feeds/all.atom.xml', view_func=feed)
+    feed_func = cached_func(cache, cache_timeout, feed)
+    blog_app.add_url_rule('/feeds/all.atom.xml', view_func=feed_func)
 
     return blog_app

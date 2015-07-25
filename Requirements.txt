@@ -2,6 +2,7 @@ Flask
 Flask-WTF
 Flask-Login
 Flask-Principal
+Flask-Cache
 SQLAlchemy
 Markdown
 Werkzeug

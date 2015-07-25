@@ -27,7 +27,7 @@ class BloggingEngine(object):
         blog_engine = BloggingEngine(app, storage)
     """
     def __init__(self, app=None, storage=None, post_processor=None,
-                 extensions=None):
+                 extensions=None, cache=None):
         """
 
         :param app: Optional app to use
@@ -38,13 +38,16 @@ class BloggingEngine(object):
         :param post_processor: (optional) The post processor object. If none
          provided, the default post processor is used.
         :type post_processor: object
-        :param extensions: A list of markdown extensions to add to post
-         processing step.
+        :param extensions: (optional) A list of markdown extensions to add to
+         post processing step.
         :type extensions: list
+        :param cache: (Optional) A Flask-Cache object to enable caching
+        :type cache: Object
         :return:
         """
         self.app = None
         self.storage = storage
+        self.cache = cache
         self._blogger_permission = None
         self.post_processor = PostProcessor() if post_processor is None \
             else post_processor
@@ -68,7 +71,7 @@ class BloggingEngine(object):
         self.storage = storage or self.storage
         from flask_blogging.views import create_blueprint
         self.app.register_blueprint(
-            create_blueprint(__name__),
+            create_blueprint(__name__, self.cache, self.config),
             url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
         self.principal = Principal(self.app)
