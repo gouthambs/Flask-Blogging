@@ -12,8 +12,6 @@ from werkzeug.contrib.atom import AtomFeed
 import datetime
 from flask.ext.principal import PermissionDenied
 
-blog_app = Blueprint("blogging", __name__, template_folder='templates')
-
 
 def _get_blogging_engine(app):
     return app.extensions["FLASK_BLOGGING_ENGINE"]
@@ -91,9 +89,6 @@ def _is_blogger(blogger_permission):
     return is_blogger
 
 
-@blog_app.route("/", defaults={"count": None, "page": 1})
-@blog_app.route("/<int:count>/", defaults={"page": 1})
-@blog_app.route("/<int:count>/<int:page>/")
 def index(count, page):
     """
     Serves the page with a list of blog posts
@@ -120,8 +115,6 @@ def index(count, page):
                            config=config)
 
 
-@blog_app.route("/page/<int:post_id>/", defaults={"slug": ""})
-@blog_app.route("/page/<int:post_id>/<slug>/")
 def page_by_id(post_id, slug):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
@@ -140,9 +133,6 @@ def page_by_id(post_id, slug):
         return redirect(url_for("blogging.index"))
 
 
-@blog_app.route("/tag/<tag>/", defaults=dict(count=None, page=1))
-@blog_app.route("/tag/<tag>/<int:count>/", defaults=dict(page=1))
-@blog_app.route("/tag/<tag>/<int:count>/<int:page>/")
 def posts_by_tag(tag, count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
@@ -161,9 +151,6 @@ def posts_by_tag(tag, count, page):
                            config=config)
 
 
-@blog_app.route("/author/<user_id>/", defaults=dict(count=None, page=1))
-@blog_app.route("/author/<user_id>/<int:count>/", defaults=dict(page=1))
-@blog_app.route("/author/<user_id>/<int:count>/<int:page>/")
 def posts_by_author(user_id, count, page):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
@@ -185,9 +172,6 @@ def posts_by_author(user_id, count, page):
                            config=config)
 
 
-@blog_app.route('/editor/', methods=["GET", "POST"],
-                defaults={"post_id": None})
-@blog_app.route('/editor/<int:post_id>/', methods=["GET", "POST"])
 @login_required
 def editor(post_id):
     blogging_engine = _get_blogging_engine(current_app)
@@ -240,7 +224,6 @@ def editor(post_id):
         return redirect(url_for("blogging.index", post_id=None))
 
 
-@blog_app.route("/delete/<int:post_id>/", methods=["POST"])
 @login_required
 def delete(post_id):
     blogging_engine = _get_blogging_engine(current_app)
@@ -265,7 +248,6 @@ def delete(post_id):
         return redirect(url_for("blogging.index", post_id=None))
 
 
-@blog_app.route("/sitemap.xml")
 def sitemap():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
@@ -281,7 +263,6 @@ def sitemap():
     return response
 
 
-@blog_app.route('/feeds/all.atom.xml')
 def feed():
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
@@ -305,3 +286,58 @@ def feed():
     response = feed.get_response()
     response.headers["Content-Type"] = "application/xml"
     return response
+
+
+def create_blueprint(import_name):
+    blog_app = Blueprint("blogging", import_name, template_folder='templates')
+
+    # register index
+    blog_app.add_url_rule("/", defaults={"count": None, "page": 1},
+                          view_func=index)
+    blog_app.add_url_rule("/<int:count>/", defaults={"page": 1},
+                          view_func=index)
+    blog_app.add_url_rule("/<int:count>/<int:page>/", view_func=index)
+
+    # register page_by_id
+    blog_app.add_url_rule("/page/<int:post_id>/", defaults={"slug": ""},
+                          view_func=page_by_id)
+    blog_app.add_url_rule("/page/<int:post_id>/<slug>/",
+                          view_func=page_by_id)
+
+    # register posts_by_tag
+    blog_app.add_url_rule("/tag/<tag>/", defaults=dict(count=None, page=1),
+                          view_func=posts_by_tag)
+    blog_app.add_url_rule("/tag/<tag>/<int:count>/", defaults=dict(page=1),
+                          view_func=posts_by_tag)
+    blog_app.add_url_rule("/tag/<tag>/<int:count>/<int:page>/",
+                          view_func=posts_by_tag)
+
+    # register posts_by_author
+    blog_app.add_url_rule("/author/<user_id>/",
+                          defaults=dict(count=None, page=1),
+                          view_func=posts_by_author)
+    blog_app.add_url_rule("/author/<user_id>/<int:count>/",
+                          defaults=dict(page=1),
+                          view_func=posts_by_author)
+    blog_app.add_url_rule("/author/<user_id>/<int:count>/<int:page>/",
+                          view_func=posts_by_author)
+
+    # register editor
+    blog_app.add_url_rule('/editor/', methods=["GET", "POST"],
+                          defaults={"post_id": None},
+                          view_func=editor)
+    blog_app.add_url_rule('/editor/<int:post_id>/', methods=["GET", "POST"],
+                          view_func=editor)
+
+    # register delete
+    blog_app.add_url_rule("/delete/<int:post_id>/", methods=["POST"],
+                          view_func=delete)
+
+
+    # register sitemap
+    blog_app.add_url_rule("/sitemap.xml", view_func=sitemap)
+
+    # register feed
+    blog_app.add_url_rule('/feeds/all.atom.xml', view_func=feed)
+
+    return blog_app
