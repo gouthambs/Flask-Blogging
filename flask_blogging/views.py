@@ -87,7 +87,7 @@ def _get_meta(storage, count, page, tag=None, user_id=None):
 
 
 def _is_blogger(blogger_permission):
-    is_blogger = blogger_permission.require().can()
+    is_blogger = current_user.is_authenticated() and blogger_permission.require().can()
     return is_blogger
 
 
