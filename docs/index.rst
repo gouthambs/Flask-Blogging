@@ -32,6 +32,7 @@ Out of the box, Flask-Blogging has support for the following:
 - Disqus support for comments
 - Google analytics for usage tracking
 - Permissions enabled to control which users can create/edit blogs
+- Integrated Flask-Cache based caching for optimization
 - Well documented, tested, and extensible design
 
 .. contents::
