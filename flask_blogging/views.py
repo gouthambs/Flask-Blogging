@@ -304,14 +304,11 @@ def feed():
     return response
 
 
-def make_name_func(blogging_engine):
-    def _func(fname):
-        permission = blogging_engine.blogger_permission
-        is_blogger = _is_blogger(permission)
-        prefix = "NonBlogger" if not is_blogger else current_user.get_id()
-        name = str(prefix)+"_"+fname
-        return name
-    return _func
+def unless(blogging_engine):
+    # disable caching for bloggers. They can change state!
+    def _unless():
+        return _is_blogger(blogging_engine.blogger_permission)
+    return _unless
 
 
 def cached_func(blogging_engine, func):
@@ -319,13 +316,12 @@ def cached_func(blogging_engine, func):
     if cache is None:
         return func
     else:
+        unless_func = unless(blogging_engine)
         config = blogging_engine.config
         cache_timeout = config.get("BLOGGING_CACHE_TIMEOUT", 60)  # 60 seconds
-
-        cached_func = cache.memoize(
-            timeout=cache_timeout,
-            make_name=make_name_func(blogging_engine))(func)
-        return cached_func
+        memoized_func = cache.memoize(
+            timeout=cache_timeout, unless=unless_func)(func)
+        return memoized_func
 
 
 def create_blueprint(import_name, blogging_engine):
