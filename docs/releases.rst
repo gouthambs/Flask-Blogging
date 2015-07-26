@@ -1,5 +1,13 @@
 Release Notes
 =============
+
+- **Version 0.4.0**
+
+  *Released July 26, 2015*
+
+  - Integrated Flask-Cache to optimize blog page rendering
+  - Fixed a bug where anonymous user was shown the new blog button
+
 - **Version 0.3.2**:
 
   *Released July 20, 2015*

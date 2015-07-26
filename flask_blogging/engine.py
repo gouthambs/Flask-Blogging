@@ -58,18 +58,24 @@ class BloggingEngine(object):
         if app is not None and storage is not None:
             self.init_app(app, storage)
 
-    def init_app(self, app, storage=None):
+    def init_app(self, app, storage=None, cache=None):
         """
         Initialize the engine.
 
         :param app: The app to use
+        :type app: Object
         :param storage: The blog storage instance that implements the
+        :type storage: Object
+        :param cache: (Optional) A Flask-Cache object to enable caching
+        :type cache: Object
          ``Storage`` class interface.
         """
         self.app = app
         self.config = self.app.config
         self.storage = storage or self.storage
-        from flask_blogging.views import create_blueprint
+        self.cache = cache or self.cache
+
+        from .views import create_blueprint
         self.app.register_blueprint(
             create_blueprint(__name__, self),
             url_prefix=self.config.get("BLOGGING_URL_PREFIX"))

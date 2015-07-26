@@ -14,6 +14,7 @@ features out of the box:
 - Disqus support for comments
 - Google analytics for usage tracking
 - Permissions enabled to control which users can create/edit blogs
+- Incorporates Flask-Cache for fast rendering
 - Well documented, tested, and extensible design
 
 

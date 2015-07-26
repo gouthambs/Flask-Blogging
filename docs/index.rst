@@ -122,8 +122,9 @@ The `BloggingEngine` class is the gateway to configure blogging support
 to your web app. You should create the `BloggingEngine` instance like this::
 
     blogging_engine = BloggingEngine()
+    blogging_engine.init_app(app, storage)
 
-You also need to pick the storage for blog. That can be done as::
+You also need to pick the ``storage`` for blog. That can be done as::
 
     from sqlalchemy import create_engine, MetaData
 
@@ -152,6 +153,16 @@ to provide the ``metadata`` object. This has the benefit of the
 table creation being passed to the user. Also, this gives the user
 the ability to use the common metadata object, and hence helps
 with the tables showing up in migrations while using Alembic.
+
+As of version 0.4.0, Flask-Cache integration is supported. In order
+to use caching in the blogging engine, you need to pass the ``Cache``
+instance to the ``BloggingEngine`` as::
+
+    from flask.ext.cache import Cache
+    from flask.ext.blogging import BloggingEngine
+
+    blogging_engine = BloggingEngine(app, storage, cache)
+
 
 *Flask-Blogging* lets the developer pick the authentication
 that is suitable, and hence requires her to provide a way to load user
@@ -207,6 +218,8 @@ keys that are currently supported include:
   from ``Flask-Principal`` (default ``False``)
 - ``BLOGGING_POSTS_PER_PAGE`` (*int*): This sets the default number of pages
   to be displayed per page. (default 10)
+- ``BLOGGING_CACHE_TIMEOUT`` (*int*): The timeout in seconds used to cache
+  the blog pages. (default 60)
 
 Blog Views
 ==========
