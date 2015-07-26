@@ -71,7 +71,7 @@ class BloggingEngine(object):
         self.storage = storage or self.storage
         from flask_blogging.views import create_blueprint
         self.app.register_blueprint(
-            create_blueprint(__name__, self.cache, self.config),
+            create_blueprint(__name__, self),
             url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
         self.principal = Principal(self.app)

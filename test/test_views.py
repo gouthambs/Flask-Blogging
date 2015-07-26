@@ -14,6 +14,7 @@ from flask_login import UserMixin
 import re
 from flask.ext.principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
+from flask.ext.cache import Cache
 
 
 class TestUser(UserMixin):
@@ -32,11 +33,14 @@ class TestViews(FlaskBloggingTestCase):
         self.storage = SQLAStorage(engine, metadata=meta)
         meta.create_all(bind=engine)
 
+    def _create_blogging_engine(self):
+        return BloggingEngine(self.app, self.storage)
+
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
         self.app.config["BLOGGING_URL_PREFIX"] = "/blog"
-        self.engine = BloggingEngine(self.app, self.storage)
+        self.engine = self._create_blogging_engine()
         self.login_manager = LoginManager(self.app)
 
         @self.login_manager.user_loader
@@ -363,3 +367,10 @@ class TestViews(FlaskBloggingTestCase):
                                         follow_redirects=True)
             assert "You do not have the rights to delete this post" in \
                    str(response.data)
+
+
+class TestViewsWithCache(TestViews):
+
+    def _create_blogging_engine(self):
+        cache = Cache(self.app, config={"CACHE_TYPE": "simple"})
+        return BloggingEngine(self.app, self.storage, cache=cache)

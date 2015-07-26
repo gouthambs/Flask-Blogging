@@ -22,6 +22,15 @@ def _get_user_name(user):
     return user_name
 
 
+def _clear_cache(cache):
+    cache.delete_memoized(index)
+    cache.delete_memoized(page_by_id)
+    cache.delete_memoized(posts_by_author)
+    cache.delete_memoized(posts_by_tag)
+    cache.delete_memoized(sitemap)
+    cache.delete_memoized(feed)
+
+
 def _process_post(post, blogging_engine, author=None, render=True):
     post_processor = blogging_engine.post_processor
     post_processor.process(post, render)
@@ -176,6 +185,9 @@ def posts_by_author(user_id, count, page):
 @login_required
 def editor(post_id):
     blogging_engine = _get_blogging_engine(current_app)
+    cache = blogging_engine.cache
+    if cache:
+        _clear_cache(cache)
     try:
         with blogging_engine.blogger_permission.require():
             post_processor = blogging_engine.post_processor
@@ -228,6 +240,9 @@ def editor(post_id):
 @login_required
 def delete(post_id):
     blogging_engine = _get_blogging_engine(current_app)
+    cache = blogging_engine.cache
+    if cache:
+        _clear_cache(cache)
     try:
         with blogging_engine.blogger_permission.require():
             storage = blogging_engine.storage
@@ -289,17 +304,36 @@ def feed():
     return response
 
 
-def cached_func(cache, cache_timeout, func):
-    return func if cache is None else \
-        cache.memoize(timeout=cache_timeout)(func)
+def make_name_func(blogging_engine):
+    def _func(fname):
+        permission = blogging_engine.blogger_permission
+        is_blogger = _is_blogger(permission)
+        prefix = "NonBlogger" if not is_blogger else current_user.get_id()
+        name = str(prefix)+"_"+fname
+        return name
+    return _func
 
 
-def create_blueprint(import_name, cache, config):
+def cached_func(blogging_engine, func):
+    cache = blogging_engine.cache
+    if cache is None:
+        return func
+    else:
+        config = blogging_engine.config
+        cache_timeout = config.get("BLOGGING_CACHE_TIMEOUT", 60)  # 60 seconds
+
+        cached_func = cache.memoize(
+            timeout=cache_timeout,
+            make_name=make_name_func(blogging_engine))(func)
+        return cached_func
+
+
+def create_blueprint(import_name, blogging_engine):
+
     blog_app = Blueprint("blogging", import_name, template_folder='templates')
-    cache_timeout = config.get("BLOGGING_CACHE_TIMEOUT", 60)  # 60 seconds
 
     # register index
-    index_func =  cached_func(cache, cache_timeout, index)
+    index_func = cached_func(blogging_engine, index)
     blog_app.add_url_rule("/", defaults={"count": None, "page": 1},
                           view_func=index_func)
     blog_app.add_url_rule("/<int:count>/", defaults={"page": 1},
@@ -307,14 +341,14 @@ def create_blueprint(import_name, cache, config):
     blog_app.add_url_rule("/<int:count>/<int:page>/", view_func=index_func)
 
     # register page_by_id
-    page_by_id_func = cached_func(cache, cache_timeout, page_by_id)
+    page_by_id_func = cached_func(blogging_engine, page_by_id)
     blog_app.add_url_rule("/page/<int:post_id>/", defaults={"slug": ""},
                           view_func=page_by_id_func)
     blog_app.add_url_rule("/page/<int:post_id>/<slug>/",
                           view_func=page_by_id_func)
 
     # register posts_by_tag
-    posts_by_tag_func = cached_func(cache, cache_timeout, posts_by_tag)
+    posts_by_tag_func = cached_func(blogging_engine, posts_by_tag)
     blog_app.add_url_rule("/tag/<tag>/", defaults=dict(count=None, page=1),
                           view_func=posts_by_tag_func)
     blog_app.add_url_rule("/tag/<tag>/<int:count>/", defaults=dict(page=1),
@@ -323,7 +357,7 @@ def create_blueprint(import_name, cache, config):
                           view_func=posts_by_tag_func)
 
     # register posts_by_author
-    posts_by_author_func = cached_func(cache, cache_timeout, posts_by_author)
+    posts_by_author_func = cached_func(blogging_engine, posts_by_author)
     blog_app.add_url_rule("/author/<user_id>/",
                           defaults=dict(count=None, page=1),
                           view_func=posts_by_author_func)
@@ -347,11 +381,11 @@ def create_blueprint(import_name, cache, config):
                           view_func=delete_func)
 
     # register sitemap
-    sitemap_func = cached_func(cache, cache_timeout, sitemap)
+    sitemap_func = cached_func(blogging_engine, sitemap)
     blog_app.add_url_rule("/sitemap.xml", view_func=sitemap_func)
 
     # register feed
-    feed_func = cached_func(cache, cache_timeout, feed)
+    feed_func = cached_func(blogging_engine, feed)
     blog_app.add_url_rule('/feeds/all.atom.xml', view_func=feed_func)
 
     return blog_app
