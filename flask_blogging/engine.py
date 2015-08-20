@@ -104,3 +104,38 @@ class BloggingEngine(object):
 
     def is_user_blogger(self):
         return self.blogger_permission.require().can()
+
+    def get_posts(self, count=10, offset=0, recent=True, tag=None,
+                  user_id=None, include_draft=False, render=False):
+        from .views import _process_post
+        posts = self.storage(count, offset, recent, tag, user_id,
+                             include_draft)
+        for post in posts:
+            _process_post(post, self, render=False)
+
+    def process_post(self, post, author=None, render=True):
+        """
+        A high level view to create post processing.
+        :param post: Dictionary representing the post
+        :type post: dict
+        :param author: The user object
+        :type author: object
+        :param render: Choice if the markdown text has to be converted or not
+        :type render: bool
+        :return:
+        """
+        post_processor = self.post_processor
+        post_processor.process(post, render)
+        if author is None:
+            if self.user_callback is None:
+                raise Exception("No user_loader has been installed for this "
+                                "BloggingEngine. Add one with the "
+                                "'BloggingEngine.user_loader' decorator.")
+            author = self.user_callback(post["user_id"])
+        if author is not None:
+            post["user_name"] = self.get_user_name(author)
+
+    @classmethod
+    def get_user_name(cls, user):
+        user_name = user.get_name() if hasattr(user, "get_name") else str(user)
+        return user_name

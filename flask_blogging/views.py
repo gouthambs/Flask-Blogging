@@ -31,19 +31,6 @@ def _clear_cache(cache):
     cache.delete_memoized(feed)
 
 
-def _process_post(post, blogging_engine, author=None, render=True):
-    post_processor = blogging_engine.post_processor
-    post_processor.process(post, render)
-    if author is None:
-        if blogging_engine.user_callback is None:
-            raise Exception("No user_loader has been installed for this "
-                            "BloggingEngine. Add one with the "
-                            "'BloggingEngine.user_loader' decorator.")
-        author = blogging_engine.user_callback(post["user_id"])
-    if author is not None:
-        post["user_name"] = _get_user_name(author)
-
-
 def _store_form_data(blog_form, storage, user, post):
     title = blog_form.title.data
     text = blog_form.text.data
@@ -120,7 +107,7 @@ def index(count, page):
     posts = storage.get_posts(count=count, offset=offset, include_draft=False,
                               tag=None, user_id=None, recent=True)
     for post in posts:
-        _process_post(post, blogging_engine, render=render)
+        blogging_engine.process_post(post, blogging_engine, render=render)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -135,7 +122,7 @@ def page_by_id(post_id, slug):
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
-        _process_post(post, blogging_engine, render=render)
+        blogging_engine.process_post(post, blogging_engine, render=render)
         return render_template("blogging/page.html", post=post, config=config,
                                meta=meta)
     else:
@@ -156,7 +143,7 @@ def posts_by_tag(tag, count, page):
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
                               include_draft=False, user_id=None, recent=True)
     for post in posts:
-        _process_post(post, blogging_engine, render=render)
+        blogging_engine.process_post(post, blogging_engine, render=render)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -175,7 +162,7 @@ def posts_by_author(user_id, count, page):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if len(posts):
         for post in posts:
-            _process_post(post, blogging_engine, render=render)
+            blogging_engine.process_post(post, blogging_engine, render=render)
     else:
         flash("No posts found for this user!", "warning")
     return render_template("blogging/index.html", posts=posts, meta=meta,
@@ -271,7 +258,7 @@ def sitemap():
     posts = storage.get_posts(count=None, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
     for post in posts:
-        _process_post(post, blogging_engine, render=False)
+        blogging_engine.process_post(post, blogging_engine, render=False)
     sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
@@ -292,7 +279,7 @@ def feed():
         feed_url=request.url, url=request.url_root, generator=None)
 
     for post in posts:
-        _process_post(post, blogging_engine, render=True)
+        blogging_engine.process_post(post, blogging_engine, render=True)
         feed.add(post["title"], str(post["rendered_text"]),
                  content_type='html',
                  author=post["user_name"],
