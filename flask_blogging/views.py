@@ -107,7 +107,7 @@ def index(count, page):
     posts = storage.get_posts(count=count, offset=offset, include_draft=False,
                               tag=None, user_id=None, recent=True)
     for post in posts:
-        blogging_engine.process_post(post, blogging_engine, render=render)
+        blogging_engine.process_post(post, render=render)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -122,7 +122,7 @@ def page_by_id(post_id, slug):
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
-        blogging_engine.process_post(post, blogging_engine, render=render)
+        blogging_engine.process_post(post, render=render)
         return render_template("blogging/page.html", post=post, config=config,
                                meta=meta)
     else:
@@ -143,7 +143,7 @@ def posts_by_tag(tag, count, page):
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
                               include_draft=False, user_id=None, recent=True)
     for post in posts:
-        blogging_engine.process_post(post, blogging_engine, render=render)
+        blogging_engine.process_post(post, render=render)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -162,7 +162,7 @@ def posts_by_author(user_id, count, page):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if len(posts):
         for post in posts:
-            blogging_engine.process_post(post, blogging_engine, render=render)
+            blogging_engine.process_post(post, render=render)
     else:
         flash("No posts found for this user!", "warning")
     return render_template("blogging/index.html", posts=posts, meta=meta,
@@ -258,7 +258,7 @@ def sitemap():
     posts = storage.get_posts(count=None, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
     for post in posts:
-        blogging_engine.process_post(post, blogging_engine, render=False)
+        blogging_engine.process_post(post, render=False)
     sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
@@ -279,7 +279,7 @@ def feed():
         feed_url=request.url, url=request.url_root, generator=None)
 
     for post in posts:
-        blogging_engine.process_post(post, blogging_engine, render=True)
+        blogging_engine.process_post(post, render=True)
         feed.add(post["title"], str(post["rendered_text"]),
                  content_type='html',
                  author=post["user_name"],

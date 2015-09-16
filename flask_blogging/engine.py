@@ -79,7 +79,8 @@ class BloggingEngine(object):
         self.app.register_blueprint(
             create_blueprint(__name__, self),
             url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
-        self.app.extensions["FLASK_BLOGGING_ENGINE"] = self
+        self.app.extensions["FLASK_BLOGGING_ENGINE"] = self  # duplicate
+        self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
 
     @property
@@ -107,31 +108,28 @@ class BloggingEngine(object):
 
     def get_posts(self, count=10, offset=0, recent=True, tag=None,
                   user_id=None, include_draft=False, render=False):
-        from .views import _process_post
         posts = self.storage(count, offset, recent, tag, user_id,
                              include_draft)
         for post in posts:
-            _process_post(post, self, render=False)
+            self.process_post(post, render=False)
 
-    def process_post(self, post, author=None, render=True):
+    def process_post(self, post, render=True):
         """
         A high level view to create post processing.
         :param post: Dictionary representing the post
         :type post: dict
-        :param author: The user object
-        :type author: object
         :param render: Choice if the markdown text has to be converted or not
         :type render: bool
         :return:
         """
         post_processor = self.post_processor
         post_processor.process(post, render)
-        if author is None:
-            if self.user_callback is None:
+        try:
+            author = self.user_callback(post["user_id"])
+        except Exception:
                 raise Exception("No user_loader has been installed for this "
                                 "BloggingEngine. Add one with the "
                                 "'BloggingEngine.user_loader' decorator.")
-            author = self.user_callback(post["user_id"])
         if author is not None:
             post["user_name"] = self.get_user_name(author)
 
