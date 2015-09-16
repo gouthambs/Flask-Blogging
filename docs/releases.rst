@@ -1,5 +1,12 @@
 Release Notes
 =============
+- **Version 0.4.1**
+
+  *Released September 16, 2015*
+
+  - Added javascript to center images in blog page
+  - Added method in blogging engine to render post and fetch post.
+
 
 - **Version 0.4.0**
 
@@ -81,6 +88,11 @@ Release Notes
 
 Compatibility Notes
 ===================
+- **Version 0.4.1**:
+
+  The documented way to get the blogging engine from ``app`` is using
+  the key ``blogging`` from ``app.extensions``.
+
 - **Version 0.3.1**:
 
     The ``SQLAStorage`` will accept metadata and set it internally. The database

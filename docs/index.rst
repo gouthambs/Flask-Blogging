@@ -191,6 +191,25 @@ of Markdown text. An ideal way to do this would be to inherit the default
 ``custom_process`` method that can be overridden to add extra functionality
 to the post processing step.
 
+In version 0.4.1 and onwards, the ``BloggingEngine`` object can be accessed
+from your ``app`` as follows::
+
+    engine = app.extensions["blogging"]
+
+The engine method also exposes a ``get_posts`` method to get the recent posts
+for display of posts in other views.
+
+In earlier versions the same can be done using the key
+``FLASK_BLOGGING_ENGINE`` instead of ``blogging``. The use of
+``FLASK_BLOGGING_ENGINE`` key will be deprecated moving forward.
+
+
+
+
+
+
+
+
 
 Configuration Variables
 =======================
