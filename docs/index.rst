@@ -82,7 +82,7 @@ Quick Start Example
     <html>
         <head> </head>
         <body>
-            {% if current_user.is_authenticated() %}
+            {% if current_user.is_authenticated %}
                 <a href="/logout/">Logout</a>
             {% else %}
                 <a href="/login/">Login</a>
@@ -114,7 +114,10 @@ Quick Start Example
         app.run(debug=True, port=8000, use_reloader=True)
 
 
-The key components required to get the blog hooked is explained below.
+The key components required to get the blog hooked is explained below. Please note
+that as of Flask-Login 0.3.0 the ``is_authenticated`` attribute in the ``UserMixin``
+is a property and not a method. Please use the appropriate option based on your
+Flask-Login version.
 
 Configuring your Application
 ============================

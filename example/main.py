@@ -36,7 +36,7 @@ index_template = """
 <html>
     <head> </head>
     <body>
-        {% if current_user.is_authenticated() %}
+        {% if current_user.is_authenticated %}
             <a href="/logout/"> Logout </a>
         {% else %}
             <a href="/login/"> Login </a>

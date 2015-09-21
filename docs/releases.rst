@@ -1,5 +1,13 @@
 Release Notes
 =============
+
+- **Version 0.4.2**
+
+  *Release September 20, 2015*
+
+  - Added compatibility with Flask-Login version 0.3.0 and higher, especially to handle migration of
+    ``is_autheticated`` attribute from method to property. (#43)
+
 - **Version 0.4.1**
 
   *Released September 16, 2015*
