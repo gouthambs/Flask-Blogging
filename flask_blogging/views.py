@@ -85,7 +85,7 @@ def _is_blogger(blogger_permission):
         callable(current_user.is_authenticated) \
         else current_user.is_authenticated
     is_blogger = authenticated and \
-                 blogger_permission.require().can()
+        blogger_permission.require().can()
     return is_blogger
 
 
