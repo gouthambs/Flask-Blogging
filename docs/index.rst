@@ -297,12 +297,6 @@ Blog Editor
 
 Useful Tips
 ===========
-- **Postgres using psycopg2**:
-  If you use ``psycopg2`` driver for Postgres while using the ``SQLAStorage``
-  you would need to have ``autocommit`` turned on while creating the engine::
-
-    create_engine("postgresql+psycopg2://postgres:@localhost/flask_blogging",
-                  isolation_level="AUTOCOMMIT")
 
 - **Migrations with Alembic**: (Applies to versions 0.3.0 and earlier)
   If you have migrations part of your project

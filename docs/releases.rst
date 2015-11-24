@@ -1,9 +1,15 @@
 Release Notes
 =============
 
+- **Version 0.5.0**
+
+  *Released November 23, 2015*
+
+  - Fixed errors encountered while using Postgres database
+
 - **Version 0.4.2**
 
-  *Release September 20, 2015*
+  *Released September 20, 2015*
 
   - Added compatibility with Flask-Login version 0.3.0 and higher, especially to handle migration of
     ``is_autheticated`` attribute from method to property. (#43)
