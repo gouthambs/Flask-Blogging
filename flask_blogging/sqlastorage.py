@@ -343,7 +343,7 @@ class SQLAStorage(Storage):
                     if tag_post_result is None:
                         # if tag_id not present for the post given by post_id
                         tag_post_statement = self._tag_posts_table.insert().\
-                            values( tag_id=tag_id, post_id=post_id)
+                            values(tag_id=tag_id, post_id=post_id)
                         conn.execute(tag_post_statement)
 
                 except sqla.exc.IntegrityError as e:
