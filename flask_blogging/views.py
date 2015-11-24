@@ -3,6 +3,7 @@ try:
     from builtins import str
 except ImportError:
     pass
+from .processor import PostProcessor
 from flask.ext.login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
@@ -188,7 +189,7 @@ def editor(post_id):
                 if form.validate():
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
-                            (current_user.get_id() == post["user_id"]) and \
+                            (PostProcessor.is_author(post, current_user)) and \
                             (post["post_id"] == post_id):
                         pass
                     else:
@@ -206,7 +207,7 @@ def editor(post_id):
                 if post_id is not None:
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
-                            (current_user.get_id() == post["user_id"]):
+                            (PostProcessor.is_author(post, current_user)):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
                                           text=post["text"], tags=tags)
@@ -238,7 +239,7 @@ def delete(post_id):
             storage = blogging_engine.storage
             post = storage.get_post_by_id(post_id)
             if (post is not None) and \
-                    (current_user.get_id() == post["user_id"]):
+                    (PostProcessor.is_author(post, current_user)):
                 success = storage.delete_post(post_id)
                 if success:
                     flash("Your post was successfully deleted", "info")

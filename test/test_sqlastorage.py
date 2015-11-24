@@ -334,8 +334,7 @@ class TestPostgresStorage(TestSQLiteStorage):
 
     def _create_storage(self):
         self._engine = create_engine(
-            "postgresql+psycopg2://postgres:@localhost/flask_blogging",
-            isolation_level="AUTOCOMMIT")
+            "postgresql+psycopg2://postgres:@localhost/flask_blogging")
         self._meta = sqla.MetaData()
         self.storage = SQLAStorage(self._engine, metadata=self._meta)
         self._meta.create_all(bind=self._engine)

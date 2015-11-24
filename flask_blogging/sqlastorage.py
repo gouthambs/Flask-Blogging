@@ -299,29 +299,59 @@ class SQLAStorage(Storage):
         return sql_filter
 
     def _save_tags(self, tags, post_id, conn):
+
         tags = self.normalize_tags(tags)
-        tag_insert_statement = self._tag_table.insert()
         tag_ids = []
-        for tag in tags:
+
+        for tag in tags:  # iterate over given tags
             try:
-                tag_insert_statement = tag_insert_statement.values(text=tag)
-                result = conn.execute(tag_insert_statement)
-                tag_id = result.inserted_primary_key[0]
-            except sqla.exc.IntegrityError as e:
-                tag_select_statement = sqla.select([self._tag_table]).where(
+                # check if the tag exists
+                statement = self._tag_table.select().where(
                     self._tag_table.c.text == tag)
-                result = conn.execute(tag_select_statement).fetchone()
-                tag_id = result[0]
-            tag_ids.append(tag_id)
-            try:
-                tag_post_statement = self._tag_posts_table.insert().values(
-                    tag_id=tag_id, post_id=post_id)
-                conn.execute(tag_post_statement)
+                tag_result = conn.execute(statement).fetchone()
+                if tag_result is None:
+                    # insert if it is a new tag
+                    tag_insert_statement = self._tag_table.insert().\
+                        values(text=tag)
+                    result = conn.execute(tag_insert_statement)
+                    tag_id = result.inserted_primary_key[0]
+                else:
+                    # tag already exists
+                    tag_id = tag_result[0]
+
             except sqla.exc.IntegrityError as e:
-                pass
-            except Exception as e:
+                # some database error occurred;
+                tag_id = None
                 self._logger.exception(str(e))
+
+            except Exception as e:
+                # unknown exception occurred
+                tag_id = None
+                self._logger.exception(str(e))
+
+            if tag_id is not None:
+                # for a valid tag_id
+                tag_ids.append(tag_id)
+
+                try:
+                    # check if given post has tag given by tag_id
+                    statement = self._tag_posts_table.select().where(
+                        sqla.and_(self._tag_posts_table.c.tag_id == tag_id,
+                                  self._tag_posts_table.c.post_id == post_id))
+                    tag_post_result = conn.execute(statement).fetchone()
+
+                    if tag_post_result is None:
+                        # if tag_id not present for the post given by post_id
+                        tag_post_statement = self._tag_posts_table.insert().\
+                            values( tag_id=tag_id, post_id=post_id)
+                        conn.execute(tag_post_statement)
+
+                except sqla.exc.IntegrityError as e:
+                    self._logger.exception(str(e))
+                except Exception as e:
+                    self._logger.exception(str(e))
         try:
+            # remove tags that have been deleted
             statement = self._tag_posts_table.delete().where(
                 sqla.and_(sqla.not_(
                     self._tag_posts_table.c.tag_id.in_(tag_ids)),
