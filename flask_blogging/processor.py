@@ -53,6 +53,10 @@ class PostProcessor(object):
         post["meta"] = md.Meta
 
     @classmethod
+    def is_author(cls, post, user):
+        return user.get_id() == u''+str(post['user_id'])
+
+    @classmethod
     def process(cls, post, render=True):
         """
         This method takes the post data and renders it
@@ -61,7 +65,7 @@ class PostProcessor(object):
         :return:
         """
         post["slug"] = cls.create_slug(post["title"])
-        post["editable"] = current_user.get_id() == post["user_id"]
+        post["editable"] = cls.is_author(post, current_user)
         post["url"] = cls.construct_url(post)
         if render:
             cls.render_text(post)
