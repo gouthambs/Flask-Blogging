@@ -93,4 +93,3 @@ class PostProcessor(object):
     def set_custom_extensions(cls, extensions):
         if type(extensions) == list:
             cls._markdown_extensions.extend(extensions)
-

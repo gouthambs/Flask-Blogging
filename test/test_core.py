@@ -25,6 +25,7 @@ expected_markup = u'<h2>This is a test</h2>\n' \
                   u'</span>\n' \
                   u'</pre></div>'
 
+
 class TestCore(TestCase):
 
     def setUp(self):
@@ -39,8 +40,3 @@ class TestCore(TestCase):
         extns = engine.post_processor.all_extensions()
         self.assertEqual(len(extns), 3)
         self.assertTrue(isinstance(extns[-1], CodeHiliteExtension))
-        #post = {"text": sample_markdown}
-        #PostProcessor.render_text(post)
-
-
-
