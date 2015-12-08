@@ -207,11 +207,23 @@ In earlier versions the same can be done using the key
 ``FLASK_BLOGGING_ENGINE`` key will be deprecated moving forward.
 
 
+Adding Custom Markdown Extensions
+---------------------------------
+
+One can provide additional MarkDown extensions to the blogging engine.
+One example usage is adding the `codehilite` MarkDown extension. Additional
+extensions should be passed as a list while initializing the `BlogggingEngine`
+as shown::
+
+    from markdown.extensions.codehilite import CodeHiliteExtension
+
+    extn1 = CodeHiliteExtension({})
+    blogging_engine = BloggingEngine(app, storage,extensions=[extn1])
 
 
-
-
-
+This allows for the MarkDown to be processed using CodeHilite along with
+the default extensions. Please note that one would also need to include
+necessary static files in the `view`, such as for code highlighting to work.
 
 
 Configuration Variables

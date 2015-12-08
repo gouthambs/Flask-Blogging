@@ -4,6 +4,7 @@ except ImportError:
     pass
 import markdown
 from markdown.extensions.meta import MetaExtension
+from markdown import Extension
 from flask import url_for
 from flask_login import current_user
 
@@ -90,5 +91,6 @@ class PostProcessor(object):
 
     @classmethod
     def set_custom_extensions(cls, extensions):
-        assert type(extensions) == list
-        cls._markdown_extensions.append(cls._custom_extensions)
+        if type(extensions) == list:
+            cls._markdown_extensions.extend(extensions)
+

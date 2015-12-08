@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+- **Version 0.5.1**
+
+  *Released December 6, 2015*
+
+  - Fixed the flexibility to add custom extensions to `BloggingEngine`.
+
 - **Version 0.5.0**
 
   *Released November 23, 2015*
