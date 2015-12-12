@@ -42,12 +42,14 @@ class Storage(object):
         raise NotImplementedError("This method needs to be implemented by "
                                   "the inheriting class")
 
-    def get_post_by_id(self, post_id):
+    def get_post_by_id(self, post_id, for_listing_only=False):
         """
         Fetch the blog post given by ``post_id``
 
         :param post_id: The post identifier for the blog post
         :type post_id: int
+        :param for_listing_only: Flag to indicate fetch only post not their next/last post info
+        :type for_listing_only: bool
         :return: If the ``post_id`` is valid, the post data is retrieved,
         else returns ``None``.
         """

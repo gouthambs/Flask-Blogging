@@ -42,6 +42,8 @@ class SQLAStorage(Storage):
                 raise ValueError("Both db and engine args cannot be None")
             self._engine = engine
             self._metadata = metadata or sqla.MetaData()
+        self._all_posts = None
+        self.refresh_posts = False
         self._table_prefix = table_prefix
         self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
@@ -112,17 +114,20 @@ class SQLAStorage(Storage):
                     if post_id is None else post_id
                 self._save_tags(tags, post_id, conn)
                 self._save_user_post(user_id, post_id, conn)
+                self.refresh_posts = True
             except Exception as e:
                 self._logger.exception(str(e))
                 post_id = None
         return post_id
 
-    def get_post_by_id(self, post_id):
+    def get_post_by_id(self, post_id, for_listing_only=False):
         """
         Fetch the blog post given by ``post_id``
 
         :param post_id: The post identifier for the blog post
         :type post_id: int
+        :param for_listing_only: Flag to indicate fetch only post not their next/last post info
+        :type for_listing_only: bool
         :return: If the ``post_id`` is valid, the post data is retrieved, else
          returns ``None``.
         """
@@ -154,6 +159,9 @@ class SQLAStorage(Storage):
                     )
                     user_result = conn.execute(user_statement).fetchone()
                     r["user_id"] = user_result[0]
+                    if not for_listing_only:
+                        # No Point in finding next & previous post while listing all the posts!
+                        r["next"], r["last"] = self._up_down_posts(post_id)
             except Exception as e:
                 self._logger.exception(str(e))
                 r = None
@@ -205,7 +213,7 @@ class SQLAStorage(Storage):
                 self._logger.exception(str(e))
                 result = []
 
-        posts = [self.get_post_by_id(pid[0]) for pid in result]
+        posts = [self.get_post_by_id(pid[0], for_listing_only=True) for pid in result]
         return posts
 
     def count_posts(self, tag=None, user_id=None, include_draft=False):
@@ -268,6 +276,8 @@ class SQLAStorage(Storage):
             except Exception as e:
                 self._logger.exception(str(e))
         status = success == 3
+        if status:
+            self.refresh_posts = True
         return status
 
     def _get_filter(self, tag, user_id, include_draft, conn):
@@ -503,3 +513,57 @@ class SQLAStorage(Storage):
                     self._metadata.tables[user_posts_table_name]
                 self._logger.debug("Reflecting to table with table name %s" %
                                    user_posts_table_name)
+
+    def _get_post_params(self, post_to_find):
+        """
+        Find the index of the ``post_to_find`` in all posts
+        :param post_to_find: post id of the post to be found
+        :return: Index of the post_to_find if found otherwise None
+        """
+        for idx, post in enumerate(self._all_posts):
+            if post[0] == post_to_find:
+                return idx, post[2]
+        return None
+
+    def _up_down_posts(self, base_id):
+        """
+        Get upper (next) and lower (previous) post to the current post decided by
+        ``base_id``
+        :param base_id: Post ID to which upper and lower post to be found.
+        :return: Next & Previous post with ID & Title
+        """
+
+        _u = None
+        _d = None
+
+        if not self._all_posts or self.refresh_posts:
+            self._all_posts = self._get_all_posts()
+            self.refresh_posts = False
+
+        if self._all_posts:
+            base_idx, title = self._get_post_params(base_id)
+
+            if base_idx is not None:
+                up_id = self._all_posts[base_idx+1:base_idx+2]
+                down_id = self._all_posts[base_idx-1:base_idx]
+
+                _u = (up_id[0][0], up_id[0][1]) if up_id else None
+                _d = (down_id[0][0], down_id[0][1]) if down_id else None
+        return _u, _d
+
+    def _get_all_posts(self):
+        """
+        Get list of all the post id's and their title.
+        :return: List of post with title
+        """
+        result = None
+        ordering = self._post_table.c.post_date
+        with self._engine.begin() as conn:
+            try:
+                post_statement = sqla.select([self._post_table])
+                select_statement = post_statement.order_by(ordering)
+                result = conn.execute(select_statement).fetchall()
+                print(result)
+            except Exception as e:
+                self._logger.exception(str(e))
+        return result

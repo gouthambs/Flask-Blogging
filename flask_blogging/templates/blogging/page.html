@@ -62,6 +62,25 @@ on {{post.post_date.strftime('%d %b, %Y')}}</p>
   {% endif %}
   <br>
   <hr>
+    <nav>
+        <ul class="pager">
+            {% if post.last %}
+                <li class="previous">
+                    <a title="see previous post" href="{{ url_for('blogging.page_by_id', post_id=post.last[0]) }}"><span aria-hidden="true">&larr;</span> {{ post.last[1] }}</a>
+                </li>
+            {% else %}
+                <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+            {% endif %}
+            {% if post.next %}
+                <li class="next">
+                    <a title="see next post" href="{{ url_for('blogging.page_by_id', post_id=post.next[0]) }}">{{ post.next[1] }} <span aria-hidden="true">&rarr;</span></a>
+                </li>
+            {% else %}
+                <li class="next disabled"><a href="#">Newer <span aria-hidden="true">&rarr;</span> </a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
 {% include "blogging/disqus.html" %}
 {% endblock main %}
 

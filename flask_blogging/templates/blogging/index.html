@@ -22,8 +22,18 @@ Blog Posts
         <a href="{{ post.url }}">
             <h1>{{ post.title }}</h1>
         </a>
-        <p>Posted by <a href="{{ url_for('blogging.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
-        on {{post.post_date.strftime('%d %b, %Y')}}</p>
+        {% if config.BLOGGING_SHOW_POST_SNIPPET %}
+            <p>Posted by <a href="{{ url_for('blogging.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+            on {{post.post_date.strftime('%d %b, %Y')}}</p>
+            <p>
+                {{ post.rendered_text | safe | quick_look }}
+                <br><a href="{{ post.url }}" style="font-size: 80%;">Read More...</a>
+            </p>
+        {% else %}
+            <p>Posted by <a href="{{ url_for('blogging.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+            on {{post.post_date.strftime('%d %b, %Y')}}</p>
+        {% endif %}
+
 
         <!-- post tags-->
         {% if post.tags %}
