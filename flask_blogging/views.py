@@ -12,6 +12,8 @@ import math
 from werkzeug.contrib.atom import AtomFeed
 import datetime
 from flask.ext.principal import PermissionDenied
+from .signals import page_by_id_generated, posts_by_tag_generated, index_generated
+
 
 
 def _get_blogging_engine(app):
@@ -112,6 +114,8 @@ def index(count, page):
                               tag=None, user_id=None, recent=True)
     for post in posts:
         blogging_engine.process_post(post, render=render)
+    index_generated.send(blogging_engine.app, engine=blogging_engine,
+                         posts=posts, meta=meta, count=count, page=page)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -127,6 +131,9 @@ def page_by_id(post_id, slug):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     if post is not None:
         blogging_engine.process_post(post, render=render)
+        page_by_id_generated.send(blogging_engine.app, engine=blogging_engine,
+                                  post=post, meta=meta, pos_id=post_id,
+                                  slug=slug)
         return render_template("blogging/page.html", post=post, config=config,
                                meta=meta)
     else:
@@ -148,6 +155,9 @@ def posts_by_tag(tag, count, page):
                               include_draft=False, user_id=None, recent=True)
     for post in posts:
         blogging_engine.process_post(post, render=render)
+    posts_by_tag_generated.send(blogging_engine.app, engine=blogging_engine,
+                                posts=posts, meta=meta, tag=tag, count=count,
+                                page=page)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 

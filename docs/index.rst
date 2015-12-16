@@ -204,12 +204,14 @@ implement either the ``get_name`` method or the ``__str__`` method.
 The ``BloggingEngine`` accepts an optional ``extensions`` argument. This is a list
 of ``Markdown`` extensions objects to be used during the markdown processing step.
 
+As of version 0.6.0, a plugin interface is available to add new functionality.
+Custom processes can be added to the ``posts`` by subscribing to the
+ ``post_process_before`` and ``post_process_after`` signals, and adding
+ new functionality to it.
 The ``BloggingEngine`` also accepts ``post_processor`` argument, which can be
 used to provide a custom post processor object to handle the processing
-of Markdown text. An ideal way to do this would be to inherit the default
-``PostProcessor`` object and override custom methods. There is a
-``custom_process`` method that can be overridden to add extra functionality
-to the post processing step.
+of Markdown text. One way to do this would be to inherit the default
+``PostProcessor`` object and override ``process`` method.
 
 In version 0.4.1 and onwards, the ``BloggingEngine`` object can be accessed
 from your ``app`` as follows::

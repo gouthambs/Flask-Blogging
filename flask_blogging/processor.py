@@ -4,7 +4,6 @@ except ImportError:
     pass
 import markdown
 from markdown.extensions.meta import MetaExtension
-from markdown import Extension
 from flask import url_for
 from flask_login import current_user
 
@@ -70,20 +69,6 @@ class PostProcessor(object):
         post["url"] = cls.construct_url(post)
         if render:
             cls.render_text(post)
-        cls.custom_process(post)
-        return
-
-    @classmethod
-    def custom_process(cls, post):
-        """
-        Override this method to add additional processes. The result is that
-        the ``post`` dict is modified or enhanced with newer key value pairs.
-
-        :param post: The post data with values for keys such as title, text,
-         tags etc.
-        :type post: dict
-        """
-        pass
 
     @classmethod
     def all_extensions(cls):
