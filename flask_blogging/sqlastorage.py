@@ -50,6 +50,22 @@ class SQLAStorage(Storage):
     def metadata(self):
         return self._metadata
 
+    @property
+    def post_table(self):
+        return self._post_table
+
+    @property
+    def tag_table(self):
+        return self._tag_table
+
+    @property
+    def tag_posts_table(self):
+        return self._tag_posts_table
+
+    @property
+    def user_posts_table(self):
+        return self._user_posts_table
+
     def save_post(self, title, text, user_id, tags, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,
                   post_id=None):
