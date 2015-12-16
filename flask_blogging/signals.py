@@ -32,6 +32,6 @@ feed_posts_processed = signals.signal("feed_posts_processed")
 sitemap_posts_fetched = signals.signal("sitemap_posts_fetched")
 sitemap_posts_processed = signals.signal("sitemap_posts_processed")
 
-create_blueprint = signals.signal("create_blueprint")
+blueprint_created = signals.signal("blueprint_created")
 
 
