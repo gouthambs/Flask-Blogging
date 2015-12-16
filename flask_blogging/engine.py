@@ -7,6 +7,8 @@ except ImportError:
     pass
 from .processor import PostProcessor
 from flask.ext.principal import Principal, Permission, RoleNeed
+from .signals import engine_initialised, post_processed
+import importlib
 
 
 class BloggingEngine(object):
@@ -57,6 +59,15 @@ class BloggingEngine(object):
 
         if app is not None and storage is not None:
             self.init_app(app, storage)
+        self.principal = None
+
+    @classmethod
+    def _register_plugins(cls, config):
+        plugins = config.get("BLOGGING_PLUGINS")
+        if plugins:
+            for plugin in plugins:
+                register = getattr(importlib.import_module(plugin), "register")
+                register()
 
     def init_app(self, app, storage=None, cache=None):
         """
@@ -70,10 +81,12 @@ class BloggingEngine(object):
         :type cache: Object
          ``Storage`` class interface.
         """
+
         self.app = app
         self.config = self.app.config
         self.storage = storage or self.storage
         self.cache = cache or self.cache
+        self._register_plugins(self.config)
 
         from .views import create_blueprint
         self.app.register_blueprint(
@@ -82,6 +95,7 @@ class BloggingEngine(object):
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self  # duplicate
         self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
+        engine_initialised.send(self.app, engine=self)
 
     @property
     def blogger_permission(self):
@@ -132,6 +146,7 @@ class BloggingEngine(object):
                                 "'BloggingEngine.user_loader' decorator.")
         if author is not None:
             post["user_name"] = self.get_user_name(author)
+        post_processed.send(self.app,engine=self, post=post, render=render)
 
     @classmethod
     def get_user_name(cls, user):
