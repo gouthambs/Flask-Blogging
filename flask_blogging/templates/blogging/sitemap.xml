@@ -4,7 +4,7 @@
 {% for post in posts %}
   <url>
     <loc>{{ config.BLOGGING_SITEURL }}{{ post.url }}</loc>
-    <priority>0.8</priority>
+    <priority>{{ post.priority }}</priority>
     <lastmod>{{post.last_modified_date.isoformat()}}</lastmod>
   </url>
 {% endfor %}

@@ -67,6 +67,7 @@ class PostProcessor(object):
         post["slug"] = cls.create_slug(post["title"])
         post["editable"] = cls.is_author(post, current_user)
         post["url"] = cls.construct_url(post)
+        post["priority"] = 0.8
         if render:
             cls.render_text(post)
 

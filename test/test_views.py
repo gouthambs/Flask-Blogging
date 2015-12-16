@@ -119,7 +119,8 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog/author/newuser/5/2/")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/blog/author/nonexistent_user/")
+        response = self.client.get("/blog/author/nonexistent_user/",
+                                   follow_redirects=True)
         assert "No posts found for this user!" in str(response.data)
 
     def test_editor_get(self):
