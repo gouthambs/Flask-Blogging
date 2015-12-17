@@ -7,7 +7,7 @@ except ImportError:
     pass
 from .processor import PostProcessor
 from flask.ext.principal import Principal, Permission, RoleNeed
-from .signals import engine_initialised, post_processed
+from .signals import engine_initialised, post_processed, blueprint_created
 import importlib
 
 
@@ -89,9 +89,12 @@ class BloggingEngine(object):
         self._register_plugins(self.config)
 
         from .views import create_blueprint
+        blog_app = create_blueprint(__name__, self)
+        # extenral urls
+        blueprint_created.send(self.app, engine=self, blueprint=blog_app)
         self.app.register_blueprint(
-            create_blueprint(__name__, self),
-            url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
+            blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
+
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self  # duplicate
         self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
