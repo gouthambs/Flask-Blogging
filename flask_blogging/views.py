@@ -17,7 +17,7 @@ from .signals import page_by_id_fetched, page_by_id_processed, \
     posts_by_author_fetched, posts_by_author_processed, \
     index_posts_fetched, index_posts_processed, \
     feed_posts_fetched, feed_posts_processed, \
-    sitemap_posts_fetched, sitemap_posts_processed, blueprint_created
+    sitemap_posts_fetched, sitemap_posts_processed
 
 
 def _get_blogging_engine(app):
@@ -423,8 +423,5 @@ def create_blueprint(import_name, blogging_engine):
     # register feed
     feed_func = cached_func(blogging_engine, feed)
     blog_app.add_url_rule('/feeds/all.atom.xml', view_func=feed_func)
-
-    # extenral urls
-    blueprint_created.send(None, blueprint=blog_app)
 
     return blog_app
