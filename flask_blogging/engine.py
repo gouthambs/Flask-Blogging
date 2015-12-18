@@ -149,7 +149,7 @@ class BloggingEngine(object):
                                 "'BloggingEngine.user_loader' decorator.")
         if author is not None:
             post["user_name"] = self.get_user_name(author)
-        post_processed.send(self.app,engine=self, post=post, render=render)
+        post_processed.send(self.app, engine=self, post=post, render=render)
 
     @classmethod
     def get_user_name(cls, user):

@@ -33,5 +33,3 @@ sitemap_posts_fetched = signals.signal("sitemap_posts_fetched")
 sitemap_posts_processed = signals.signal("sitemap_posts_processed")
 
 blueprint_created = signals.signal("blueprint_created")
-
-

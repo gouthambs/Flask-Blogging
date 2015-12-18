@@ -11,6 +11,7 @@ from flask_blogging import signals
 from flask import Blueprint
 from werkzeug.contrib.atom import AtomFeed
 
+
 # receivers for various signals
 def blueprint_created_receiver(sender, engine, blueprint):
     isinstance(engine, BloggingEngine)
@@ -18,16 +19,10 @@ def blueprint_created_receiver(sender, engine, blueprint):
     engine.ctr_blueprint_created += 1
 
 
-def sitemap_posts_fetched_receiver(sender, engine, posts):
+def sitemap_posts_receiver(sender, engine, posts):
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
-    engine.ctr_sitemap_posts_fetched += 1
-
-
-def sitemap_posts_processed_receiver(sender, engine, posts):
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    engine.ctr_sitemap_posts_processed += 1
+    engine.ctr_sitemap_posts += 1
 
 
 def feed_posts_fetched_receiver(sender, engine, posts):
@@ -42,20 +37,76 @@ def feed_posts_processed_receiver(sender, engine, feed):
     engine.ctr_feed_posts_processed += 1
 
 
+def index_posts_receiver(sender, engine, posts, meta, count, page):
+    isinstance(engine, BloggingEngine)
+    isinstance(posts, list)
+    isinstance(meta, dict)
+    isinstance(count, int)
+    isinstance(page, int)
+    engine.ctr_index_posts += 1
+
+
+def page_by_id_receiver(sender, engine, post, meta, post_id, slug):
+    isinstance(engine, BloggingEngine)
+    isinstance(post, dict)
+    isinstance(meta, dict)
+    isinstance(post_id, int)
+    isinstance(slug, str)
+    engine.ctr_page_by_id += 1
+
+
+def posts_by_tag_receiver(sender, engine, posts, meta, tag, count, page):
+    isinstance(engine, BloggingEngine)
+    isinstance(posts, list)
+    isinstance(meta, dict)
+    isinstance(tag, str)
+    isinstance(count, int)
+    isinstance(page, int)
+    engine.ctr_posts_by_tag += 1
+
+
+def posts_by_author_receiver(sender, engine, posts, meta, user_id, count,
+                             page):
+    isinstance(engine, BloggingEngine)
+    isinstance(posts, list)
+    isinstance(meta, dict)
+    isinstance(user_id, str)
+    isinstance(count, int)
+    isinstance(page, int)
+    engine.ctr_posts_by_author += 1
+
+
 def register():
     signals.blueprint_created.connect(blueprint_created_receiver)
-    signals.sitemap_posts_fetched.connect(sitemap_posts_fetched_receiver)
-    signals.sitemap_posts_processed.connect(sitemap_posts_processed_receiver)
+
+    signals.sitemap_posts_fetched.connect(sitemap_posts_receiver)
+    signals.sitemap_posts_processed.connect(sitemap_posts_receiver)
+
     signals.feed_posts_fetched.connect(feed_posts_fetched_receiver)
     signals.feed_posts_processed.connect(feed_posts_processed_receiver)
+
+    signals.index_posts_fetched.connect(index_posts_receiver)
+    signals.index_posts_processed.connect(index_posts_receiver)
+
+    signals.page_by_id_fetched.connect(page_by_id_receiver)
+    signals.page_by_id_processed.connect(page_by_id_receiver)
+
+    signals.posts_by_tag_fetched.connect(posts_by_tag_receiver)
+    signals.posts_by_tag_processed.connect(posts_by_tag_receiver)
+
+    signals.posts_by_author_fetched.connect(posts_by_author_receiver)
+    signals.posts_by_author_processed.connect(posts_by_author_receiver)
 
 
 class SignalCountingBloggingEngine(BloggingEngine):
     ctr_blueprint_created = 0
-    ctr_sitemap_posts_fetched = 0
-    ctr_sitemap_posts_processed = 0
+    ctr_sitemap_posts = 0
     ctr_feed_posts_fetched = 0
     ctr_feed_posts_processed = 0
+    ctr_index_posts = 0
+    ctr_page_by_id = 0
+    ctr_posts_by_tag = 0
+    ctr_posts_by_author = 0
 
 
 class TestViews(FlaskBloggingTestCase):
@@ -118,8 +169,7 @@ class TestViews(FlaskBloggingTestCase):
         with self.client:
             response = self.client.get("/blog/sitemap.xml")
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(self.engine.ctr_sitemap_posts_fetched, 1)
-            self.assertEqual(self.engine.ctr_sitemap_posts_processed, 1)
+            self.assertEqual(self.engine.ctr_sitemap_posts, 2)
 
     def test_feed_signals(self):
         with self.client:
@@ -128,3 +178,26 @@ class TestViews(FlaskBloggingTestCase):
             self.assertEqual(self.engine.ctr_feed_posts_fetched, 1)
             self.assertEqual(self.engine.ctr_feed_posts_processed, 1)
 
+    def test_index_posts_signals(self):
+        with self.client:
+            response = self.client.get("/blog/")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(self.engine.ctr_index_posts, 2)
+
+    def test_page_by_id_signals(self):
+        with self.client:
+            response = self.client.get("/blog/page/1/")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(self.engine.ctr_page_by_id, 2)
+
+    def test_posts_by_tag_signals(self):
+        with self.client:
+            response = self.client.get("/blog/tag/hello/")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(self.engine.ctr_posts_by_tag, 2)
+
+    def test_posts_by_author_signals(self):
+        with self.client:
+            response = self.client.get("/blog/author/testuser/")
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(self.engine.ctr_posts_by_author, 2)

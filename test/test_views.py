@@ -16,8 +16,6 @@ from flask.ext.principal import identity_changed, Identity, \
 from flask.ext.cache import Cache
 
 
-
-
 class TestViews(FlaskBloggingTestCase):
 
     def _create_storage(self):
