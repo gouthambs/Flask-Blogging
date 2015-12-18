@@ -138,8 +138,8 @@ def page_by_id(post_id, slug):
 
     if post is not None:
         page_by_id_fetched.send(blogging_engine.app, engine=blogging_engine,
-                                  post=post, meta=meta, post_id=post_id,
-                                  slug=slug)
+                                post=post, meta=meta, post_id=post_id,
+                                slug=slug)
         blogging_engine.process_post(post, render=render)
         page_by_id_processed.send(blogging_engine.app, engine=blogging_engine,
                                   post=post, meta=meta, post_id=post_id,
@@ -171,11 +171,13 @@ def posts_by_tag(tag, count, page):
 
         for post in posts:
             blogging_engine.process_post(post, render=render)
-        posts_by_tag_processed.send(blogging_engine.app, engine=blogging_engine,
-                                    posts=posts, meta=meta, tag=tag, count=count,
+        posts_by_tag_processed.send(blogging_engine.app,
+                                    engine=blogging_engine,
+                                    posts=posts, meta=meta, tag=tag,
+                                    count=count,
                                     page=page)
         return render_template("blogging/index.html", posts=posts, meta=meta,
-                           config=config)
+                               config=config)
     else:
         flash("No posts found for this tag!", "warning")
         return redirect(url_for("blogging.index", post_id=None))
@@ -205,7 +207,7 @@ def posts_by_author(user_id, count, page):
                                        meta=meta, user_id=user_id, count=count,
                                        page=page)
         return render_template("blogging/index.html", posts=posts, meta=meta,
-                           config=config)
+                               config=config)
     else:
         flash("No posts found for this user!", "warning")
         return redirect(url_for("blogging.index", post_id=None))
@@ -301,11 +303,12 @@ def sitemap():
                               user_id=None, tag=None, include_draft=False)
     if len(posts):
         sitemap_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
-                               posts=posts)
+                                   posts=posts)
         for post in posts:
             blogging_engine.process_post(post, render=False)
-        sitemap_posts_processed.send(blogging_engine.app, engine=blogging_engine,
-                               posts=posts)
+        sitemap_posts_processed.send(blogging_engine.app,
+                                     engine=blogging_engine,
+                                     posts=posts)
     sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
