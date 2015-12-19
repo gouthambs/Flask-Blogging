@@ -7,95 +7,7 @@ from flask_blogging import SQLAStorage, BloggingEngine
 from flask.ext.login import LoginManager, login_user, logout_user, current_user
 from flask.ext.principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
-from flask_blogging import signals
-from flask import Blueprint
-from werkzeug.contrib.atom import AtomFeed
-
-
-# receivers for various signals
-def blueprint_created_receiver(sender, engine, blueprint):
-    isinstance(engine, BloggingEngine)
-    isinstance(blueprint, Blueprint)
-    engine.ctr_blueprint_created += 1
-
-
-def sitemap_posts_receiver(sender, engine, posts):
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    engine.ctr_sitemap_posts += 1
-
-
-def feed_posts_fetched_receiver(sender, engine, posts):
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    engine.ctr_feed_posts_fetched += 1
-
-
-def feed_posts_processed_receiver(sender, engine, feed):
-    isinstance(engine, BloggingEngine)
-    isinstance(feed, AtomFeed)
-    engine.ctr_feed_posts_processed += 1
-
-
-def index_posts_receiver(sender, engine, posts, meta, count, page):
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    isinstance(meta, dict)
-    isinstance(count, int)
-    isinstance(page, int)
-    engine.ctr_index_posts += 1
-
-
-def page_by_id_receiver(sender, engine, post, meta, post_id, slug):
-    isinstance(engine, BloggingEngine)
-    isinstance(post, dict)
-    isinstance(meta, dict)
-    isinstance(post_id, int)
-    isinstance(slug, str)
-    engine.ctr_page_by_id += 1
-
-
-def posts_by_tag_receiver(sender, engine, posts, meta, tag, count, page):
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    isinstance(meta, dict)
-    isinstance(tag, str)
-    isinstance(count, int)
-    isinstance(page, int)
-    engine.ctr_posts_by_tag += 1
-
-
-def posts_by_author_receiver(sender, engine, posts, meta, user_id, count,
-                             page):
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    isinstance(meta, dict)
-    isinstance(user_id, str)
-    isinstance(count, int)
-    isinstance(page, int)
-    engine.ctr_posts_by_author += 1
-
-
-def register():
-    signals.blueprint_created.connect(blueprint_created_receiver)
-
-    signals.sitemap_posts_fetched.connect(sitemap_posts_receiver)
-    signals.sitemap_posts_processed.connect(sitemap_posts_receiver)
-
-    signals.feed_posts_fetched.connect(feed_posts_fetched_receiver)
-    signals.feed_posts_processed.connect(feed_posts_processed_receiver)
-
-    signals.index_posts_fetched.connect(index_posts_receiver)
-    signals.index_posts_processed.connect(index_posts_receiver)
-
-    signals.page_by_id_fetched.connect(page_by_id_receiver)
-    signals.page_by_id_processed.connect(page_by_id_receiver)
-
-    signals.posts_by_tag_fetched.connect(posts_by_tag_receiver)
-    signals.posts_by_tag_processed.connect(posts_by_tag_receiver)
-
-    signals.posts_by_author_fetched.connect(posts_by_author_receiver)
-    signals.posts_by_author_processed.connect(posts_by_author_receiver)
+from test.plugin import disconnect_receivers
 
 
 class SignalCountingBloggingEngine(BloggingEngine):
@@ -109,7 +21,7 @@ class SignalCountingBloggingEngine(BloggingEngine):
     ctr_posts_by_author = 0
 
 
-class TestViews(FlaskBloggingTestCase):
+class TestSignals(FlaskBloggingTestCase):
 
     def _create_storage(self):
         temp_dir = tempfile.gettempdir()
@@ -123,11 +35,14 @@ class TestViews(FlaskBloggingTestCase):
     def _create_blogging_engine(self):
         return SignalCountingBloggingEngine(self.app, self.storage)
 
+    def tearDown(self):
+        disconnect_receivers(self.app)
+
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
         self.app.config["BLOGGING_URL_PREFIX"] = "/blog"
-        self.app.config["BLOGGING_PLUGINS"] = ["test.test_signals"]
+        self.app.config["BLOGGING_PLUGINS"] = ["test.plugin"]
         self.engine = self._create_blogging_engine()
         self.login_manager = LoginManager(self.app)
 

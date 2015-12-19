@@ -8,7 +8,6 @@ except ImportError:
 from .processor import PostProcessor
 from flask.ext.principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
-import importlib
 
 
 class BloggingEngine(object):
@@ -62,12 +61,12 @@ class BloggingEngine(object):
         self.principal = None
 
     @classmethod
-    def _register_plugins(cls, config):
+    def _register_plugins(cls, app, config):
         plugins = config.get("BLOGGING_PLUGINS")
         if plugins:
             for plugin in plugins:
-                register = getattr(importlib.import_module(plugin), "register")
-                register()
+                lib = __import__(plugin, globals(), locals(), str("module"))
+                lib.register(app)
 
     def init_app(self, app, storage=None, cache=None):
         """
@@ -86,7 +85,7 @@ class BloggingEngine(object):
         self.config = self.app.config
         self.storage = storage or self.storage
         self.cache = cache or self.cache
-        self._register_plugins(self.config)
+        self._register_plugins(self.app, self.config)
 
         from .views import create_blueprint
         blog_app = create_blueprint(__name__, self)
