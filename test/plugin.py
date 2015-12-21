@@ -5,30 +5,35 @@ from werkzeug.contrib.atom import AtomFeed
 
 # receivers for various signals
 def blueprint_created_receiver(sender, engine, blueprint):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(blueprint, Blueprint)
     engine.ctr_blueprint_created += 1
 
 
 def sitemap_posts_receiver(sender, engine, posts):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     engine.ctr_sitemap_posts += 1
 
 
 def feed_posts_fetched_receiver(sender, engine, posts):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     engine.ctr_feed_posts_fetched += 1
 
 
 def feed_posts_processed_receiver(sender, engine, feed):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(feed, AtomFeed)
     engine.ctr_feed_posts_processed += 1
 
 
 def index_posts_receiver(sender, engine, posts, meta, count, page):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     isinstance(meta, dict)
@@ -38,6 +43,7 @@ def index_posts_receiver(sender, engine, posts, meta, count, page):
 
 
 def page_by_id_receiver(sender, engine, post, meta, post_id, slug):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(post, dict)
     isinstance(meta, dict)
@@ -47,6 +53,7 @@ def page_by_id_receiver(sender, engine, post, meta, post_id, slug):
 
 
 def posts_by_tag_receiver(sender, engine, posts, meta, tag, count, page):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     isinstance(meta, dict)
@@ -58,6 +65,7 @@ def posts_by_tag_receiver(sender, engine, posts, meta, tag, count, page):
 
 def posts_by_author_receiver(sender, engine, posts, meta, user_id, count,
                              page):
+    assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     isinstance(meta, dict)
