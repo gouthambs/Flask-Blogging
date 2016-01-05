@@ -6,13 +6,14 @@ import logging
 import sqlalchemy as sqla
 import datetime
 from .storage import Storage
+from .signals import sqla_initialized, sqla_post_saved
 
 
 class SQLAStorage(Storage):
     """
     The ``SQLAStorage`` implements the interface specified by the ``Storage``
     class. This  class uses SQLAlchemy to implement storage and retrieval of
-    data from any of the databases supported by SQLAlchemy. This
+    data from any of the databases supported by SQLAlchemy.
     """
     _db = None
     _logger = logging.getLogger("flask-blogging")
@@ -45,6 +46,9 @@ class SQLAStorage(Storage):
         self._table_prefix = table_prefix
         self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
+        sqla_initialized.send(self, engine=self._engine,
+                              table_prefix=self._table_prefix,
+                              meta=self.metadata)
 
     @property
     def metadata(self):
@@ -128,6 +132,12 @@ class SQLAStorage(Storage):
                     if post_id is None else post_id
                 self._save_tags(tags, post_id, conn)
                 self._save_user_post(user_id, post_id, conn)
+                sqla_post_saved.send(self, conn=conn, title=title, text=text,
+                                     user_id=user_id, tags=tags, draft=draft,
+                                     post_date=post_date,
+                                     last_modified_date=last_modified_date,
+                                     meta=meta_data,
+                                     post_id=post_id)
             except Exception as e:
                 self._logger.exception(str(e))
                 post_id = None
