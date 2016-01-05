@@ -34,4 +34,6 @@ sitemap_posts_processed = signals.signal("sitemap_posts_processed")
 
 blueprint_created = signals.signal("blueprint_created")
 
+
+sqla_initialized = signals.signal("sqla_initialized")
 sqla_post_saved = signals.signal("sqla_post_saved")
