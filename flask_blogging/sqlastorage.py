@@ -6,7 +6,7 @@ import logging
 import sqlalchemy as sqla
 import datetime
 from .storage import Storage
-from .signals import sqla_initialized, sqla_post_saved
+from .signals import sqla_initialized
 
 
 class SQLAStorage(Storage):
