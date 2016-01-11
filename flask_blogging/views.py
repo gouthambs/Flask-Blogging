@@ -17,7 +17,8 @@ from .signals import page_by_id_fetched, page_by_id_processed, \
     posts_by_author_fetched, posts_by_author_processed, \
     index_posts_fetched, index_posts_processed, \
     feed_posts_fetched, feed_posts_processed, \
-    sitemap_posts_fetched, sitemap_posts_processed
+    sitemap_posts_fetched, sitemap_posts_processed, editor_post_saved, \
+    post_deleted, editor_get_fetched
 
 
 def _get_blogging_engine(app):
@@ -235,6 +236,11 @@ def editor(post_id):
                     else:
                         post = {}
                     pid = _store_form_data(form, storage, current_user, post)
+                    editor_post_saved.send(blogging_engine.app,
+                                           engine=blogging_engine,
+                                           post_id=pid,
+                                           user=current_user,
+                                           post=post)
                     flash("Blog posted successfully!", "info")
                     slug = post_processor.create_slug(form.title.data)
                     return redirect(url_for("blogging.page_by_id", post_id=pid,
@@ -251,6 +257,10 @@ def editor(post_id):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
                                           text=post["text"], tags=tags)
+                        editor_get_fetched.send(blogging_engine.app,
+                                                engine=blogging_engine,
+                                                post_id=post_id,
+                                                form=form)
                         return render_template("blogging/editor.html",
                                                form=form, post_id=post_id,
                                                config=config)
@@ -283,6 +293,10 @@ def delete(post_id):
                 success = storage.delete_post(post_id)
                 if success:
                     flash("Your post was successfully deleted", "info")
+                    post_deleted.send(blogging_engine.app,
+                                      engine=blogging_engine,
+                                      post_id=post_id,
+                                      post=post)
                 else:
                     flash("There were errors while deleting your post",
                           "warning")
