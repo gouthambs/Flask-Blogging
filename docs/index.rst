@@ -158,6 +158,23 @@ table creation being passed to the user. Also, this gives the user
 the ability to use the common metadata object, and hence helps
 with the tables showing up in migrations while using Alembic.
 
+As of version 0.5.2, support for the multi database scenario
+under Flask-SQLAlchemy was added. When we have a multiple database
+scenario, one can use the ``bind`` keyword in ``SQLAStorage`` to
+specify the database to bind to, as shown below::
+
+    # config value
+    SQLALCHEMY_BINDS = {
+        'blog': "sqlite:////tmp/blog.db"),
+        'security': "sqlite:////tmp/security.db")
+    }
+
+The storage can be initialised as::
+
+    db = SQLAlchemy(app)
+    storage = SQLAStorage(db=db, bind="blog")
+    db.create_all()
+
 As of version 0.4.0, Flask-Cache integration is supported. In order
 to use caching in the blogging engine, you need to pass the ``Cache``
 instance to the ``BloggingEngine`` as::

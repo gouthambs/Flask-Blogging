@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+- **Version 0.5.2**
+
+  *Released January 12, 2015*
+
+  - Added support for multiple binds for SQLAStorage
+
+
 - **Version 0.5.1**
 
   *Released December 6, 2015*
