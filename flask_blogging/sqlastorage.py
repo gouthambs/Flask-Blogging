@@ -17,7 +17,8 @@ class SQLAStorage(Storage):
     _db = None
     _logger = logging.getLogger("flask-blogging")
 
-    def __init__(self, engine=None, table_prefix="", metadata=None, db=None):
+    def __init__(self, engine=None, table_prefix="", metadata=None, db=None,
+                 bind=None):
         """
         The constructor for the ``SQLAStorage`` class.
 
@@ -31,17 +32,21 @@ class SQLAStorage(Storage):
         :param metadata: (Optional) The SQLAlchemy MetaData object
         :type metadata: object
         :param db: (Optional) The Flask-SQLAlchemy SQLAlchemy object
-        :param db: object
-        :param
+        :type db: object
+        :param bind: (Optional) Reference the database to bind for multiple
+        database scenario with binds
+        :type bind: str
         """
+        self._bind = bind
         if db:
-            self._engine = db.engine
+            self._engine = db.get_engine(db.get_app(), bind=self._bind)
             self._metadata = db.metadata
         else:
             if engine is None:
                 raise ValueError("Both db and engine args cannot be None")
             self._engine = engine
             self._metadata = metadata or sqla.MetaData()
+        self._info = {} if self._bind is None else {"bind_key": self._bind}
         self._table_prefix = table_prefix
         self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
@@ -405,6 +410,7 @@ class SQLAStorage(Storage):
         with self._engine.begin() as conn:
             post_table_name = self._table_name("post")
             if not conn.dialect.has_table(conn, post_table_name):
+
                 self._post_table = sqla.Table(
                     post_table_name, self._metadata,
                     sqla.Column("id", sqla.Integer, primary_key=True),
@@ -413,7 +419,8 @@ class SQLAStorage(Storage):
                     sqla.Column("post_date", sqla.DateTime),
                     sqla.Column("last_modified_date", sqla.DateTime),
                     # if 1 then make it a draft
-                    sqla.Column("draft", sqla.SmallInteger, default=0)
+                    sqla.Column("draft", sqla.SmallInteger, default=0),
+                    info=self._info
 
                 )
                 self._logger.debug("Created table with table name %s" %
@@ -435,7 +442,8 @@ class SQLAStorage(Storage):
                     tag_table_name, self._metadata,
                     sqla.Column("id", sqla.Integer, primary_key=True),
                     sqla.Column("text", sqla.String(128), unique=True,
-                                index=True)
+                                index=True),
+                    info=self._info
                 )
                 self._logger.debug("Created table with table name %s" %
                                    tag_table_name)
@@ -466,7 +474,8 @@ class SQLAStorage(Storage):
                                                 onupdate="CASCADE",
                                                 ondelete="CASCADE"),
                                 index=True),
-                    sqla.UniqueConstraint('tag_id', 'post_id', name='uix_1')
+                    sqla.UniqueConstraint('tag_id', 'post_id', name='uix_1'),
+                    info=self._info
                 )
                 self._logger.debug("Created table with table name %s" %
                                    tag_posts_table_name)
@@ -494,7 +503,8 @@ class SQLAStorage(Storage):
                                                 onupdate="CASCADE",
                                                 ondelete="CASCADE"),
                                 index=True),
-                    sqla.UniqueConstraint('user_id', 'post_id', name='uix_2')
+                    sqla.UniqueConstraint('user_id', 'post_id', name='uix_2'),
+                    info=self._info
                 )
                 self._logger.debug("Created table with table name %s" %
                                    user_posts_table_name)
