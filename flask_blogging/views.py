@@ -36,13 +36,18 @@ def _store_form_data(blog_form, storage, user, post):
     title = blog_form.title.data
     text = blog_form.text.data
     tags = blog_form.tags.data.split(",")
+    seo_title = blog_form.seo_title.data
+    seo_description = blog_form.seo_description.data
     draft = blog_form.draft.data
     user_id = user.get_id()
     current_datetime = datetime.datetime.utcnow()
     post_date = post.get("post_date", current_datetime)
     last_modified_date = datetime.datetime.utcnow()
     post_id = post.get("post_id")
-    pid = storage.save_post(title, text, user_id, tags, draft=draft,
+    pid = storage.save_post(title, text, user_id, tags, 
+                            seo_title=seo_title, 
+                            seo_description=seo_description,
+                            draft=draft,
                             post_date=post_date,
                             last_modified_date=last_modified_date,
                             post_id=post_id)
@@ -210,7 +215,9 @@ def editor(post_id):
                             (PostProcessor.is_author(post, current_user)):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
-                                          text=post["text"], tags=tags)
+                                          text=post["text"], tags=tags,
+                                          seo_title=post["seo_title"],
+                                          seo_description=post["seo_description"],)
                         return render_template("blogging/editor.html",
                                                form=form, post_id=post_id,
                                                config=config)

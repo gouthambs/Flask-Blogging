@@ -37,6 +37,24 @@
                 {{form.tags(id="tags", placeholder="Comma separated tags", class="form-control input-md", required="")}}
             </div>
         </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-offset-2  control-label input-md" for="seo_title">
+                SEO Title
+            </label>
+            <div class="input-group col-md-8 col-md-offset-2">
+                {{form.seo_title(placeholder="SEO Title", id="seo_title", class="form-control" )}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-offset-2  control-label input-md" for="seo_title">
+                SEO Description
+            </label>
+            <div class="input-group col-md-8 col-md-offset-2">
+                {{form.seo_description(placeholder="SEO Description", id="seo_description", class="form-control" )}}
+            </div>
+        </div>
         <!-- draft input-->
         <!--div class="form-group">
             <div class="col-md-offset-2">

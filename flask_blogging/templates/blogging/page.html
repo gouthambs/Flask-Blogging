@@ -1,7 +1,20 @@
 {% extends "blogging/base.html" %}
+
 {% block title %}
-    {{post.title}}
+  {%- if post.seo_title and post.seo_title != "" -%}
+    {{ post.seo_title }}
+  {%- else -%}
+    {{ post.title }}
+  {%- endif -%}
 {% endblock title %}
+
+{% block description %}
+  {%- if post.seo_description and post.seo_description != "" -%}
+    {{ post.seo_description }}
+  {%- else -%}
+    {{ post.text[:120] }}
+  {%- endif -%}
+{% endblock description %}
 
 {% block main %}
 <div class="modal fade" id="confirmModal" >
