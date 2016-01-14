@@ -1,3 +1,10 @@
 *.py[cod]
 .idea
-
+bin/
+flask/
+app/*.pyc
+.DS_Store
+*.pyc
+dbmgr.py
+migrations/
+migrations/versions

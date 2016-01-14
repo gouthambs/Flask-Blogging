@@ -55,7 +55,7 @@ class SQLAStorage(Storage):
     def metadata(self):
         return self._metadata
 
-    def save_post(self, title, text, user_id, tags, draft=False,
+    def save_post(self, title, text, user_id, tags, seo_title=None, seo_description=None, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,
                   post_id=None):
         """
@@ -84,6 +84,10 @@ class SQLAStorage(Storage):
          for an insert call,
          and a valid value for update. (default ``None``)
         :type post_id: int
+        :param seo_title: The SEO Crafted title of the blog post
+        :type seo_title: str
+        :param seo_description: The meta description of the blog post
+        :type seo_description: str
 
         :return: The post_id value, in case of a successful insert or update.
          Return ``None`` if there were errors.
@@ -109,7 +113,8 @@ class SQLAStorage(Storage):
                         self._post_table.c.id == post_id)
                 post_statement = post_statement.values(
                     title=title, text=text, post_date=post_date,
-                    last_modified_date=last_modified_date, draft=draft
+                    last_modified_date=last_modified_date, draft=draft, 
+                    seo_title=seo_title, seo_description=seo_description
                 )
 
                 post_result = conn.execute(post_statement)
@@ -142,7 +147,8 @@ class SQLAStorage(Storage):
                     r = dict(post_id=post_result[0], title=post_result[1],
                              text=post_result[2], post_date=post_result[3],
                              last_modified_date=post_result[4],
-                             draft=post_result[5])
+                             draft=post_result[5], seo_title=post_result[6],
+                             seo_description=post_result[7])
                     # get the tags
                     tag_statement = sqla.select([self._tag_table.c.text]). \
                         where(
@@ -184,7 +190,7 @@ class SQLAStorage(Storage):
 
         :return: A list of posts, with each element a dict containing values
          for the following keys: (title, text, draft, post_date,
-         last_modified_date). If count is ``None``, then all the posts are
+         last_modified_date, seo_title, seo_description). If count is ``None``, then all the posts are
          returned.
         """
         ordering = sqla.desc(self._post_table.c.post_date) if recent \
@@ -420,6 +426,8 @@ class SQLAStorage(Storage):
                     sqla.Column("last_modified_date", sqla.DateTime),
                     # if 1 then make it a draft
                     sqla.Column("draft", sqla.SmallInteger, default=0),
+                    sqla.Column("seo_title", sqla.String(256)),
+                    sqla.Column("seo_description", sqla.String(256)),
                     info=self._info
 
                 )

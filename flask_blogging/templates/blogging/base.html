@@ -10,10 +10,8 @@
     {% endblock style %}
     {% block extrastyle %}
     {% endblock extrastyle %}
-    <title>
-        {% block title %}
-        {% endblock title %}
-    </title>
+    <title>{% block title %}{% endblock title %}</title>
+    <meta name="description" content="{% block description %}{% endblock description %}">
 </head>
 <body>
 

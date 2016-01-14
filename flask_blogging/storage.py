@@ -6,7 +6,7 @@ except ImportError:
 
 class Storage(object):
 
-    def save_post(self, title, text, user_id, tags, draft=False,
+    def save_post(self, title, text, user_id, tags, seo_title, seo_description, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,
                   post_id=None):
         """
@@ -35,6 +35,10 @@ class Storage(object):
         :param post_id: The post identifier. This should be ``None`` for an
          insert call, and a valid value for update.
         :type post_id: int
+        :param seo_title: The SEO Crafted title of the blog post
+        :type seo_title: str
+        :param seo_description: The meta description of the blog post
+        :type seo_description: str
 
         :return: The post_id value, in case of a successful insert or update.
         Return ``None`` if there were errors.
@@ -75,7 +79,7 @@ class Storage(object):
 
         :return: A list of posts, with each element a dict containing values
          for the following keys: (title, text, draft, post_date,
-         last_modified_date). If count is ``None``, then all the posts are
+         last_modified_date, seo_title, seo_description). If count is ``None``, then all the posts are
          returned.
         """
         raise NotImplementedError("This method needs to be implemented by the "

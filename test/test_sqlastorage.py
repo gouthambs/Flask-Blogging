@@ -48,7 +48,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
             expected_columns = ['id', 'title', 'text', 'post_date',
-                                'last_modified_date', 'draft']
+                                'last_modified_date', 'draft', 'seo_title', 'seo_description']
             self.assertListEqual(columns, expected_columns)
 
     def test_tag_table_exists(self):
@@ -86,12 +86,13 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         user_id = 1
         post_id = 5
         pid = self.storage.save_post(title="Title", text="Sample Text",
-                                     user_id="user", tags=["hello", "world"])
+                                     user_id="user", tags=["hello", "world"],
+                                     seo_title="SEO", seo_description="Test Description")
         posts = self.storage.get_posts()
         self.assertEqual(len(posts), 1)
         self.storage.save_post(title="Title", text="Sample Text",
                                user_id="newuser", tags=["hello", "world"],
-                               post_id=pid)
+                               post_id=pid, seo_title="SEO", seo_description="Test Description")
         self.assertEqual(len(posts), 1)
         return
 
@@ -111,18 +112,21 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         # check that when tag is updated, the posts get updated
         tags = ["hello", "world"]
         pid = self.storage.save_post(title="Title", text="Sample Text",
-                                     user_id="user", tags=tags)
+                                     user_id="user", tags=tags,
+                                     seo_title="SEO", seo_description="Test Description")
         post = self.storage.get_post_by_id(pid)
         self.assertEqual(len(post["tags"]), 2)
         tags.pop()
         pid = self.storage.save_post(title="Title", text="Sample Text",
-                                     user_id="user", tags=tags, post_id=pid)
+                                     user_id="user", tags=tags, post_id=pid,
+                                     seo_title="SEO", seo_description="Test Description")
         post = self.storage.get_post_by_id(pid)
         self.assertEqual(len(post["tags"]), 1)
 
     def test_tag_post_uniqueness(self):
         self.storage.save_post(title="Title", text="Sample Text",
-                               user_id="user", tags=["tags"])
+                               user_id="user", tags=["tags"],
+                               seo_title="SEO", seo_description="Test Description")
         table_name = "tag_posts"
         metadata = self._meta
         table = metadata.tables[table_name]
@@ -133,7 +137,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
     def test_user_post_uniqueness(self):
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
-                                     tags=["hello", "world"])
+                                     tags=["hello", "world"],
+                                     seo_title="SEO", seo_description="Test Description")
         table_name = "user_posts"
         metadata = sqla.MetaData()
         metadata.reflect(bind=self._engine)
@@ -154,10 +159,12 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
     def test_save_post(self):
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
-                                     tags=["hello", "world"])
+                                     tags=["hello", "world"],
+                                     seo_title="SEO", seo_description="Test Description")
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
-                                     tags=["hello", "world"], post_id=1)
+                                     tags=["hello", "world"], post_id=1,
+                                     seo_title="SEO", seo_description="Test Description")
         p = self.storage.get_post_by_id(2)
         self.assertIsNone(p)
 
@@ -165,7 +172,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
                                      tags=["hello", "world"],
-                                     post_id=5)
+                                     post_id=5,
+                                     seo_title="SEO", seo_description="Test Description")
         self.assertNotEqual(pid, 5)
         self.assertEqual(pid, 2)
         p = self.storage.get_post_by_id(2)
@@ -175,7 +183,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         # insert, check exists, delete, check doesn't exist anymore
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
-                                     tags=["hello", "world"])
+                                     tags=["hello", "world"],
+                                     seo_title="SEO", seo_description="Test Description")
         p = self.storage.get_post_by_id(pid)
         self.assertIsNotNone(p)
         self.storage.delete_post(pid)
@@ -186,17 +195,20 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
                                      tags=["hello", "world"],
-                                     post_id=1)
+                                     post_id=1,
+                                     seo_title="SEO", seo_description="Test Description")
         p = self.storage.get_post_by_id(pid)
         self.assertIsNotNone(p)
 
     def test_get_post_by_id(self):
         pid1 = self.storage.save_post(title="Title1", text="Sample Text1",
                                       user_id="testuser",
-                                      tags=["hello", "world"])
+                                      tags=["hello", "world"],
+                                      seo_title="SEO", seo_description="Test Description")
         pid2 = self.storage.save_post(title="Title2", text="Sample Text2",
                                       user_id="testuser",
-                                      tags=["hello", "my", "world"])
+                                      tags=["hello", "my", "world"],
+                                      seo_title="SEO", seo_description="Test Description")
 
         post = self.storage.get_post_by_id(pid1)
         self._assert_post(post, "Title1", "Sample Text1", "testuser",
@@ -309,7 +321,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
             user = "testuser" if i < 10 else "newuser"
             self.storage.save_post(title="Title%d" % i,
                                    text="Sample Text%d" % i,
-                                   user_id=user, tags=tags)
+                                   user_id=user, tags=tags,
+                                   seo_title="SEO", seo_description="Test Description")
             time.sleep(1)
 
 
@@ -377,7 +390,7 @@ class TestSQLiteBinds(FlaskBloggingTestCase):
             table = metadata.tables[table_name]
             columns = [t.name for t in table.columns]
             expected_columns = ['id', 'title', 'text', 'post_date',
-                                'last_modified_date', 'draft']
+                                'last_modified_date', 'draft', 'seo_title', 'seo_description']
             self.assertListEqual(columns, expected_columns)
 
     def test_tag_table_exists(self):
