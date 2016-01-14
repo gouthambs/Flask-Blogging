@@ -71,7 +71,8 @@ class TestViews(FlaskBloggingTestCase):
             user = "testuser" if i < 10 else "newuser"
             self.storage.save_post(title="Sample Title%d" % i,
                                    text="Sample Text%d" % i,
-                                   user_id=user, tags=tags)
+                                   user_id=user, tags=tags,
+                                   seo_title="SEO", seo_description="Test Description")
 
     def tearDown(self):
         os.remove(self._dbfile)
@@ -180,7 +181,9 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.post("/blog/editor/",
                                         data=dict(title="Test Title",
                                                   text="Test Text",
-                                                  tags="tag1, tag2"))
+                                                  tags="tag1, tag2",
+                                                  seo_title="SEO", 
+                                                  seo_description="Test Description"))
             self.assertEqual(response.status_code, 302)
 
             response = self.client.get("/blog/page/21/")
@@ -193,7 +196,8 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.post(
                 "/blog/editor/1/",
                 data=dict(title="Sample Title0-Edited",
-                          text="Sample Text0-Edited", tags="tag1, tag2"))
+                          text="Sample Text0-Edited", tags="tag1, tag2",
+                          seo_title="SEO", seo_description="Test Description"))
 
             response = self.client.get("/blog/100/")
             self.assertEqual(response.status_code, 200)
