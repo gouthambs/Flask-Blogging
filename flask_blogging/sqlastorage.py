@@ -53,7 +53,8 @@ class SQLAStorage(Storage):
         self._create_all_tables()
         sqla_initialized.send(self, engine=self._engine,
                               table_prefix=self._table_prefix,
-                              meta=self.metadata)
+                              meta=self.metadata,
+                              bind=self._bind)
 
     @property
     def metadata(self):

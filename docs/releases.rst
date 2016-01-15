@@ -1,9 +1,16 @@
 Release Notes
 =============
 
+- **Version 0.6.0**
+
+  *Released January 14, 2015
+
+  - The plugin framework for Flask-Blogging to allow users to add new
+    features and capabilities.
+
 - **Version 0.5.2**
 
-  *Released January 12, 2015*
+  *Released January 12, 2016*
 
   - Added support for multiple binds for SQLAStorage
 
@@ -101,7 +108,7 @@ Release Notes
     - Fixed PEP8 errors
     - Expanded SQLAStorage to include Postgres and MySQL flavors
     - Added ``post_date`` and ``last_modified_date`` as arguments to the
-    ``Storage.save_post(...)`` call for general compatibility
+      ``Storage.save_post(...)`` call for general compatibility
 
 
 - **Version 0.1.0**:

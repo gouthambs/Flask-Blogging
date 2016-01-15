@@ -206,8 +206,9 @@ of ``Markdown`` extensions objects to be used during the markdown processing ste
 
 As of version 0.6.0, a plugin interface is available to add new functionality.
 Custom processes can be added to the ``posts`` by subscribing to the
- ``post_process_before`` and ``post_process_after`` signals, and adding
- new functionality to it.
+``post_process_before`` and ``post_process_after`` signals, and adding
+new functionality to it.
+
 The ``BloggingEngine`` also accepts ``post_processor`` argument, which can be
 used to provide a custom post processor object to handle the processing
 of Markdown text. One way to do this would be to inherit the default
@@ -466,7 +467,48 @@ flask_blogging.signals module
 ---------------------------
 
 .. automodule:: flask_blogging.signals
-    :members:
-    :undoc-members:
+    :members: engine_initialised
+
+.. autodata:: flask_blogging.signals
+
+.. autodata:: flask_blogging.signals.engine_initialised
+
+.. autodata:: flask_blogging.signals.post_processed
+
+.. autodata:: flask_blogging.signals.page_by_id_fetched
+
+.. autodata:: flask_blogging.signals.page_by_id_processed
+
+.. autodata:: flask_blogging.signals.posts_by_tag_fetched
+
+.. autodata:: flask_blogging.signals.posts_by_tag_processed
+
+.. autodata:: flask_blogging.signals.posts_by_author_fetched
+
+.. autodata:: flask_blogging.signals.posts_by_author_processed
+
+.. autodata:: flask_blogging.signals.index_posts_fetched
+
+.. autodata:: flask_blogging.signals.index_posts_processed
+
+.. autodata:: flask_blogging.signals.feed_posts_fetched
+
+.. autodata:: flask_blogging.signals.feed_posts_processed
+
+
+.. autodata:: flask_blogging.signals.sitemap_posts_fetched
+
+.. autodata:: flask_blogging.signals.sitemap_posts_processed
+
+.. autodata:: flask_blogging.signals.editor_post_saved
+
+.. autodata:: flask_blogging.signals.editor_get_fetched
+
+.. autodata:: flask_blogging.signals.post_deleted
+
+.. autodata:: flask_blogging.signals.blueprint_created
+
+.. autodata:: flask_blogging.signals.sqla_initialized
+
 
 .. include:: authors.rst

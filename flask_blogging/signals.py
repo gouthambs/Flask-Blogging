@@ -1,8 +1,6 @@
 """
     The flask_blogging signals module
 
-    :copyright: (c) 2012 by Matt Wright.
-    :license: MIT, see LICENSE for more details.
 """
 
 
@@ -77,7 +75,7 @@ Signal sent when posts are fetched for a given tag but before processing
 :param engine: The blogging engine that was initialized
 :type engine: object
 :param posts: Lists of post fetched with a given tag
-:type post: list
+:type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
 :param tag: The tag that is requested
@@ -96,7 +94,7 @@ Signal sent after posts for a given tag were fetched and processed
 :param engine: The blogging engine that was initialized
 :type engine: object
 :param posts: Lists of post fetched and processed with a given tag
-:type post: list
+:type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
 :param tag: The tag that is requested
@@ -114,8 +112,8 @@ Signal sent after posts by an author were fetched but before processing
 :type app: object
 :param engine: The blogging engine that was initialized
 :type engine: object
-:param posts: Lists of post fetched and processed with a given author
-:type post: list
+:param posts: Lists of post fetched with a given author
+:type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
 :param user_id: The ``user_id`` for the author
@@ -134,7 +132,7 @@ Signal sent after posts by an author were fetched and processed
 :param engine: The blogging engine that was initialized
 :type engine: object
 :param posts: Lists of post fetched and processed with a given author
-:type post: list
+:type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
 :param user_id: The ``user_id`` for the author
@@ -145,21 +143,148 @@ Signal sent after posts by an author were fetched and processed
 :type page: int
 """)
 
-index_posts_fetched = signals.signal("index_posts_fetched")
-index_posts_processed = signals.signal("index_posts_processed")
+index_posts_fetched = signals.signal("index_posts_fetched", doc="""\
+Signal sent after the posts for the index page are fetched
 
-feed_posts_fetched = signals.signal("feed_posts_fetched")
-feed_posts_processed = signals.signal("feed_posts_processed")
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param posts: Lists of post fetched for the index page
+:type posts: list
+:param meta: The metadata associated with that page
+:type meta: dict
+:param count: The number of posts per page
+:type count: int
+:param page: The page offset
+:type page: int
+""")
 
-sitemap_posts_fetched = signals.signal("sitemap_posts_fetched")
-sitemap_posts_processed = signals.signal("sitemap_posts_processed")
+index_posts_processed = signals.signal("index_posts_processed", doc="""\
+Signal sent after the posts for the index page are fetched and processed
 
-editor_post_saved = signals.signal("editor_post_saved")
-editor_get_fetched = signals.signal("editor_get_fetched")
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param posts: Lists of post fetched and processed with a given author
+:type posts: list
+:param meta: The metadata associated with that page
+:type meta: dict
+:param count: The number of posts per page
+:type count: int
+:param page: The page offset
+:type page: int
+""")
 
-post_deleted = signals.signal("post_deleted")
+feed_posts_fetched = signals.signal("feed_posts_fetched", docs="""\
+Signal send after feed posts are fetched
 
-blueprint_created = signals.signal("blueprint_created")
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param posts: Lists of post fetched and processed with a given author
+:type posts: list
+""")
+feed_posts_processed = signals.signal("feed_posts_processed", docs="""\
+Signal send after feed posts are processed
 
-sqla_initialized = signals.signal("sqla_initialized")
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param feed: Feed of post fetched and processed
+:type feed: list
+""")
+
+sitemap_posts_fetched = signals.signal("sitemap_posts_fetched", docs="""\
+Signal send after posts are fetched
+
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param posts: Lists of post fetched and processed with a given author
+:type posts: list
+""")
+sitemap_posts_processed = signals.signal("sitemap_posts_processed", docs="""\
+Signal send after posts are fetched and processed
+
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param posts: Lists of post fetched and processed with a given author
+:type posts: list
+""")
+
+editor_post_saved = signals.signal("editor_post_saved", docs="""\
+Signal sent after a post was saved during the POST request
+
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param post_id: The id of the post that was deleted
+:type post_id: int
+:param user: The user object
+:type user: object
+:param post: The post that was deleted
+:type post: object
+
+""")
+editor_get_fetched = signals.signal("editor_get_fetched", docs="""\
+Signal sent after fetching the post during the GET request
+
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param post_id: The id of the post that was deleted
+:type post_id: int
+:param form: The form prepared for the editor display
+:type form: object
+""")
+
+post_deleted = signals.signal("post_deleted", docs="""\
+The signal sent after the post is deleted.
+
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param post_id: The id of the post that was deleted
+:type post_id: int
+:param post: The post that was deleted
+:type post: object
+""")
+
+blueprint_created = signals.signal("blueprint_created", docs="""\
+The signal sent after the blueprint is created. A good time to
+add other views to the blueprint.
+
+:param app: The Flask app which is the sender
+:type app: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param blueprint: The blog app blueprint
+:type blueprint: object
+
+""")
+
+sqla_initialized = signals.signal("sqla_initialized", docs="""\
+Signal sent after the SQLAStorage object is initialized
+
+:param sqlastorage: The SQLAStorage object
+:type sqlastorage: object
+:param engine: The blogging engine that was initialized
+:type engine: object
+:param table_prefix: The prefix to use for tables
+:type table_prefix: str
+:param meta: The metadata for the database
+:type meta: object
+:param bind: The bind value in the multiple db scenario.
+:type bind: object
+""")
 
