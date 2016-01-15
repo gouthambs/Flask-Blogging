@@ -177,7 +177,7 @@ Signal sent after the posts for the index page are fetched and processed
 :type page: int
 """)
 
-feed_posts_fetched = signals.signal("feed_posts_fetched", docs="""\
+feed_posts_fetched = signals.signal("feed_posts_fetched", doc="""\
 Signal send after feed posts are fetched
 
 :param app: The Flask app which is the sender
@@ -187,7 +187,7 @@ Signal send after feed posts are fetched
 :param posts: Lists of post fetched and processed with a given author
 :type posts: list
 """)
-feed_posts_processed = signals.signal("feed_posts_processed", docs="""\
+feed_posts_processed = signals.signal("feed_posts_processed", doc="""\
 Signal send after feed posts are processed
 
 :param app: The Flask app which is the sender
@@ -198,7 +198,7 @@ Signal send after feed posts are processed
 :type feed: list
 """)
 
-sitemap_posts_fetched = signals.signal("sitemap_posts_fetched", docs="""\
+sitemap_posts_fetched = signals.signal("sitemap_posts_fetched", doc="""\
 Signal send after posts are fetched
 
 :param app: The Flask app which is the sender
@@ -208,7 +208,7 @@ Signal send after posts are fetched
 :param posts: Lists of post fetched and processed with a given author
 :type posts: list
 """)
-sitemap_posts_processed = signals.signal("sitemap_posts_processed", docs="""\
+sitemap_posts_processed = signals.signal("sitemap_posts_processed", doc="""\
 Signal send after posts are fetched and processed
 
 :param app: The Flask app which is the sender
@@ -219,7 +219,7 @@ Signal send after posts are fetched and processed
 :type posts: list
 """)
 
-editor_post_saved = signals.signal("editor_post_saved", docs="""\
+editor_post_saved = signals.signal("editor_post_saved", doc="""\
 Signal sent after a post was saved during the POST request
 
 :param app: The Flask app which is the sender
@@ -234,7 +234,7 @@ Signal sent after a post was saved during the POST request
 :type post: object
 
 """)
-editor_get_fetched = signals.signal("editor_get_fetched", docs="""\
+editor_get_fetched = signals.signal("editor_get_fetched", doc="""\
 Signal sent after fetching the post during the GET request
 
 :param app: The Flask app which is the sender
@@ -247,7 +247,7 @@ Signal sent after fetching the post during the GET request
 :type form: object
 """)
 
-post_deleted = signals.signal("post_deleted", docs="""\
+post_deleted = signals.signal("post_deleted", doc="""\
 The signal sent after the post is deleted.
 
 :param app: The Flask app which is the sender
@@ -260,7 +260,7 @@ The signal sent after the post is deleted.
 :type post: object
 """)
 
-blueprint_created = signals.signal("blueprint_created", docs="""\
+blueprint_created = signals.signal("blueprint_created", doc="""\
 The signal sent after the blueprint is created. A good time to
 add other views to the blueprint.
 
@@ -273,7 +273,7 @@ add other views to the blueprint.
 
 """)
 
-sqla_initialized = signals.signal("sqla_initialized", docs="""\
+sqla_initialized = signals.signal("sqla_initialized", doc="""\
 Signal sent after the SQLAStorage object is initialized
 
 :param sqlastorage: The SQLAStorage object
