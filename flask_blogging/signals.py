@@ -287,4 +287,3 @@ Signal sent after the SQLAStorage object is initialized
 :param bind: The bind value in the multiple db scenario.
 :type bind: object
 """)
-
