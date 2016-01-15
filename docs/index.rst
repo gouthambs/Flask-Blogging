@@ -462,6 +462,11 @@ flask_blogging.forms module
     :members:
     :undoc-members:
 
+flask_blogging.signals module
+---------------------------
 
+.. automodule:: flask_blogging.signals
+    :members:
+    :undoc-members:
 
 .. include:: authors.rst
