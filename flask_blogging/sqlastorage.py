@@ -138,12 +138,7 @@ class SQLAStorage(Storage):
                     if post_id is None else post_id
                 self._save_tags(tags, post_id, conn)
                 self._save_user_post(user_id, post_id, conn)
-                sqla_post_saved.send(self, conn=conn, title=title, text=text,
-                                     user_id=user_id, tags=tags, draft=draft,
-                                     post_date=post_date,
-                                     last_modified_date=last_modified_date,
-                                     meta=meta_data,
-                                     post_id=post_id)
+
             except Exception as e:
                 self._logger.exception(str(e))
                 post_id = None
