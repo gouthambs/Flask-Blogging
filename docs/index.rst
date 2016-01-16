@@ -275,6 +275,7 @@ keys that are currently supported include:
   to be displayed per page. (default 10)
 - ``BLOGGING_CACHE_TIMEOUT`` (*int*): The timeout in seconds used to cache
   the blog pages. (default 60)
+- ``BLOGGING_PLUGINS`` (*list*): A list of plugins to register.
 
 Blog Views
 ==========
