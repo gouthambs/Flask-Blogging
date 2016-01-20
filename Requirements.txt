@@ -1,6 +1,6 @@
 Flask
 Flask-WTF
-Flask-Login==0.2.11
+Flask-Login
 Flask-Principal
 Flask-Cache
 SQLAlchemy
