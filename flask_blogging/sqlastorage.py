@@ -76,6 +76,10 @@ class SQLAStorage(Storage):
     def user_posts_table(self):
         return self._user_posts_table
 
+    @property
+    def engine(self):
+        return self._engine
+
     def save_post(self, title, text, user_id, tags, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,
                   post_id=None):
