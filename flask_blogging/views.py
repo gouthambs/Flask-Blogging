@@ -123,8 +123,9 @@ def index(count, page):
         blogging_engine.process_post(post, render=render)
     index_posts_processed.send(blogging_engine.app, engine=blogging_engine,
                                posts=posts, meta=meta, count=count, page=page)
+    context = blogging_engine.view_context('index')
     return render_template("blogging/index.html", posts=posts, meta=meta,
-                           config=config)
+                           config=config, **context)
 
 
 def page_by_id(post_id, slug):
@@ -145,8 +146,9 @@ def page_by_id(post_id, slug):
         page_by_id_processed.send(blogging_engine.app, engine=blogging_engine,
                                   post=post, meta=meta, post_id=post_id,
                                   slug=slug)
+        context = blogging_engine.view_context('page_by_id')
         return render_template("blogging/page.html", post=post, config=config,
-                               meta=meta)
+                               meta=meta, **context)
     else:
         flash("The page you are trying to access is not valid!", "warning")
         return redirect(url_for("blogging.index"))
@@ -177,8 +179,9 @@ def posts_by_tag(tag, count, page):
                                     posts=posts, meta=meta, tag=tag,
                                     count=count,
                                     page=page)
+        context = blogging_engine.view_context('posts_by_tag')
         return render_template("blogging/index.html", posts=posts, meta=meta,
-                               config=config)
+                               config=config, **context)
     else:
         flash("No posts found for this tag!", "warning")
         return redirect(url_for("blogging.index", post_id=None))
@@ -207,8 +210,9 @@ def posts_by_author(user_id, count, page):
                                        engine=blogging_engine, posts=posts,
                                        meta=meta, user_id=user_id, count=count,
                                        page=page)
+        context = blogging_engine.view_context('posts_by_author')
         return render_template("blogging/index.html", posts=posts, meta=meta,
-                               config=config)
+                               config=config, **context)
     else:
         flash("No posts found for this user!", "warning")
         return redirect(url_for("blogging.index", post_id=None))
@@ -217,6 +221,7 @@ def posts_by_author(user_id, count, page):
 @login_required
 def editor(post_id):
     blogging_engine = _get_blogging_engine(current_app)
+    context = blogging_engine.view_context('editor')
     cache = blogging_engine.cache
     if cache:
         _clear_cache(cache)
@@ -248,7 +253,8 @@ def editor(post_id):
                 else:
                     flash("There were errors in blog submission", "warning")
                     return render_template("blogging/editor.html", form=form,
-                                           post_id=post_id, config=config)
+                                           post_id=post_id, config=config,
+                                           **context)
             else:
                 if post_id is not None:
                     post = storage.get_post_by_id(post_id)
@@ -263,7 +269,7 @@ def editor(post_id):
                                                 form=form)
                         return render_template("blogging/editor.html",
                                                form=form, post_id=post_id,
-                                               config=config)
+                                               config=config, **context)
                     else:
                         flash("You do not have the rights to edit this post",
                               "warning")
@@ -272,7 +278,7 @@ def editor(post_id):
 
             form = BlogEditor()
             return render_template("blogging/editor.html", form=form,
-                                   post_id=post_id, config=config)
+                                   post_id=post_id, config=config, **context)
     except PermissionDenied:
         flash("You do not have permissions to create or edit posts", "warning")
         return redirect(url_for("blogging.index", post_id=None))

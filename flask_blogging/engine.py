@@ -5,6 +5,7 @@ try:
     from builtins import object
 except ImportError:
     pass
+from collections import defaultdict
 from .processor import PostProcessor
 from flask.ext.principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
@@ -55,6 +56,7 @@ class BloggingEngine(object):
         if extensions:
             self.post_processor.set_custom_extensions(extensions)
         self.user_callback = None
+        self.context_processors = defaultdict(lambda: [])
 
         if app is not None and storage is not None:
             self.init_app(app, storage)
@@ -118,6 +120,46 @@ class BloggingEngine(object):
         """
         self.user_callback = callback
         return callback
+
+    def add_context_processor(self, callback, endpoint=None):
+        """
+        Use this decorator to add a context processor, generating a dictionary
+        of data which will be passed to blog views.
+
+        :param callback: The callback function that returns a dictionary
+        :param endpoint: The name of the view which will use this context
+         processor (None will apply to all views)
+        :return: The callback function
+        """
+        processors = self.context_processors[endpoint]
+        if callback not in processors:
+            processors.append(callback)
+        return callback
+
+    def context_processor(self, callback):
+        return self.add_context_processor(callback, None)
+
+    def index_context_processor(self, callback):
+        return self.add_context_processor(callback, 'index')
+
+    def page_by_id_context_processor(self, callback):
+        return self.add_context_processor(callback, 'page_by_id')
+
+    def posts_by_tag_context_processor(self, callback):
+        return self.add_context_processor(callback, 'posts_by_tag')
+
+    def posts_by_author_context_processor(self, callback):
+        return self.add_context_processor(callback, 'posts_by_author')
+
+    def editor_context_processor(self, callback):
+        return self.add_context_processor(callback, 'editor')
+
+    def view_context(self, endpoint=None):
+        context = {}
+        for endpoint in (None, endpoint):
+            for context_processor in self.context_processors[endpoint]:
+                context.update(context_processor())
+        return context
 
     def is_user_blogger(self):
         return self.blogger_permission.require().can()
