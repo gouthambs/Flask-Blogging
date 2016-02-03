@@ -348,7 +348,7 @@ def feed():
                                 posts=posts)
         for post in posts:
             blogging_engine.process_post(post, render=True)
-            feed.add(post["title"], str(post["rendered_text"]),
+            feed.add(post["title"], unicode(post["rendered_text"]),
                      content_type='html',
                      author=post["user_name"],
                      url=config.get("BLOGGING_SITEURL", "")+post["url"],
