@@ -392,3 +392,4 @@ class TestViewsWithUnicode(TestViews):
     def test_editor_post(self):
         pass
 
+
