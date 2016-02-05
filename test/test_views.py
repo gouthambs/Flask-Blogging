@@ -14,7 +14,7 @@ import re
 from flask.ext.principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 from flask.ext.cache import Cache
-from utils import get_random_unicode
+from .utils import get_random_unicode
 
 
 class TestViews(FlaskBloggingTestCase):
