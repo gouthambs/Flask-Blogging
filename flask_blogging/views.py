@@ -19,6 +19,7 @@ from .signals import page_by_id_fetched, page_by_id_processed, \
     feed_posts_fetched, feed_posts_processed, \
     sitemap_posts_fetched, sitemap_posts_processed, editor_post_saved, \
     post_deleted, editor_get_fetched
+from .utils import ensureUtf
 
 
 def _get_blogging_engine(app):
@@ -348,7 +349,7 @@ def feed():
                                 posts=posts)
         for post in posts:
             blogging_engine.process_post(post, render=True)
-            feed.add(post["title"], unicode(post["rendered_text"]),
+            feed.add(post["title"], ensureUtf(post["rendered_text"]),
                      content_type='html',
                      author=post["user_name"],
                      url=config.get("BLOGGING_SITEURL", "")+post["url"],
