@@ -14,6 +14,7 @@ import re
 from flask.ext.principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 from flask.ext.cache import Cache
+from .utils import get_random_unicode
 
 
 class TestViews(FlaskBloggingTestCase):
@@ -370,3 +371,23 @@ class TestViewsWithCache(TestViews):
     def _create_blogging_engine(self):
         cache = Cache(self.app, config={"CACHE_TYPE": "simple"})
         return BloggingEngine(self.app, self.storage, cache=cache)
+
+
+class TestViewsWithUnicode(TestViews):
+
+    def setUp(self):
+        TestViews.setUp(self)
+
+        for i in range(20):
+            tags = ["unicode hello"] if i < 10 else ["unicode world"]
+            user = "testuser" if i < 10 else "newuser"
+            self.storage.save_post(
+                    title=u'{0}_{1}'.format(get_random_unicode(15), i),
+                    text=u'{0}_{1}'.format(get_random_unicode(200), i),
+                    user_id=user, tags=tags)
+
+    def test_editor_edit_page(self):
+        pass
+
+    def test_editor_post(self):
+        pass
