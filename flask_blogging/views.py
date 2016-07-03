@@ -4,14 +4,14 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
 import math
 from werkzeug.contrib.atom import AtomFeed
 import datetime
-from flask.ext.principal import PermissionDenied
+from flask_principal import PermissionDenied
 from .signals import page_by_id_fetched, page_by_id_processed, \
     posts_by_tag_fetched, posts_by_tag_processed, \
     posts_by_author_fetched, posts_by_author_processed, \

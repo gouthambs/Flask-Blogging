@@ -6,7 +6,7 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
-from flask.ext.principal import Principal, Permission, RoleNeed
+from flask_principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
 
 
@@ -18,7 +18,7 @@ class BloggingEngine(object):
     .. code:: python
 
         from flask import Flask
-        from flask.ext.blogging import BloggingEngine, SQLAStorage
+        from flask_blogging import BloggingEngine, SQLAStorage
         from sqlalchemy import create_engine
 
         app = Flask(__name__)
