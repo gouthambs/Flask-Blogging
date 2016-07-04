@@ -3,7 +3,7 @@ Release Notes
 
 - **Version 0.6.0**
 
-  *Released January 14, 2015
+  *Released January 14, 2016
 
   - The plugin framework for Flask-Blogging to allow users to add new
     features and capabilities.
