@@ -3,9 +3,9 @@ This example demonstrates the use of caches
 """
 from flask import Flask, render_template_string, redirect, current_app
 from sqlalchemy import create_engine, MetaData
-from flask.ext.login import UserMixin, LoginManager, login_user, logout_user, current_user
-from flask.ext.blogging import SQLAStorage, BloggingEngine
-from flask.ext.principal import identity_changed, Identity, AnonymousIdentity, identity_loaded, \
+from flask_login import UserMixin, LoginManager, login_user, logout_user, current_user
+from flask_blogging import SQLAStorage, BloggingEngine
+from flask_principal import identity_changed, Identity, AnonymousIdentity, identity_loaded, \
     UserNeed, RoleNeed
 from flask.ext.cache import Cache
 

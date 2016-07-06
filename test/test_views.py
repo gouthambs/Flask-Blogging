@@ -5,15 +5,15 @@ except ImportError:
 import os
 import tempfile
 from flask import redirect, url_for, current_app
-from flask.ext.login import LoginManager, login_user, logout_user, current_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 from sqlalchemy import create_engine, MetaData
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase, TestUser
 import re
-from flask.ext.principal import identity_changed, Identity, \
+from flask_principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
-from flask.ext.cache import Cache
+from flask_cache import Cache
 from .utils import get_random_unicode
 
 

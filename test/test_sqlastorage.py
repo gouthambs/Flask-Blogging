@@ -9,7 +9,7 @@ from flask_blogging.sqlastorage import SQLAStorage
 from sqlalchemy import create_engine
 from test import FlaskBloggingTestCase
 import sqlalchemy as sqla
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import time
 try:
     import _mysql

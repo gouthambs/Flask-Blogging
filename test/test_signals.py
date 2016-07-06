@@ -4,8 +4,8 @@ from test import FlaskBloggingTestCase, TestUser
 import tempfile
 from sqlalchemy import create_engine, MetaData
 from flask_blogging import SQLAStorage, BloggingEngine
-from flask.ext.login import LoginManager, login_user, logout_user, current_user
-from flask.ext.principal import identity_changed, Identity, \
+from flask_login import LoginManager, login_user, logout_user, current_user
+from flask_principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 from test.plugin import disconnect_receivers
 

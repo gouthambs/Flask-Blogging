@@ -4,7 +4,7 @@ except ImportError:
     pass
 
 from unittest import TestCase
-from flask.ext.blogging import BloggingEngine, PostProcessor
+from flask_blogging import BloggingEngine, PostProcessor
 from markdown.extensions.codehilite import CodeHiliteExtension
 
 
