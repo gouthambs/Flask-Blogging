@@ -1,9 +1,21 @@
 Release Notes
 =============
 
+- **Version 0.7.1**
+
+  *Released July 5, 2016*
+ 
+  - Improvements to docs
+  - Added extension import transition (@slippers)
+
+- **Version 0.7.0**
+  
+  *Released May 25, 2016*
+
+
 - **Version 0.6.0**
 
-  *Released January 14, 2016
+  *Released January 14, 2016*
 
   - The plugin framework for Flask-Blogging to allow users to add new
     features and capabilities.
