@@ -1,0 +1,49 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as utils %}
+
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{%- endblock %}
+
+{% block styles %}
+{{super()}}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/css/bootstrap-markdown.min.css"
+rel="stylesheet"/>
+{% endblock styles %}
+
+{% block content %}
+{{ super() }}
+<!-- flash messages -->
+{%- with messages = get_flashed_messages(with_categories=True) %}
+{%- if messages %}
+{{utils.flashed_messages(messages)}}
+{%- endif %}
+{%- endwith -%}
+{% endblock content %}
+
+{% include "blogging/analytics.html" %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+          "HTML-CSS": {
+          styles: {
+          ".MathJax .mo, .MathJax .mi": {color: "black ! important"}}
+          },
+          tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']],processEscapes: true}
+          });
+</script>
+<script type="text/javascript"
+src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/js/bootstrap-markdown.min.js">
+</script>
+<script type="text/javascript"
+src="https://cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/markdown.min.js">
+</script>
+
+
+{% endblock scripts %}
+
