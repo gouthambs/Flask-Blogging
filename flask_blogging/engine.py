@@ -8,7 +8,6 @@ except ImportError:
 from .processor import PostProcessor
 from flask_principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
-from flask_bootstrap import Bootstrap
 
 
 class BloggingEngine(object):
