@@ -7,4 +7,3 @@ SQLAlchemy
 Markdown
 Werkzeug
 blinker
-Flask-Bootstrap

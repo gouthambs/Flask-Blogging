@@ -82,8 +82,6 @@ class BloggingEngine(object):
          ``Storage`` class interface.
         """
 
-        Bootstrap(app)
-
         self.app = app
         self.config = self.app.config
         self.storage = storage or self.storage
