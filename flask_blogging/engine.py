@@ -10,6 +10,7 @@ from flask_principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
 from flask_bootstrap import Bootstrap
 
+
 class BloggingEngine(object):
     """
     The BloggingEngine is the class for initializing the blog support for your
