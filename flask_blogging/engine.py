@@ -8,7 +8,7 @@ except ImportError:
 from .processor import PostProcessor
 from flask_principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
-
+from flask_bootstrap import Bootstrap
 
 class BloggingEngine(object):
     """
@@ -97,6 +97,10 @@ class BloggingEngine(object):
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self  # duplicate
         self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
+
+        if self.config.get("BLOGGING_FLASK_BOOTSTRAP", False):
+            Bootstrap(self.app)
+
         engine_initialised.send(self.app, engine=self)
 
     @property

@@ -12,10 +12,32 @@
 {{super()}}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/css/bootstrap-markdown.min.css"
 rel="stylesheet"/>
+<style>
+body { padding-top: 80px;}
+</style>
+
 {% if config.BLOGGING_GOOGLE_ANALYTICS %}
 {{google.uanalytics(config['BLOGGING_GOOGLE_ANALYTICS'])}}
 {% endif %}
 {% endblock styles %}
+
+{% block navbar %}
+<!-- navbar header -->
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">
+                {{ config.BLOGGING_SITENAME or 'Flask-Blogging'}}
+            </a>
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock navbar %}
 
 {% block content %}
 {{ super() }}
