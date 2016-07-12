@@ -160,17 +160,13 @@ class BloggingEngine(object):
     def bootstrap_loader(self):
         if not self.config.get("BLOGGING_FLASK_BOOTSTRAP", False):
             return
-        
         Bootstrap(self.app)
-
         mathjax = WebCDN('//cdn.mathjax.org/mathjax/latest/')
-        markdown = WebCDN('//cdnjs.cloudflare.com/ajax/libs' + 
-                '/markdown.js/0.5.0/')
+        markdown = WebCDN('//cdnjs.cloudflare.com/ajax/libs' +
+                        '/markdown.js/0.5.0/')
         bootstrap_markdown = WebCDN('//cdnjs.cloudflare.com/ajax/libs' +
-                '/bootstrap-markdown/2.8.0/')
+                                    '/bootstrap-markdown/2.8.0/')
         cdns = self.app.extensions['bootstrap']['cdns']
         cdns['mathjax'] = mathjax
         cdns['bootstrap-markdown'] = bootstrap_markdown
         cdns['markdown'] = markdown
-
-
