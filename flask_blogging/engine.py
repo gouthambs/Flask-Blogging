@@ -8,7 +8,7 @@ except ImportError:
 from .processor import PostProcessor
 from flask_principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap, WebCDN
 
 
 class BloggingEngine(object):
@@ -101,6 +101,12 @@ class BloggingEngine(object):
 
         if self.config.get("BLOGGING_FLASK_BOOTSTRAP", False):
             Bootstrap(self.app)
+            self.app.extensions['bootstrap']['cdns']['mathjax'] \
+                    = WebCDN('//cdn.mathjax.org/mathjax/latest/')
+            self.app.extensions['bootstrap']['cdns']['bootstrap-markdown'] \
+                    = WebCDN('//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/')
+            self.app.extensions['bootstrap']['cdns']['markdown'] \
+                    = WebCDN('//cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/')
 
         engine_initialised.send(self.app, engine=self)
 
