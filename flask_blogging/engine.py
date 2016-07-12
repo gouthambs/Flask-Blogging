@@ -28,8 +28,12 @@ class BloggingEngine(object):
         storage = SQLAStorage(db_engine, metadata=meta)
         blog_engine = BloggingEngine(app, storage)
     """
-    def __init__(self, app=None, storage=None, post_processor=None,
-                 extensions=None, cache=None):
+    def __init__(self,
+            app=None,
+            storage=None,
+            post_processor=None,
+            extensions=None,
+            cache=None):
         """
 
         :param app: Optional app to use
@@ -52,7 +56,7 @@ class BloggingEngine(object):
         self.cache = cache
         self._blogger_permission = None
         self.post_processor = PostProcessor() if post_processor is None \
-            else post_processor
+                else post_processor
         if extensions:
             self.post_processor.set_custom_extensions(extensions)
         self.user_callback = None
@@ -93,21 +97,14 @@ class BloggingEngine(object):
         # extenral urls
         blueprint_created.send(self.app, engine=self, blueprint=blog_app)
         self.app.register_blueprint(
-            blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
+                blog_app,
+                url_prefix=self.config.get("BLOGGING_URL_PREFIX")
+                )
 
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self  # duplicate
         self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
-
-        if self.config.get("BLOGGING_FLASK_BOOTSTRAP", False):
-            Bootstrap(self.app)
-            self.app.extensions['bootstrap']['cdns']['mathjax'] \
-                    = WebCDN('//cdn.mathjax.org/mathjax/latest/')
-            self.app.extensions['bootstrap']['cdns']['bootstrap-markdown'] \
-                    = WebCDN('//cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/')
-            self.app.extensions['bootstrap']['cdns']['markdown'] \
-                    = WebCDN('//cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/')
-
+        self.bootstrap_loader()
         engine_initialised.send(self.app, engine=self)
 
     @property
@@ -118,6 +115,27 @@ class BloggingEngine(object):
             else:
                 self._blogger_permission = Permission()
         return self._blogger_permission
+
+    def bootstrap_loader(self):
+        if self.config.get("BLOGGING_FLASK_BOOTSTRAP", False):
+            Bootstrap(self.app)
+        else:
+            return
+
+        mathjax = lwrap(
+                WebCDN('//cdn.mathjax.org/mathjax/latest/')
+                )
+        markdown = lwrap(
+                WebCDN('//cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/')
+                )
+        bootstrap-markdown = lwrap(
+                WebCDN('//cdnjs.cloudflare.com/ajax/libs \
+                        /bootstrap-markdown/2.8.0/')
+                )
+        cdns = self.app.extensions['bootstrap']['cdns']
+        cdns['mathjax'] = mathjax
+        cdns['bootstrap-markdown'] = bootstrap-markdown
+        cdns['markdown'] = markdown
 
     def user_loader(self, callback):
         """
@@ -133,10 +151,16 @@ class BloggingEngine(object):
     def is_user_blogger(self):
         return self.blogger_permission.require().can()
 
-    def get_posts(self, count=10, offset=0, recent=True, tag=None,
-                  user_id=None, include_draft=False, render=False):
+    def get_posts(self,
+            count=10,
+            offset=0,
+            recent=True,
+            tag=None,
+            user_id=None,
+            include_draft=False,
+            render=False):
         posts = self.storage(count, offset, recent, tag, user_id,
-                             include_draft)
+                include_draft)
         for post in posts:
             self.process_post(post, render=False)
 
@@ -154,11 +178,11 @@ class BloggingEngine(object):
         try:
             author = self.user_callback(post["user_id"])
         except Exception:
-                raise Exception("No user_loader has been installed for this "
-                                "BloggingEngine. Add one with the "
-                                "'BloggingEngine.user_loader' decorator.")
-        if author is not None:
-            post["user_name"] = self.get_user_name(author)
+            raise Exception("No user_loader has been installed for this "
+                    "BloggingEngine. Add one with the "
+                    "'BloggingEngine.user_loader' decorator.")
+            if author is not None:
+                post["user_name"] = self.get_user_name(author)
         post_processed.send(self.app, engine=self, post=post, render=render)
 
     @classmethod
