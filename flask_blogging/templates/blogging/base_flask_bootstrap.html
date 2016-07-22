@@ -47,7 +47,6 @@ body { padding-top: 80px;}
 {% endblock content %}
 
 {% block scripts %}
-{{super()}}
 <script type="text/javascript" src="{{bootstrap_find_resource('MathJax.js?config=TeX-AMS_HTML', cdn='mathjax', use_minified=False)}}"></script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
