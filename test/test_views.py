@@ -30,13 +30,16 @@ class TestViews(FlaskBloggingTestCase):
 
     def _create_blogging_engine(self):
         return BloggingEngine(self.app, self.storage)
+    
+    def other_config(self):
+        pass
 
     def setUp(self, **config):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
         self.app.config["BLOGGING_URL_PREFIX"] = "/blog"
         self.app.config["BLOGGING_PLUGINS"] = []
-        self.app.config.update(config)
+        self.other_config()
         self.engine = self._create_blogging_engine()
         self.login_manager = LoginManager(self.app)
 
@@ -396,5 +399,5 @@ class TestViewsWithUnicode(TestViews):
 
 class TestViewsWithBootstrap(TestViews):
 
-    def setUp(self):
-        TestViews.setUp(self, BLOGGING_FLASK_BOOTSTRAP=True)
+    def other_config(self):
+        self.app.config["BLOGGING_FLASK_BOOTSTRAP"] = True
