@@ -30,7 +30,7 @@ class TestViews(FlaskBloggingTestCase):
 
     def _create_blogging_engine(self):
         return BloggingEngine(self.app, self.storage)
-    
+
     def other_config(self):
         pass
 
