@@ -393,8 +393,8 @@ class TestViewsWithUnicode(TestViews):
     def test_editor_post(self):
         pass
 
+
 class TestViewsWithBootstrap(TestViews):
 
     def setUp(self):
-        TestViews.setUp(self,BLOGGING_FLASK_BOOTSTRAP=True)
-
+        TestViews.setUp(self, BLOGGING_FLASK_BOOTSTRAP=True)
