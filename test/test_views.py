@@ -34,7 +34,7 @@ class TestViews(FlaskBloggingTestCase):
     def other_config(self):
         pass
 
-    def setUp(self, **config):
+    def setUp(self):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
         self.app.config["BLOGGING_URL_PREFIX"] = "/blog"
