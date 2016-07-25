@@ -10,10 +10,6 @@
 
 {% block styles %}
 {{super()}}
-<style>
-body { padding-top: 80px;}
-</style>
-
 {% if config.BLOGGING_GOOGLE_ANALYTICS %}
 {{google.uanalytics(config['BLOGGING_GOOGLE_ANALYTICS'])}}
 {% endif %}
@@ -21,8 +17,8 @@ body { padding-top: 80px;}
 
 {% block navbar %}
 <!-- navbar header -->
-<div class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
+<div class="navbar navbar-default">
+    <div class="container-fluid">
         <div class="navbar-header">
             <a href="/" class="navbar-brand">
                 {{ config.BLOGGING_SITENAME or 'Flask-Blogging'}}
@@ -47,6 +43,7 @@ body { padding-top: 80px;}
 {% endblock content %}
 
 {% block scripts %}
+{{ super() }}
 <script type="text/javascript" src="{{bootstrap_find_resource('MathJax.js?config=TeX-AMS_HTML', cdn='mathjax', use_minified=False)}}"></script>
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -58,4 +55,3 @@ MathJax.Hub.Config({
           });
 </script>
 {% endblock scripts %}
-

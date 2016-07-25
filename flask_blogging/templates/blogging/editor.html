@@ -5,9 +5,9 @@
 {% block styles %}
 {{super()}}
 {% if config.BLOGGING_FLASK_BOOTSTRAP %} 
-<link href="{{bootstrap_find_resource('css/bootstrap-markdown.css', cdn='bootstrap-markdown')}}" rel="stylesheet"/>
+<link href="{{bootstrap_find_resource('css/bootstrap-markdown.css', cdn='bootstrap-markdown')}}" rel="stylesheet">
 {% else %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/css/bootstrap-markdown.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/css/bootstrap-markdown.min.css" rel="stylesheet">
 {% endif %}
 {% endblock styles %}
 
@@ -76,7 +76,3 @@
 <script type="text/javascript"src="https://cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/markdown.min.js"></script>
 {% endif %}
 {% endblock scripts %}
-
-
-
-

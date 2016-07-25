@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 {% block styles %}
 <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet"/>
-<style>
-body { padding-top: 80px;}
-</style>
 {% endblock styles %}
 <title>
     {% block title %}
@@ -17,8 +14,8 @@ body { padding-top: 80px;}
 
 {% block navbar %}
 <!-- navbar header -->
-<div class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
+<div class="navbar navbar-default">
+    <div class="container-fluid">
         <div class="navbar-header">
             <a href="/" class="navbar-brand">
                 {{ config.BLOGGING_SITENAME or 'Flask-Blogging'}}
