@@ -50,7 +50,6 @@ class TestNoBootstrap(TestViews):
         try:
             super(TestNoBootstrap, self)._create_blogging_engine()
         except Exception as e:
-            print(e.message)
             self.assertEqual('Flask_Bootstrap extention not found.',
                              str(e.message))
         self.skipTest(TestNoBootstrap)
