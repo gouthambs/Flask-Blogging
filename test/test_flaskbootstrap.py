@@ -1,4 +1,4 @@
-from test_views import TestViews
+from .test_views import TestViews
 try:
     from flask_bootstrap import Bootstrap, bootstrap_find_resource
 except ImportError:
