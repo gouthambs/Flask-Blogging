@@ -161,8 +161,7 @@ class BloggingEngine(object):
         if not self.config.get('BLOGGING_FLASK_BOOTSTRAP', False):
             return
         if 'bootstrap' not in self.app.extensions:
-            raise Exception("Flask_Bootstrap extention not found.")
-            return
+            raise RuntimeError('Flask_Bootstrap extention not found.')
 
         mathjax = WebCDN('//cdn.mathjax.org/mathjax/latest/')
         markdown = WebCDN('//cdnjs.cloudflare.com/ajax/'
