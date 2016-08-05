@@ -15,7 +15,6 @@ from flask_principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 from flask_cache import Cache
 from .utils import get_random_unicode
-from flask_bootstrap import Bootstrap
 
 
 class TestViews(FlaskBloggingTestCase):
@@ -396,9 +395,3 @@ class TestViewsWithUnicode(TestViews):
 
     def test_editor_post(self):
         pass
-
-
-class TestViewsWithBootstrap(TestViews):
-
-    def other_config(self):
-        Bootstrap(self.app)

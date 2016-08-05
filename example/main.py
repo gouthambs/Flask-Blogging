@@ -11,6 +11,7 @@ app.config["BLOGGING_URL_PREFIX"] = "/blog"
 app.config["BLOGGING_DISQUS_SITENAME"] = "test"
 app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
 app.config["BLOGGING_SITENAME"] = "My Site"
+# app.config["BLOGGING_FLASK_BOOTSTRAP"] = True
 
 # extensions
 # Bootstrap(app)

@@ -158,10 +158,12 @@ class BloggingEngine(object):
         return user_name
 
     def static_asset_loader(self):
-        if 'bootstrap' not in self.app.extensions:
-            self.app.config["BLOGGING_FLASK_BOOTSTRAP"] = False
+        if not self.config.get('BLOGGING_FLASK_BOOTSTRAP', False):
             return
-        self.app.config["BLOGGING_FLASK_BOOTSTRAP"] = True
+        if 'bootstrap' not in self.app.extensions:
+            raise Exception("Flask_Bootstrap extention not found.")
+            return
+
         mathjax = WebCDN('//cdn.mathjax.org/mathjax/latest/')
         markdown = WebCDN('//cdnjs.cloudflare.com/ajax/'
                           'libs/markdown.js/0.5.0/')
