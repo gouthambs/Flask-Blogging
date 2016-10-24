@@ -137,11 +137,10 @@ def page_by_id(post_id, slug):
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
-
+    page_by_id_fetched.send(blogging_engine.app, engine=blogging_engine,
+                            post=post, meta=meta, post_id=post_id,
+                            slug=slug)
     if post is not None:
-        page_by_id_fetched.send(blogging_engine.app, engine=blogging_engine,
-                                post=post, meta=meta, post_id=post_id,
-                                slug=slug)
         blogging_engine.process_post(post, render=render)
         page_by_id_processed.send(blogging_engine.app, engine=blogging_engine,
                                   post=post, meta=meta, post_id=post_id,
@@ -165,12 +164,10 @@ def posts_by_tag(tag, count, page):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
                               include_draft=False, user_id=None, recent=True)
-
+    posts_by_tag_fetched.send(blogging_engine.app, engine=blogging_engine,
+                              posts=posts, meta=meta, tag=tag, count=count,
+                              page=page)
     if len(posts):
-        posts_by_tag_fetched.send(blogging_engine.app, engine=blogging_engine,
-                                  posts=posts, meta=meta, tag=tag, count=count,
-                                  page=page)
-
         for post in posts:
             blogging_engine.process_post(post, render=render)
         posts_by_tag_processed.send(blogging_engine.app,
@@ -197,11 +194,11 @@ def posts_by_author(user_id, count, page):
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id,
                               include_draft=False, tag=None, recent=True)
     render = config.get("BLOGGING_RENDER_TEXT", True)
+    posts_by_author_fetched.send(blogging_engine.app,engine=blogging_engine, 
+                                 posts=posts, meta=meta, user_id=user_id, 
+                                 count=count, page=page)
     if len(posts):
-        posts_by_author_fetched.send(blogging_engine.app,
-                                     engine=blogging_engine, posts=posts,
-                                     meta=meta, user_id=user_id, count=count,
-                                     page=page)
+        
         for post in posts:
             blogging_engine.process_post(post, render=render)
         posts_by_author_processed.send(blogging_engine.app,
@@ -316,14 +313,14 @@ def sitemap():
     config = blogging_engine.config
     posts = storage.get_posts(count=None, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
+    sitemap_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
+                               posts=posts)
+
     if len(posts):
-        sitemap_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
-                                   posts=posts)
         for post in posts:
             blogging_engine.process_post(post, render=False)
         sitemap_posts_processed.send(blogging_engine.app,
-                                     engine=blogging_engine,
-                                     posts=posts)
+                                     engine=blogging_engine, posts=posts)
     sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
@@ -344,9 +341,10 @@ def feed():
                                          "Flask-Blogging"),
         feed_url=request.url, url=request.url_root, generator=None)
 
+    feed_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
+                            posts=posts)
     if len(posts):
-        feed_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
-                                posts=posts)
+        
         for post in posts:
             blogging_engine.process_post(post, render=True)
             feed.add(post["title"], ensureUtf(post["rendered_text"]),
