@@ -1,5 +1,10 @@
 Release Notes
 =============
+- **Version 0.7.2**
+  *Release October 30, 2016*
+  
+  - Moved default static assets to https (#78)
+  - Fixed the issue where post fetched wouldn't emit when no posts exist (#76)
 
 - **Version 0.7.1**
 

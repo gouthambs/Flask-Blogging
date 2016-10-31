@@ -122,8 +122,8 @@ Flask-Login version.
 Configuring your Application
 ============================
 
-The `BloggingEngine` class is the gateway to configure blogging support
-to your web app. You should create the `BloggingEngine` instance like this::
+The ``BloggingEngine`` class is the gateway to configure blogging support
+to your web app. You should create the ``BloggingEngine`` instance like this::
 
     blogging_engine = BloggingEngine()
     blogging_engine.init_app(app, storage)
@@ -140,7 +140,7 @@ You also need to pick the ``storage`` for blog. That can be done as::
 Here we have created the storage, and created all the tables
 in the metadata. Once you have created the blogging engine,
 storage, and all the tables in the storage, you can connect
-with your app using the `init_app` method as shown below::
+with your app using the ``init_app`` method as shown below::
 
    blogging_engine.init_app(app, storage)
 
@@ -231,8 +231,8 @@ Adding Custom Markdown Extensions
 ---------------------------------
 
 One can provide additional MarkDown extensions to the blogging engine.
-One example usage is adding the `codehilite` MarkDown extension. Additional
-extensions should be passed as a list while initializing the `BlogggingEngine`
+One example usage is adding the ``codehilite`` MarkDown extension. Additional
+extensions should be passed as a list while initializing the ``BlogggingEngine``
 as shown::
 
     from markdown.extensions.codehilite import CodeHiliteExtension
@@ -243,7 +243,80 @@ as shown::
 
 This allows for the MarkDown to be processed using CodeHilite along with
 the default extensions. Please note that one would also need to include
-necessary static files in the `view`, such as for code highlighting to work.
+necessary static files in the ``view``, such as for code highlighting to work.
+
+Extending using Markdown Metadata
+---------------------------------
+
+Let's say you want to include a summary for your blog post, and have it
+show up along with the post. You don't need to modify the database or 
+the models to accomplish this. This is infact supported by default by way
+of Markdown metadata syntax. In your blog post, you can include metadata,
+as shown below::
+
+    Summary: This is a short summary of the blog post
+    
+    This is the much larger blog post. There are lot of things
+    to discuss here. 
+
+In the template ``page.html`` this metadata can be accessed as, ``post.meta.summary``
+and can be populated in the way it is desired. The same metadata for each post
+is also available in other template views like ``index.html``.
+
+Extending using the plugin framework
+------------------------------------
+
+The plugin framework is a very powerful way to modify the behavior of the 
+blogging engine. Lets say you want to show the top 10 most popular tag in the
+post. Lets show how one can do that using the plugins framework. As a first step,
+we create our plugin::
+
+    # plugins/tag_cloud/__init__.py
+    from flask_blogging import signals
+    from flask_blogging.sqlastorage import SQLAStorage
+    import sqlalchemy as sqla
+    from sqlalchemy import func
+
+
+    def get_tag_data(sqla_storage):
+        engine = sqla_storage.engine
+        with engine.begin() as conn:
+            tag_posts_table = sqla_storage.tag_posts_table
+            tag_table = sqla_storage.tag_table
+
+            tag_cloud_stmt = sqla.select([
+                tag_table.c.text,func.count(tag_posts_table.c.tag_id)]).group_by(
+                tag_posts_table.c.tag_id
+            ).where(tag_table.c.id == tag_posts_table.c.tag_id).limit(10)
+            tag_cloud = conn.execute(tag_cloud_stmt).fetchall()
+        return tag_cloud
+
+
+    def get_tag_cloud(app, engine, posts, meta, count, page):
+        if isinstance(engine.storage, SQLAStorage):
+            tag_cloud = get_tag_data(engine.storage)
+            meta["tag_cloud"] = tag_cloud
+        else:
+            raise RuntimeError("Plugin only supports SQLAStorage. Given storage"
+                               "not supported")
+        return
+
+
+    def register(app):
+        signals.index_posts_fetched.connect(get_tag_cloud)
+        return
+
+
+The ``register`` method is what is invoked in order to register the plugin. We have
+connected this plugin to the ``index_posts_fetched`` signal. So when the posts are
+fetched to show on the index page, this signal will be fired, and this plugin will
+be invoked. The plugin basically queries the table that stores the tags, and returns
+the tag text and the number of times it is referenced. The data about the tag cloud
+we are storing in the ``meta["tag_cloud"]`` which corresponds to the metadata variable.
+
+
+Now in the ``index.html`` template, one can reference the ``meta.tag_cloud`` to access this 
+data for display.
 
 
 Configuration Variables
