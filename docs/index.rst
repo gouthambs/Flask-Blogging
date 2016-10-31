@@ -263,6 +263,7 @@ In the template ``page.html`` this metadata can be accessed as, ``post.meta.summ
 and can be populated in the way it is desired. The same metadata for each post
 is also available in other template views like ``index.html``.
 
+
 Extending using the plugin framework
 ------------------------------------
 
@@ -315,8 +316,11 @@ the tag text and the number of times it is referenced. The data about the tag cl
 we are storing in the ``meta["tag_cloud"]`` which corresponds to the metadata variable.
 
 
-Now in the ``index.html`` template, one can reference the ``meta.tag_cloud`` to access this 
-data for display.
+Now in the `index.html` template, one can reference the ``meta.tag_cloud`` to access this
+data for display. The plugin can be registered by setting the config variable as shown::
+
+    app.config["BLOGGING_PLUGINS"] = ["plugins.tag_cloud"]
+
 
 
 Configuration Variables
