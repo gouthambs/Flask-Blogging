@@ -194,11 +194,10 @@ def posts_by_author(user_id, count, page):
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id,
                               include_draft=False, tag=None, recent=True)
     render = config.get("BLOGGING_RENDER_TEXT", True)
-    posts_by_author_fetched.send(blogging_engine.app,engine=blogging_engine, 
-                                 posts=posts, meta=meta, user_id=user_id, 
+    posts_by_author_fetched.send(blogging_engine.app, engine=blogging_engine,
+                                 posts=posts, meta=meta, user_id=user_id,
                                  count=count, page=page)
     if len(posts):
-        
         for post in posts:
             blogging_engine.process_post(post, render=render)
         posts_by_author_processed.send(blogging_engine.app,
@@ -344,7 +343,6 @@ def feed():
     feed_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
                             posts=posts)
     if len(posts):
-        
         for post in posts:
             blogging_engine.process_post(post, render=True)
             feed.add(post["title"], ensureUtf(post["rendered_text"]),
