@@ -1,0 +1,61 @@
+{% extends "blogging/base.html" %}
+{% block title %}
+Blog Posts
+{% endblock title %}
+
+{% block main %}
+    {% if alert %}
+        <div class="alert alert-{{alert.type}}">
+            <strong>{{ alert.type }}</strong> {{ alert.message }}
+        </div>
+    {% endif %}
+
+    {% if meta.is_user_blogger %}
+        <div class="pull-right">
+            <a href="{{ url_for('blogging.editor') }}" id="new">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;New
+            </a>
+        </div>
+    {% endif %}
+
+    {% for post in posts %}
+        <a href="{{ post.url }}">
+            <h1>{{ post.title }}</h1>
+        </a>
+        <p>Posted by <a href="{{ url_for('blogging.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+        on {{post.post_date.strftime('%d %b, %Y')}}</p>
+
+        <!-- post tags-->
+        {% if post.tags %}
+            <span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;
+            {% for tag in post.tags %}
+                <span class="label">
+                    <a href="{{ url_for('blogging.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
+                    {{ tag }}
+                    </a>
+                </span>&nbsp;&nbsp;
+            {% endfor %}
+            <br>
+        {% endif %}
+        <hr>
+    {% endfor %}
+    {% if ((meta)  and (meta.max_pages>1)) %}
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="pager">
+                    {% if meta.pagination.prev_page %}
+                        <li><a href="{{meta.pagination.prev_page}}">&laquo;Prev</a></li>
+                    {% else %}
+                        <li class="disabled"><a href="">&laquo; Prev</a></li>
+                    {% endif %}
+                    {% if meta.pagination.next_page %}
+                        <li><a href="{{meta.pagination.next_page}}">Next &raquo;</a></li>
+                    {% else %}
+                        <li class="disabled"><a href="">Next &raquo;</a></li>
+                    {% endif %}
+
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endblock main %}

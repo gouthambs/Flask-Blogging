@@ -1,0 +1,64 @@
+{% extends 'blogging/base.html' %}
+{% block extrastyle %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/css/bootstrap-markdown.min.css"
+      rel="stylesheet"/>
+{% endblock extrastyle %}
+{% block main %}
+<form class="form-horizontal" action="{{url_for('blogging.editor', post_id=post_id or None)}}" method="POST">
+
+    {{ form.hidden_tag() }}
+
+    <fieldset>
+        <!-- Form Name -->
+        <legend>Blog Editor</legend>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="control-label col-md-offset-2  control-label input-md" for="title">
+                Title
+            </label>
+            <div class="input-group col-md-8 col-md-offset-2">
+                {{form.title(placeholder="Title", id="title", class="form-control", required="" )}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group col-md-8 col-md-offset-2">
+                {{form.text(placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
+                <span class="help-block">
+                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a>
+                </span>
+            </div>
+        </div>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-offset-2 control-label" for="tags">Tags</label>
+
+            <div class="input-group col-md-8 col-md-offset-2">
+                {{form.tags(id="tags", placeholder="Comma separated tags", class="form-control input-md", required="")}}
+            </div>
+        </div>
+        <!-- draft input-->
+        <!--div class="form-group">
+            <div class="col-md-offset-2">
+                <label>
+                    {{form.draft(id="draft")}} draft?
+                </label>
+            </div>
+        </div-->
+        <div class="form-group">
+            <div class="col-md-offset-2">
+                {{ form.submit(id="submit", class="btn btn-primary") }}
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% endblock main %}
+
+{% block extrajs %}
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.8.0/js/bootstrap-markdown.min.js">
+    </script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/markdown.min.js">
+    </script>
+{% endblock extrajs %}

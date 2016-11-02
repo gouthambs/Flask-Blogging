@@ -1,0 +1,78 @@
+{% extends "blogging/base.html" %}
+{% block title %}
+    {{post.title}}
+{% endblock title %}
+
+{% block main %}
+<div class="modal fade" id="confirmModal" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Are you sure you want to delete this post?</h4>
+            </div>
+            <div class="modal-footer">
+                <form action="{{ url_for('blogging.delete', post_id=post.post_id) }}" method="POST">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <input type="submit" value="Yes" class="btn btn-primary" id="confirmedDelete"/>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% if meta.is_user_blogger %}
+    <div class="pull-right">
+    {% if post.editable %}
+        <a href="#" id="delete">
+            <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
+        </a>&nbsp&nbsp&nbsp&nbsp
+
+        <a href="{{ url_for('blogging.editor', post_id=post.post_id) }}" id="edit">
+            <span class="glyphicon glyphicon-edit"></span>&nbsp;Edit
+        </a>&nbsp&nbsp&nbsp&nbsp
+    {% endif %}
+        <a href="{{ url_for('blogging.editor') }}" id="new">
+            <span class="glyphicon glyphicon-plus"></span>&nbsp;New
+        </a>
+    </div>
+{% endif %}
+
+
+  <a href="{{ url_for('blogging.page_by_id', post_id=post.post_id, slug=post.slug) }}">
+      <h1>{{ post.title }}</h1>
+  </a>
+    <p>Posted by <a href="{{ url_for('blogging.posts_by_author', user_id=post.user_id)}}"><em>{{post.user_name}}</em></a>
+on {{post.post_date.strftime('%d %b, %Y')}}</p>
+    {{post.rendered_text | safe}}
+
+   <br>
+  <!-- article tags-->
+  {% if post.tags %}
+    <span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;
+    {% for tag in post.tags %}
+        <span class="label">
+          <a href="{{ url_for('blogging.posts_by_tag', tag=tag.lower(), count=10, offset=0) }}">
+          {{ tag }}
+          </a>
+        </span>&nbsp;&nbsp;
+    {% endfor %}
+    <br>
+  {% endif %}
+  <br>
+  <hr>
+{% include "blogging/disqus.html" %}
+{% endblock main %}
+
+{% block extrajs %}
+
+<script>
+    $(document).ready(function(){
+        $("#delete").click(function(){
+            $('#confirmModal').modal('show');
+        });
+        $("img").addClass("center-block").addClass("img-responsive");
+    });
+</script>
+{% endblock extrajs %}
