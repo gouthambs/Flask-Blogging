@@ -8,6 +8,7 @@ from flask import url_for
 from flask_login import current_user
 from slugify import slugify
 
+
 class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
     def __init__(self):
