@@ -6,7 +6,7 @@ import markdown
 from markdown.extensions.meta import MetaExtension
 from flask import url_for
 from flask_login import current_user
-
+from slugify import slugify
 
 class MathJaxPattern(markdown.inlinepatterns.Pattern):
 
@@ -38,7 +38,7 @@ class PostProcessor(object):
 
     @staticmethod
     def create_slug(title):
-        return "-".join([t.lower() for t in title.split()])
+        return slugify(title)
 
     @classmethod
     def construct_url(cls, post):
