@@ -1,5 +1,11 @@
 Release Notes
 =============
+
+- **Version 0.7.3**
+  *Release November 6, 2016*
+  
+  - Fix issues with slugs with special characters (#80)
+
 - **Version 0.7.2**
   *Release October 30, 2016*
   
