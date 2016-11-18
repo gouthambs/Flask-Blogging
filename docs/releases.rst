@@ -2,7 +2,7 @@ Release Notes
 =============
 
 - **Version 0.7.4**
-  *Release November 17, 2017
+  *Release November 17, 2017*
 
   - Fix Requirements.txt error
 
