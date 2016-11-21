@@ -6,10 +6,17 @@ Flask-Blogging
 
 
 This is a Flask extension for adding blog support to your site using Markdown.
-Please see
-`Flask-Blogging documentation <http://flask-blogging.readthedocs.org/en/latest/>`_
-for more details.
+Please see `Flask-Blogging documentation <http://flask-blogging.readthedocs.org/en/latest/>`_
+for more details.  
 
+Sponsor
+-------
+
+`ButterCMS <https://buttercms.com/?utm_source=github&utm_medium=sponsorship-link&utm_campaign=flask-blogging>`_ is an API-based CMS and blogging platform built for developers:
+
+.. image:: https://dl.dropboxusercontent.com/u/598519/buttercms-banners/b-on-y.png
+    :target: https://buttercms.com/?utm_source=github&utm_medium=sponsorship-banner&utm_campaign=flask-blogging
+    
 Screen Shots
 ------------
 
