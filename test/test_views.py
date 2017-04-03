@@ -11,7 +11,7 @@ from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
 from test import FlaskBloggingTestCase, TestUser
 import re
-from flask_principal import identity_changed, Identity, \
+from flask_principal import identity_changed, Identity, Permission,\
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 from flask_cache import Cache
 from .utils import get_random_unicode
@@ -22,7 +22,7 @@ class TestViews(FlaskBloggingTestCase):
     def _create_storage(self):
         temp_dir = tempfile.gettempdir()
         self._dbfile = os.path.join(temp_dir, "temp.db")
-        conn_string = 'sqlite:///'+self._dbfile
+        conn_string = 'sqlite:///' + self._dbfile
         engine = create_engine(conn_string)
         meta = MetaData()
         self.storage = SQLAStorage(engine, metadata=meta)
@@ -301,18 +301,20 @@ class TestViews(FlaskBloggingTestCase):
 
         ctx.pop()
 
-    def _set_identity_loader(self):
+    def _set_identity_loader(self, role_name):
         @identity_loaded.connect_via(self.app)
         def on_identity_loaded(sender, identity):
             identity.user = current_user
             if hasattr(current_user, "id"):
                 identity.provides.add(UserNeed(current_user.id))
-            identity.provides.add(RoleNeed("blogger"))
+            identity.provides.add(RoleNeed(role_name))
 
     def test_permissions_editor(self):
         self.app.config["BLOGGING_PERMISSIONS"] = True
+        self.app.config["BLOGGING_PERMISSIONNAME"] = "testblogger"
         user_id = "newuser"
-        self._set_identity_loader()
+        self._set_identity_loader(self.app.config["BLOGGING_PERMISSIONNAME"]
+                                  or "blogger")
 
         with self.client:
             response = self.client.post("/blog/editor/")
@@ -337,10 +339,20 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.post("/blog/editor/1/")
             self.assertEqual(response.status_code, 200)
 
+            test_permission = Permission(RoleNeed("testblogger"))
+            blogger_permission = Permission(RoleNeed("blogger"))
+            self.assertTrue(test_permission.issubset(
+                self.engine.blogger_permission))
+            self.assertFalse(blogger_permission.issubset(
+                self.engine.blogger_permission))
+
     def test_permissions_delete(self):
         self.app.config["BLOGGING_PERMISSIONS"] = True
+        # Assuming "BLOGGING_PERMISSIONNAME" read failure
+        self.app.config["BLOGGING_PERMISSIONNAME"] = None
         user_id = "testuser"
-        self._set_identity_loader()
+        self._set_identity_loader(self.app.config["BLOGGING_PERMISSIONNAME"]
+                                  or "blogger")
 
         with self.client:
             # Anonymous user cannot delete
@@ -364,6 +376,13 @@ class TestViews(FlaskBloggingTestCase):
                                         follow_redirects=True)
             assert "You do not have the rights to delete this post" in \
                    str(response.data)
+
+            test_permission = Permission(RoleNeed("testblogger"))
+            blogger_permission = Permission(RoleNeed("blogger"))
+            self.assertFalse(test_permission.issubset(
+                self.engine.blogger_permission))
+            self.assertTrue(blogger_permission.issubset(
+                self.engine.blogger_permission))
 
 
 class TestViewsWithCache(TestViews):
