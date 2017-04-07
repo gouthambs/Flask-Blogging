@@ -104,7 +104,7 @@ class BloggingEngine(object):
         if self._blogger_permission is None:
             if self.config.get("BLOGGING_PERMISSIONS", False):
                 self._blogger_permission = Permission(RoleNeed(
-                    self.app.config["BLOGGING_PERMISSIONNAME"] or "blogger"))
+                    self.config.get("BLOGGING_PERMISSIONNAME", "blogger")))
             else:
                 self._blogger_permission = Permission()
         return self._blogger_permission

@@ -313,8 +313,7 @@ class TestViews(FlaskBloggingTestCase):
         self.app.config["BLOGGING_PERMISSIONS"] = True
         self.app.config["BLOGGING_PERMISSIONNAME"] = "testblogger"
         user_id = "newuser"
-        self._set_identity_loader(self.app.config["BLOGGING_PERMISSIONNAME"]
-                                  or "blogger")
+        self._set_identity_loader(self.app.config.get("BLOGGING_PERMISSIONNAME", "blogger"))
 
         with self.client:
             response = self.client.post("/blog/editor/")
@@ -349,10 +348,9 @@ class TestViews(FlaskBloggingTestCase):
     def test_permissions_delete(self):
         self.app.config["BLOGGING_PERMISSIONS"] = True
         # Assuming "BLOGGING_PERMISSIONNAME" read failure
-        self.app.config["BLOGGING_PERMISSIONNAME"] = None
+        # self.app.config["BLOGGING_PERMISSIONNAME"] = None
         user_id = "testuser"
-        self._set_identity_loader(self.app.config["BLOGGING_PERMISSIONNAME"]
-                                  or "blogger")
+        self._set_identity_loader(self.app.config.get("BLOGGING_PERMISSIONNAME", "blogger"))
 
         with self.client:
             # Anonymous user cannot delete
