@@ -313,7 +313,8 @@ class TestViews(FlaskBloggingTestCase):
         self.app.config["BLOGGING_PERMISSIONS"] = True
         self.app.config["BLOGGING_PERMISSIONNAME"] = "testblogger"
         user_id = "newuser"
-        self._set_identity_loader(self.app.config.get("BLOGGING_PERMISSIONNAME", "blogger"))
+        self._set_identity_loader(self.app.config.get(
+            "BLOGGING_PERMISSIONNAME", "blogger"))
 
         with self.client:
             response = self.client.post("/blog/editor/")
@@ -350,7 +351,8 @@ class TestViews(FlaskBloggingTestCase):
         # Assuming "BLOGGING_PERMISSIONNAME" read failure
         # self.app.config["BLOGGING_PERMISSIONNAME"] = None
         user_id = "testuser"
-        self._set_identity_loader(self.app.config.get("BLOGGING_PERMISSIONNAME", "blogger"))
+        self._set_identity_loader(self.app.config.get(
+            "BLOGGING_PERMISSIONNAME", "blogger"))
 
         with self.client:
             # Anonymous user cannot delete
@@ -399,9 +401,9 @@ class TestViewsWithUnicode(TestViews):
             tags = ["unicode hello"] if i < 10 else ["unicode world"]
             user = "testuser" if i < 10 else "newuser"
             self.storage.save_post(
-                    title=u'{0}_{1}'.format(get_random_unicode(15), i),
-                    text=u'{0}_{1}'.format(get_random_unicode(200), i),
-                    user_id=user, tags=tags)
+                title=u'{0}_{1}'.format(get_random_unicode(15), i),
+                text=u'{0}_{1}'.format(get_random_unicode(200), i),
+                user_id=user, tags=tags)
 
     def test_editor_edit_page(self):
         pass
