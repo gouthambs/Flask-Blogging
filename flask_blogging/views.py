@@ -4,7 +4,7 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
-from flask_login import login_required, current_user
+from flask_security import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
@@ -224,7 +224,7 @@ def editor(post_id):
             storage = blogging_engine.storage
             if request.method == 'POST':
                 form = BlogEditor(request.form)
-                if form.validate():
+                if form.validate_on_submit():
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
                             (PostProcessor.is_author(post, current_user)) and \
