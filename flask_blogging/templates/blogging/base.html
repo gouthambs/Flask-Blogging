@@ -29,11 +29,17 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <ul class="nav navbar-nav">
-                  <li><a href="{{ config.BLOGGING_URL_PREFIX }}/sitemap.xml">Sitemap</a></li>
-                  <li><a href="{{ config.BLOGGING_URL_PREFIX }}/feeds/all.atom.xml">ATOM</a></li>
-                </ul>
             </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ config.BLOGGING_URL_PREFIX }}/sitemap.xml">Sitemap</a></li>
+                <li><a href="{{ config.BLOGGING_URL_PREFIX }}/feeds/all.atom.xml">ATOM</a></li>
+                {% if config.BLOGGING_IMPRESSUM %}
+                    <li><a href="{{ config.BLOGGING_URL_PREFIX }}/impressum">Impressum</a></li>
+                {% endif %}
+                {% if config.BLOGGING_PRIVACY %}
+                    <li><a href="{{ config.BLOGGING_URL_PREFIX }}/privacy">Privacy</a></li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 
