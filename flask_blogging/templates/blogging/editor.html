@@ -23,9 +23,10 @@
 
         <div class="form-group">
             <div class="input-group col-md-8 col-md-offset-2">
-                {{form.text(placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
+                {{form.text(id="editor", placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
                 <span class="help-block">
-                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a>
+                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a><br>
+                    <a target="_blank" href="{{ url_for("blogging.upload") }}">Upload new Images</a>
                 </span>
             </div>
         </div>
@@ -60,5 +61,36 @@
     </script>
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js">
+    </script>
+
+    <!-- Add additional <pre> wrapper icon -->
+    <script>
+    $("#editor").markdown({
+      additionalButtons: [
+        [{
+              name: "groupMisc",
+              data: [{
+                name: "cmdPre",
+                title: "<pre>",
+                icon: "glyphicon glyphicon-console",
+                callback: function(e){
+                  var chunk, cursor;
+                  var selected = e.getSelection();
+                  var content = e.getContent();
+
+                  // Give random drink
+                  chunk = "<pre>\n" + selected.text + "\n</pre>";
+
+                  // transform selection and set the cursor into chunked text
+                  e.replaceSelection(chunk);
+                  cursor = selected.start;
+
+                  // Set the cursor
+                  e.setSelection(cursor,cursor+chunk.length)
+                }
+              }]
+        }]
+      ]
+    })
     </script>
 {% endblock extrajs %}

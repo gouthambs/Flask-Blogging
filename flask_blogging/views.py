@@ -20,6 +20,9 @@ from .signals import page_by_id_fetched, page_by_id_processed, \
     sitemap_posts_fetched, sitemap_posts_processed, editor_post_saved, \
     post_deleted, editor_get_fetched
 from .utils import ensureUtf
+import os
+from .forms import UploadForm
+from werkzeug.utils import secure_filename
 
 
 def _get_blogging_engine(app):
@@ -96,6 +99,64 @@ def _is_blogger(blogger_permission):
     is_blogger = authenticated and \
         blogger_permission.require().can()
     return is_blogger
+
+
+def _get_abs_img_path():
+    # TODO: Make this final anywhere we have app context
+    ROOT = os.path.sep.join(current_app.root_path.split(os.path.sep))
+    ABS_IMG_FOLDER = os.path.join(ROOT, current_app.config["IMG_FOLDER"])
+
+    if not os.path.exists(ABS_IMG_FOLDER):
+        os.mkdir(ABS_IMG_FOLDER)
+    return ABS_IMG_FOLDER
+
+
+@login_required
+def upload():
+    existing_files = list(sorted([f for f in os.listdir(_get_abs_img_path())]))
+    filename = ""
+    form = UploadForm()
+    if form.validate_on_submit():
+        uploaded_img = form.upload_img.data
+        filename = secure_filename(form.upload_name.data)
+
+        if not any(filename.endswith('.' + x) for x
+                   in UploadForm.ALLOWED_EXTENSIONS):
+            flash("This file extension is not allowed."
+                  "Use one of these: {ext}"
+                  .format(ext=" ,".join(UploadForm.ALLOWED_EXTENSIONS)),
+                  category="danger")
+            return redirect(request.url)
+
+        if filename in existing_files:
+            flash("File already exists, choose an other name",
+                  category="warning")
+            return redirect(request.url)
+
+        uploaded_img.save(os.path.join(_get_abs_img_path(), filename))
+        flash("Image saved: " + filename, category="info")
+
+        return redirect(request.url)
+
+    if form.errors:
+        flash("Errors on Form. Check if you provide all needed data!",
+              category="danger")
+
+    return render_template("blogging/upload.html",
+                           existing_files=existing_files,
+                           new_file=filename,
+                           form=form)
+
+
+@login_required
+def upload_delete(filename):
+    existing_files = list(sorted([f for f in os.listdir(_get_abs_img_path())]))
+    if filename not in existing_files:
+        flash("File does not exist", category="danger")
+    else:
+        os.remove(os.path.join(_get_abs_img_path(), filename))
+        flash("File removed: " + filename, category="info")
+    return redirect(url_for("blogging.upload"))
 
 
 def index(count, page):
@@ -224,7 +285,7 @@ def editor(post_id):
             storage = blogging_engine.storage
             if request.method == 'POST':
                 form = BlogEditor(request.form)
-                if form.validate():
+                if form.validate_on_submit():
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
                             (PostProcessor.is_author(post, current_user)) and \
@@ -380,7 +441,10 @@ def cached_func(blogging_engine, func):
 
 def create_blueprint(import_name, blogging_engine):
 
-    blog_app = Blueprint("blogging", import_name, template_folder='templates')
+    blog_app = Blueprint("blogging", import_name,
+                         template_folder='templates',
+                         static_folder='static',
+                         static_url_path='/static/blogging')
 
     # register index
     index_func = cached_func(blogging_engine, index)
@@ -389,6 +453,12 @@ def create_blueprint(import_name, blogging_engine):
     blog_app.add_url_rule("/<int:count>/", defaults={"page": 1},
                           view_func=index_func)
     blog_app.add_url_rule("/<int:count>/<int:page>/", view_func=index_func)
+
+    # register upload
+    blog_app.add_url_rule("/upload", view_func=upload, methods=["GET", "POST"])
+    blog_app.add_url_rule("/upload/delete/<filename>",
+                          view_func=upload_delete,
+                          methods=["GET"])
 
     # register page_by_id
     page_by_id_func = cached_func(blogging_engine, page_by_id)
