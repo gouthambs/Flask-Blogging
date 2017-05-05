@@ -8,6 +8,7 @@ except ImportError:
 from .processor import PostProcessor
 from flask_principal import Principal, Permission, RoleNeed
 from .signals import engine_initialised, post_processed, blueprint_created
+from flask_fileupload import FlaskFileUpload
 
 
 class BloggingEngine(object):
@@ -48,6 +49,8 @@ class BloggingEngine(object):
         """
         self.app = None
         self.storage = storage
+        self.config = None
+        self.ffu = None
         self.cache = cache
         self._blogger_permission = None
         self.post_processor = PostProcessor() if post_processor is None \
@@ -89,7 +92,7 @@ class BloggingEngine(object):
 
         from .views import create_blueprint
         blog_app = create_blueprint(__name__, self)
-        # extenral urls
+        # external urls
         blueprint_created.send(self.app, engine=self, blueprint=blog_app)
         self.app.register_blueprint(
             blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
@@ -98,6 +101,8 @@ class BloggingEngine(object):
         self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
         engine_initialised.send(self.app, engine=self)
+
+        self.ffu = FlaskFileUpload(app)
 
     @property
     def blogger_permission(self):
