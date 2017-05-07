@@ -4,3 +4,4 @@
 .env
 dist/
 Flask_Blogging.egg-info/
+example/static/*

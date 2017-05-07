@@ -25,7 +25,8 @@
             <div class="input-group col-md-8 col-md-offset-2">
                 {{form.text(placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
                 <span class="help-block">
-                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a>
+                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a><br>
+                    <a target="_blank" href="{{ url_for("flask_fileupload.upload") }}">Upload new File</a>
                 </span>
             </div>
         </div>
