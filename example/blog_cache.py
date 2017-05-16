@@ -7,7 +7,7 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user, curren
 from flask_blogging import SQLAStorage, BloggingEngine
 from flask_principal import identity_changed, Identity, AnonymousIdentity, identity_loaded, \
     UserNeed, RoleNeed
-from flask.ext.cache import Cache
+from flask_cache import Cache
 
 
 app = Flask(__name__)

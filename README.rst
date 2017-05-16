@@ -20,13 +20,14 @@ Sponsor
 Screen Shots
 ------------
 
+    Blog Editor
+
 .. figure:: /docs/_static/blog_editor.png
 
-    Blog Editor
+    Blog Page
 
 .. figure:: /docs/_static/blog_page.png
 
-    Blog Page
 
 Minimal Example
 ---------------

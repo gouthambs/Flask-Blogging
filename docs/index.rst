@@ -26,6 +26,7 @@ Out of the box, Flask-Blogging has support for the following:
 
 - Bootstrap based site
 - Markdown based blog editor
+- Upload and manage static assets for the blog
 - Models to store blog
 - Authentication of User's choice
 - Sitemap, ATOM support
@@ -146,7 +147,7 @@ with your app using the ``init_app`` method as shown below::
 
 If you are using ``Flask-Sqlalchemy``, you can do the following::
 
-    from flask.ext.sqlalchemy import SQLAlchemy
+    from flask_sqlalchemy import SQLAlchemy
 
     db = SQLAlchemy(app)
     storage = SQLAStorage(db=db)
@@ -179,8 +180,8 @@ As of version 0.4.0, Flask-Cache integration is supported. In order
 to use caching in the blogging engine, you need to pass the ``Cache``
 instance to the ``BloggingEngine`` as::
 
-    from flask.ext.cache import Cache
-    from flask.ext.blogging import BloggingEngine
+    from flask_cache import Cache
+    from flask_blogging import BloggingEngine
 
     blogging_engine = BloggingEngine(app, storage, cache)
 
