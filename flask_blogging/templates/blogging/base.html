@@ -41,7 +41,7 @@
                 {% for category, message in messages %}
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3">
-                    <div class="alert alert-{{category}} alert-dismissible" role="alert">
+                    <div id="alert_div" class="alert alert-{{category}} alert-dismissible" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -73,6 +73,15 @@
           tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']],processEscapes: true}
           });
     </script>
+
+    <script>
+        $(document).ready(function(){
+            $("#alert_div").fadeTo(3000, 500).slideUp(500, function(){
+               $("#alert_div").slideUp(500);
+                });
+        })
+    </script>
+
     {% endblock js %}
     {% block extrajs %}
     {% endblock extrajs %}
