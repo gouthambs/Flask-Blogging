@@ -47,6 +47,7 @@ index_template = """
         &nbsp&nbsp<a href="/blog/"> Blog </a>
         &nbsp&nbsp<a href="/blog/sitemap.xml">Sitemap</a>
         &nbsp&nbsp<a href="/blog/feeds/all.atom.xml">ATOM</a>
+        &nbsp&nbsp<a href="/fileupload/">FileUpload</a>
     </body>
 </html>
 """

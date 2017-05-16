@@ -1,5 +1,5 @@
 Flask
-Flask-WTF
+Flask-WTF>=0.14.0
 Flask-Login
 Flask-Principal
 Flask-Cache

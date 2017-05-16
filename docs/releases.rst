@@ -1,8 +1,17 @@
 Release Notes
 =============
 
+- **Version 0.8.0**
+  *Release May 16, 2017*
+
+  - Added integration with Flask-FileUpload to enable static file uploads (#99)
+  - Updated compatibility to latest Flask-WTF package (#96, #97)
+  - Updated to latest bootstrap-markdown package (#92)
+  - Added alert fade outs (#94)
+
+
 - **Version 0.7.4**
-  *Release November 17, 2017*
+  *Release November 17, 2016*
 
   - Fix Requirements.txt error
 
