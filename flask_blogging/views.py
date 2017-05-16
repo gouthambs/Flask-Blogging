@@ -4,7 +4,7 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
-from flask_login import login_required, current_user
+from flask_security import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
@@ -128,6 +128,31 @@ def index(count, page):
                            config=config)
 
 
+def privacy():
+    """
+    Serves the privacy page if BLOGGING_PRIVACY is set to True
+    """
+
+    blogging_engine = _get_blogging_engine(current_app)
+    config = blogging_engine.config
+    if config.get("BLOGGING_PRIVACY"):
+        return render_template("blogging/privacy.html")
+    else:
+        return redirect(url_for("blogging.index"))
+
+
+def impressum():
+    """
+        Serves the impressum page if BLOGGING_IMPRESSUM is set to True
+    """
+    blogging_engine = _get_blogging_engine(current_app)
+    config = blogging_engine.config
+    if config.get("BLOGGING_IMPRESSUM"):
+        return render_template("blogging/impressum.html")
+    else:
+        return redirect(url_for("blogging.index"))
+
+
 def page_by_id(post_id, slug):
     blogging_engine = _get_blogging_engine(current_app)
     storage = blogging_engine.storage
@@ -224,7 +249,7 @@ def editor(post_id):
             storage = blogging_engine.storage
             if request.method == 'POST':
                 form = BlogEditor(request.form)
-                if form.validate():
+                if form.validate_on_submit():
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
                             (PostProcessor.is_author(post, current_user)) and \
@@ -389,6 +414,12 @@ def create_blueprint(import_name, blogging_engine):
     blog_app.add_url_rule("/<int:count>/", defaults={"page": 1},
                           view_func=index_func)
     blog_app.add_url_rule("/<int:count>/<int:page>/", view_func=index_func)
+
+    # register privacy
+    blog_app.add_url_rule("/privacy", view_func=privacy)
+
+    # register impressum
+    blog_app.add_url_rule("/impressum", view_func=impressum)
 
     # register page_by_id
     page_by_id_func = cached_func(blogging_engine, page_by_id)

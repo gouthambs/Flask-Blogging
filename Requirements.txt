@@ -1,10 +1,11 @@
 Flask
 Flask-WTF
-Flask-Login
+Flask-Security
 Flask-Principal
 Flask-Cache
 Flask-FileUpload
 SQLAlchemy
+wtforms
 Markdown
 Werkzeug
 blinker
