@@ -54,6 +54,7 @@ Dependencies
 - `Flask-Login <https://github.com/maxcountryman/flask-login>`_
 - `Flask-Principal <https://github.com/mattupstate/flask-principal>`_
 - `Flask-WTF <https://github.com/lepture/flask-wtf>`_
+- `Flask-FileUpload <https://github.com/Speedy1991/Flask-FileUpload>`_
 - `Markdown <https://pythonhosted.org/Markdown/>`_
 - `Bootstrap <http://getbootstrap.com/>`_
 - `Bootstrap-Markdown <https://github.com/toopay/bootstrap-markdown>`_
@@ -65,6 +66,6 @@ License
 
 `MIT </LICENSE>`_
 
-.. include:: docs/releases.rst
+.. include:: /docs/releases.rst
 
-.. include:: docs/authors.rst
+.. include:: /docs/authors.rst
