@@ -10,7 +10,7 @@ Please see `Flask-Blogging documentation <http://flask-blogging.readthedocs.org/
 for more details. You can extend Flask-Blogging by using `plugins from here <https://github.com/gouthambs/blogging_plugins>`_.
 
 Features
-~~~~~~~~
+--------
 
 - Integration with Markdown Editor
 - Ability to upload images for use in blog pages
