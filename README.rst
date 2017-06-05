@@ -16,6 +16,7 @@ Features
 - Ability to upload images for use in blog pages
 - Incorporate math formulas in LaTeX format
 - Integrates with authentication to allow multiple users
+- Easily extend to add new features
 
 
 Sponsor
