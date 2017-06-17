@@ -2,6 +2,8 @@ language: python
 python:
   - 2.7
   - 3.4
+  - 3.5
+  - 3.6
 before_script:
   - mysql -e 'create database flask_blogging;'
   - psql -c 'create database flask_blogging;' -U postgres;

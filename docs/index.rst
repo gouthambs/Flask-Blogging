@@ -232,6 +232,19 @@ In earlier versions the same can be done using the key
 ``FLASK_BLOGGING_ENGINE`` key will be deprecated moving forward.
 
 
+Models from SQLAStorage
+-----------------------
+
+`SQLAlchemy` ORM models for the `SQLAStorage` can be accessed after
+configurtion of the `SQLAStorage` object. Here is a quick example::
+
+    storage = SQLAStorage(db=db)
+    from flask_blogging.sqlastorage import Post, Tag  # Has to be after SQLAStorage initialization
+
+These ORM models can be extremely convenient to use with Flask-Admin.
+
+
+
 Adding Custom Markdown Extensions
 ---------------------------------
 
