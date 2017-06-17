@@ -79,6 +79,14 @@ class SQLAStorage(Storage):
         return self._post_table
 
     @property
+    def post_model(self):
+        return getattr(self._Base.classes, self._table_name("post"))
+
+    @property
+    def tag_model(self):
+        return getattr(self._Base.classes, self._table_name("tag"))
+
+    @property
     def tag_table(self):
         return self._tag_table
 
