@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+- **Version 0.9.0**
+  *Release Jun 17, 2017*
+
+  - Added information contained in the ``meta`` variable passed to the views as requested in (#102)
+  - Add missing space to Prev pagination link text (#103)
+  - Only render the modal of the user is a blogger (#101)
+  - Added ``Post`` and ``Tag`` models in ``sqlastorage`` using ``automap_base``.
+
+
 - **Version 0.8.0**
   *Release May 16, 2017*
 

@@ -381,13 +381,20 @@ There are various views that are exposed through Flask-Blogging. The URL for
 the various views are:
 
 - ``url_for('blogging.index')`` (GET): The index blog posts with the first
-  page of articles.
+  page of articles. The ``meta`` variable passed into the view holds values
+  for the keys ``is_user_blogger``, ``count`` and ``page``.
 - ``url_for('blogging.page_by_id', post_id=<post_id>)`` (GET): The blog post
-  corresponding to the ``post_id`` is retrieved.
+  corresponding to the ``post_id`` is retrieved. The ``meta`` variable passed
+  into the view holds values for the keys ``is_user_blogger``, ``post_id`` and
+  ``slug``.
 - ``url_for('blogging.posts_by_tag', tag=<tag_name>)`` (GET): The list of blog
-  posts corresponding to ``tag_name`` is returned.
+  posts corresponding to ``tag_name`` is returned. The ``meta`` variable passed
+  into the view holds values for the keys ``is_user_blogger``, ``tag``, ``count`` and
+  ``page``.
 - ``url_for('blogging.posts_by_author', user_id=<user_id>)`` (GET): The list of
-  blog posts written by the author ``user_id`` is returned.
+  blog posts written by the author ``user_id`` is returned. The ``meta`` variable passed
+  into the view holds values for the keys ``is_user_blogger``, ``count``, ``user_id`` and
+  ``pages``.
 - ``url_for('blogging.editor')`` (GET, POST): The blog editor
   is shown. This view needs authentication and permissions (if enabled).
 - ``url_for('blogging.delete', post_id=<post_id>)`` (POST): The blog post
