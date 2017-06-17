@@ -100,25 +100,20 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         # check if the user post table updates the user_id
         user_id = 1
         post_id = 5
-        from flask_blogging.sqlastorage import Post
         pid = self.storage.save_post(title="Title", text="Sample Text",
                                      user_id="user", tags=["hello", "world"])
-        #posts = self.storage.get_posts()
-        Session = sessionmaker()
-        Session.configure(bind=self._engine)
-        session = Session()
-        posts = session.query(Post).all()
+        with self._engine.begin() as conn:
+            from flask_blogging.sqlastorage import Post
+            Session = sessionmaker()
+            Session.configure(bind=self._engine)
+            session = Session()
+            posts = session.query(Post).all()
 
-
-        self.assertEqual(len(posts), 1)
-        post = posts[0]
-        self.assertEqual(post.title, "Title")
-        self.assertEqual(post.text, "Sample Text")
-        self.assertEqual(post.id, pid)
-        self.storage.save_post(title="Title", text="Sample Text",
-                               user_id="newuser", tags=["hello", "world"],
-                               post_id=pid)
-        self.assertEqual(len(posts), 1)
+            self.assertEqual(len(posts), 1)
+            post = posts[0]
+            self.assertEqual(post.title, "Title")
+            self.assertEqual(post.text, "Sample Text")
+            self.assertEqual(post.id, pid)
         return
 
     def test_tags_uniqueness(self):
