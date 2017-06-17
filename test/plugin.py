@@ -32,46 +32,45 @@ def feed_posts_processed_receiver(sender, engine, feed):
     engine.ctr_feed_posts_processed += 1
 
 
-def index_posts_receiver(sender, engine, posts, meta, count, page):
+def index_posts_receiver(sender, engine, posts, meta):
     assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     isinstance(meta, dict)
-    isinstance(count, int)
-    isinstance(page, int)
+    isinstance(meta["count"], int)
+    isinstance(meta["page"], int)
     engine.ctr_index_posts += 1
 
 
-def page_by_id_receiver(sender, engine, post, meta, post_id, slug):
+def page_by_id_receiver(sender, engine, post, meta):
     assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(post, dict)
     isinstance(meta, dict)
-    isinstance(post_id, int)
-    isinstance(slug, str)
+    isinstance(meta["post_id"], int)
+    isinstance(meta["slug"], str)
     engine.ctr_page_by_id += 1
 
 
-def posts_by_tag_receiver(sender, engine, posts, meta, tag, count, page):
+def posts_by_tag_receiver(sender, engine, posts, meta):
     assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     isinstance(meta, dict)
-    isinstance(tag, str)
-    isinstance(count, int)
-    isinstance(page, int)
+    isinstance(meta["tag"], str)
+    isinstance(meta["count"], int)
+    isinstance(meta["page"], int)
     engine.ctr_posts_by_tag += 1
 
 
-def posts_by_author_receiver(sender, engine, posts, meta, user_id, count,
-                             page):
+def posts_by_author_receiver(sender, engine, posts, meta):
     assert sender == engine.app
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     isinstance(meta, dict)
-    isinstance(user_id, str)
-    isinstance(count, int)
-    isinstance(page, int)
+    isinstance(meta["user_id"], str)
+    isinstance(meta["count"], int)
+    isinstance(meta["page"], int)
     engine.ctr_posts_by_author += 1
 
 

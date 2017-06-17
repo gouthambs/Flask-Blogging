@@ -66,7 +66,7 @@ class SQLAStorage(Storage):
                               table_prefix=self._table_prefix,
                               meta=self.metadata,
                               bind=self._bind)
-                              
+
     def _inject_models(self):
         global this
         this.Post = getattr(self._Base.classes, self._table_name("post"))

@@ -114,16 +114,18 @@ def index(count, page):
     meta = _get_meta(storage, count, page)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
+    meta["count"] = count
+    meta["page"] = page
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, include_draft=False,
                               tag=None, user_id=None, recent=True)
     index_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
-                             posts=posts, meta=meta, count=count, page=page)
+                             posts=posts, meta=meta)
     for post in posts:
         blogging_engine.process_post(post, render=render)
     index_posts_processed.send(blogging_engine.app, engine=blogging_engine,
-                               posts=posts, meta=meta, count=count, page=page)
+                               posts=posts, meta=meta)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -137,14 +139,14 @@ def page_by_id(post_id, slug):
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
+    meta["post_id"] = post_id
+    meta["slug"] = slug
     page_by_id_fetched.send(blogging_engine.app, engine=blogging_engine,
-                            post=post, meta=meta, post_id=post_id,
-                            slug=slug)
+                            post=post, meta=meta)
     if post is not None:
         blogging_engine.process_post(post, render=render)
         page_by_id_processed.send(blogging_engine.app, engine=blogging_engine,
-                                  post=post, meta=meta, post_id=post_id,
-                                  slug=slug)
+                                  post=post, meta=meta)
         return render_template("blogging/page.html", post=post, config=config,
                                meta=meta)
     else:
@@ -160,21 +162,20 @@ def posts_by_tag(tag, count, page):
     meta = _get_meta(storage, count, page, tag=tag)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
-
+    meta["tag"] = tag
+    meta["count"] = count
+    meta["page"] = page
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
                               include_draft=False, user_id=None, recent=True)
     posts_by_tag_fetched.send(blogging_engine.app, engine=blogging_engine,
-                              posts=posts, meta=meta, tag=tag, count=count,
-                              page=page)
+                              posts=posts, meta=meta)
     if len(posts):
         for post in posts:
             blogging_engine.process_post(post, render=render)
         posts_by_tag_processed.send(blogging_engine.app,
                                     engine=blogging_engine,
-                                    posts=posts, meta=meta, tag=tag,
-                                    count=count,
-                                    page=page)
+                                    posts=posts, meta=meta)
         return render_template("blogging/index.html", posts=posts, meta=meta,
                                config=config)
     else:
@@ -190,20 +191,21 @@ def posts_by_author(user_id, count, page):
     meta = _get_meta(storage, count, page, user_id=user_id)
     offset = meta["offset"]
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
+    meta["user_id"] = user_id
+    meta["count"] = count
+    meta["page"] = page
 
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id,
                               include_draft=False, tag=None, recent=True)
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts_by_author_fetched.send(blogging_engine.app, engine=blogging_engine,
-                                 posts=posts, meta=meta, user_id=user_id,
-                                 count=count, page=page)
+                                 posts=posts, meta=meta)
     if len(posts):
         for post in posts:
             blogging_engine.process_post(post, render=render)
         posts_by_author_processed.send(blogging_engine.app,
                                        engine=blogging_engine, posts=posts,
-                                       meta=meta, user_id=user_id, count=count,
-                                       page=page)
+                                       meta=meta)
         return render_template("blogging/index.html", posts=posts, meta=meta,
                                config=config)
     else:
