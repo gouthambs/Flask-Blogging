@@ -1,8 +1,8 @@
 Release Notes
 =============
 
-- **Version 0.9.0**
-  *Release Jun 17, 2017*
+
+- **Version 0.9.0** (*Release Jun 17, 2017*)
 
   - Added information contained in the ``meta`` variable passed to the views as requested in (#102)
   - Add missing space to Prev pagination link text (#103)
@@ -10,8 +10,7 @@ Release Notes
   - Added ``Post`` and ``Tag`` models in ``sqlastorage`` using ``automap_base``.
 
 
-- **Version 0.8.0**
-  *Release May 16, 2017*
+- **Version 0.8.0** (*Release May 16, 2017*)
 
   - Added integration with Flask-FileUpload to enable static file uploads (#99)
   - Updated compatibility to latest Flask-WTF package (#96, #97)
@@ -19,101 +18,85 @@ Release Notes
   - Added alert fade outs (#94)
 
 
-- **Version 0.7.4**
-  *Release November 17, 2016*
+- **Version 0.7.4** (*Release November 17, 2016*)
 
   - Fix Requirements.txt error
 
-- **Version 0.7.3**
-  *Release November 6, 2016*
+
+- **Version 0.7.3** (*Release November 6, 2016*)
   
   - Fix issues with slugs with special characters (#80)
 
-- **Version 0.7.2**
-  *Release October 30, 2016*
+
+- **Version 0.7.2** (*Release October 30, 2016*)
   
   - Moved default static assets to https (#78)
   - Fixed the issue where post fetched wouldn't emit when no posts exist (#76)
 
-- **Version 0.7.1**
 
-  *Released July 5, 2016*
+- **Version 0.7.1** (*Released July 5, 2016*)
  
   - Improvements to docs
   - Added extension import transition (@slippers)
 
-- **Version 0.7.0**
-  
-  *Released May 25, 2016*
+
+- **Version 0.7.0** (*Released May 25, 2016*)
 
 
-- **Version 0.6.0**
-
-  *Released January 14, 2016*
+- **Version 0.6.0** (*Released January 14, 2016*)
 
   - The plugin framework for Flask-Blogging to allow users to add new
     features and capabilities.
 
-- **Version 0.5.2**
 
-  *Released January 12, 2016*
+- **Version 0.5.2** (*Released January 12, 2016*)
 
   - Added support for multiple binds for SQLAStorage
 
 
-- **Version 0.5.1**
-
-  *Released December 6, 2015*
+- **Version 0.5.1** (*Released December 6, 2015*)
 
   - Fixed the flexibility to add custom extensions to `BloggingEngine`.
 
-- **Version 0.5.0**
 
-  *Released November 23, 2015*
+- **Version 0.5.0** (*Released November 23, 2015*)
 
   - Fixed errors encountered while using Postgres database
 
-- **Version 0.4.2**
 
-  *Released September 20, 2015*
+- **Version 0.4.2** (*Released September 20, 2015*)
 
   - Added compatibility with Flask-Login version 0.3.0 and higher, especially to handle migration of
     ``is_autheticated`` attribute from method to property. (#43)
 
-- **Version 0.4.1**
 
-  *Released September 16, 2015*
+- **Version 0.4.1** (*Released September 16, 2015*)
 
   - Added javascript to center images in blog page
   - Added method in blogging engine to render post and fetch post.
 
 
-- **Version 0.4.0**
-
-  *Released July 26, 2015*
+- **Version 0.4.0** (*Released July 26, 2015*)
 
   - Integrated Flask-Cache to optimize blog page rendering
   - Fixed a bug where anonymous user was shown the new blog button
 
-- **Version 0.3.2**:
 
-  *Released July 20, 2015*
+- **Version 0.3.2** (*Released July 20, 2015*)
 
   - Fixed a bug in the edit post routines. The edited post would end up as a
     new one instead.
 
-- **Version 0.3.1**:
 
-  *Released July 17, 2015*
+- **Version 0.3.1** (*Released July 17, 2015*)
 
   - The ``SQLAStorage`` accepts metadata, and ``SQLAlchemy`` object as inputs.
     This adds the ability to keep the blogging table metadata synced up with
     other models. This feature adds compatibility with ``Alembic`` autogenerate.
   - Update docs to reflect the correct version number.
 
-- **Version 0.3.0**:
 
-  *Released July 11, 2015*
+- **Version 0.3.0** (*Released July 11, 2015*)
 
   - Permissions is a new feature introduced in this version. By setting
     ``BLOGGING_PERMISSIONS`` to ``True``, one can restrict which of the users
@@ -122,17 +105,15 @@ Release Notes
     the number of posts in a page.
   - Documented the url construction procedure.
 
-- **Version 0.2.1**:
 
-  *Released July 10, 2015*
+- **Version 0.2.1** (*Released July 10, 2015*)
 
   - ``BloggingEngine`` ``init_app`` method can be called without having to
     pass a ``storage`` object.
   - Hook tests to ``setup.py`` script.
 
-- **Version 0.2.0**:
 
-  *Released July 6, 2015*
+- **Version 0.2.0** (*Released July 6, 2015*)
     
     - ``BloggingEngine`` configuration moved to the ``app`` config setting.
       This breaks backward compatibility. See compatibility notes below.
@@ -141,15 +122,13 @@ Release Notes
     - The ``setup.py`` reads version from the module file. Improves version
       consistency.
 
-- **Version 0.1.2**:
 
-  *Released July 4, 2015*
+- **Version 0.1.2** (*Released July 4, 2015*)
     
     - Added Python 3.4 support
 
-- **Version 0.1.1**:
 
-  *Released June 15, 2015*
+- **Version 0.1.1** (*Released June 15, 2015*)
     
     - Fixed PEP8 errors
     - Expanded SQLAStorage to include Postgres and MySQL flavors
@@ -157,14 +136,13 @@ Release Notes
       ``Storage.save_post(...)`` call for general compatibility
 
 
-- **Version 0.1.0**:
-
-  *Released June 1, 2015*
+- **Version 0.1.0** (*Released June 1, 2015*)
     
     - Initial Release
     - Adds detailed documentation
     - Supports Markdown based blog editor
     - Has 90% code coverage in unit tests
+
 
 Compatibility Notes
 ===================
