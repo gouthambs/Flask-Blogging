@@ -9,7 +9,7 @@ before_script:
   - psql -c 'create database flask_blogging;' -U postgres;
 install:
   - pip install -e .
-  - pip install coverage pep8 mysqlclient==1.3.6 psycopg2 Flask-Sqlalchemy==2.1
+  - pip install coverage pep8 mysqlclient==1.3.6 psycopg2 Flask-Sqlalchemy==2.2
 script:
   - nosetests --with-coverage --cover-package=flask_blogging --cover-min-percentage=85 -v
   - pep8 --repeat flask_blogging/ test/
