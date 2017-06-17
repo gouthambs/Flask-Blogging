@@ -11,6 +11,7 @@ class FlaskBloggingTestCase(unittest.TestCase):
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = "test-secret"
         self.app.config["WTF_CSRF_ENABLED"] = False  # to bypass CSRF token
+        self.app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
         self.client = self.app.test_client()
 
         @self.app.route("/")

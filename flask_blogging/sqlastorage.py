@@ -55,7 +55,8 @@ class SQLAStorage(Storage):
             self._metadata = metadata or sqla.MetaData()
         self._info = {} if self._bind is None else {"bind_key": self._bind}
         self._table_prefix = table_prefix
-        tables = [self._table_name(t) for t in ['post', 'tag', 'user_posts', 'tag_posts']]
+        table_suffix = ['post', 'tag', 'user_posts', 'tag_posts']
+        tables = [self._table_name(t) for t in table_suffix]
         self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
         self._Base = automap_base(metadata=self._metadata)
@@ -65,6 +66,7 @@ class SQLAStorage(Storage):
                               table_prefix=self._table_prefix,
                               meta=self.metadata,
                               bind=self._bind)
+                              
     def _inject_models(self):
         global this
         this.Post = getattr(self._Base.classes, self._table_name("post"))
