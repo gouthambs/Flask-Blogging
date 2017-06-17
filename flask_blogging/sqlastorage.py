@@ -2,11 +2,17 @@ try:
     from builtins import str
 except ImportError:
     pass
+import sys
 import logging
 import sqlalchemy as sqla
+from sqlalchemy.ext.automap import automap_base
 import datetime
 from .storage import Storage
 from .signals import sqla_initialized
+
+this = sys.modules[__name__]
+this.Post = None
+this.Tag = None
 
 
 class SQLAStorage(Storage):
@@ -49,12 +55,20 @@ class SQLAStorage(Storage):
             self._metadata = metadata or sqla.MetaData()
         self._info = {} if self._bind is None else {"bind_key": self._bind}
         self._table_prefix = table_prefix
+        tables = [self._table_name(t) for t in ['post', 'tag', 'user_posts', 'tag_posts']]
         self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
+        self._Base = automap_base(metadata=self._metadata)
+        self._Base.prepare()
+        self._inject_models()
         sqla_initialized.send(self, engine=self._engine,
                               table_prefix=self._table_prefix,
                               meta=self.metadata,
                               bind=self._bind)
+    def _inject_models(self):
+        global this
+        this.Post = getattr(self._Base.classes, self._table_name("post"))
+        this.Tag = getattr(self._Base.classes, self._table_name("tag"))
 
     @property
     def metadata(self):

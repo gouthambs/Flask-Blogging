@@ -7,6 +7,7 @@ import tempfile
 import os
 from flask_blogging.sqlastorage import SQLAStorage
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from test import FlaskBloggingTestCase
 import sqlalchemy as sqla
 from flask_sqlalchemy import SQLAlchemy
@@ -89,6 +90,30 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
                                      user_id="user", tags=["hello", "world"])
         posts = self.storage.get_posts()
         self.assertEqual(len(posts), 1)
+        self.storage.save_post(title="Title", text="Sample Text",
+                               user_id="newuser", tags=["hello", "world"],
+                               post_id=pid)
+        self.assertEqual(len(posts), 1)
+        return
+
+    def test_user_post_model_consistency(self):
+        # check if the user post table updates the user_id
+        user_id = 1
+        post_id = 5
+        from flask_blogging.sqlastorage import Post
+        pid = self.storage.save_post(title="Title", text="Sample Text",
+                                     user_id="user", tags=["hello", "world"])
+        #posts = self.storage.get_posts()
+        Session = sessionmaker(bind=self.storage.engine)
+        session = Session()
+        posts = session.query(Post).all()
+
+
+        self.assertEqual(len(posts), 1)
+        post = posts[0]
+        self.assertEqual(post.title, "Title")
+        self.assertEqual(post.text, "Sample Text")
+        self.assertEqual(post.id, pid)
         self.storage.save_post(title="Title", text="Sample Text",
                                user_id="newuser", tags=["hello", "world"],
                                post_id=pid)
@@ -380,6 +405,10 @@ class TestSQLiteBinds(FlaskBloggingTestCase):
                                 'last_modified_date', 'draft']
             self.assertListEqual(columns, expected_columns)
 
+            # test models
+            from flask_blogging.sqlastorage import Post
+            self.assertNotEqual(Post, None)
+
     def test_tag_table_exists(self):
         table_name = "tag"
         with self._engine.begin() as conn:
@@ -389,6 +418,10 @@ class TestSQLiteBinds(FlaskBloggingTestCase):
             columns = [t.name for t in table.columns]
             expected_columns = ['id', 'text']
             self.assertListEqual(columns, expected_columns)
+
+            # test models
+            from flask_blogging.sqlastorage import Tag
+            self.assertNotEqual(Tag, None)
 
     def test_tag_post_table_exists(self):
         table_name = "tag_posts"
