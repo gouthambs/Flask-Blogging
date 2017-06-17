@@ -104,7 +104,8 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         pid = self.storage.save_post(title="Title", text="Sample Text",
                                      user_id="user", tags=["hello", "world"])
         #posts = self.storage.get_posts()
-        Session = sessionmaker(bind=self.storage.engine)
+        Session = sessionmaker()
+        Session.configure(bind=self._engine)
         session = Session()
         posts = session.query(Post).all()
 
