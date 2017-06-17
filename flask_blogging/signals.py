@@ -44,10 +44,6 @@ and prior to the post being processed.
 :type post: dict
 :param meta: The metadata associated with that page
 :type meta: dict
-:param post_id: The identifier of the post
-:type post_id: int
-:param slug: The slug associated with the page
-:type slug: str
 """)
 page_by_id_processed = signals.signal("page_by_id_generated", doc="""\
 Signal sent when a blog page specified by ``id`` is fetched,
@@ -61,10 +57,6 @@ and prior to the post being processed.
 :type post: dict
 :param meta: The metadata associated with that page
 :type meta: dict
-:param post_id: The identifier of the post
-:type post_id: int
-:param slug: The slug associated with the page
-:type slug: str
 """)
 
 posts_by_tag_fetched = signals.signal("posts_by_tag_fetched", doc="""\
@@ -78,12 +70,6 @@ Signal sent when posts are fetched for a given tag but before processing
 :type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
-:param tag: The tag that is requested
-:type tag: str
-:param count: The number of posts per page
-:type count: int
-:param page: The page offset
-:type page: int
 """)
 
 posts_by_tag_processed = signals.signal("posts_by_tag_generated", doc="""\
@@ -97,12 +83,6 @@ Signal sent after posts for a given tag were fetched and processed
 :type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
-:param tag: The tag that is requested
-:type tag: str
-:param count: The number of posts per page
-:type count: int
-:param page: The page offset
-:type page: int
 """)
 
 posts_by_author_fetched = signals.signal("posts_by_author_fetched", doc="""\
@@ -116,12 +96,6 @@ Signal sent after posts by an author were fetched but before processing
 :type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
-:param user_id: The ``user_id`` for the author
-:type user_id: str
-:param count: The number of posts per page
-:type count: int
-:param page: The page offset
-:type page: int
 """)
 posts_by_author_processed = signals.signal("posts_by_author_generated",
                                            doc="""\
@@ -135,12 +109,6 @@ Signal sent after posts by an author were fetched and processed
 :type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
-:param user_id: The ``user_id`` for the author
-:type user_id: str
-:param count: The number of posts per page
-:type count: int
-:param page: The page offset
-:type page: int
 """)
 
 index_posts_fetched = signals.signal("index_posts_fetched", doc="""\
@@ -154,10 +122,6 @@ Signal sent after the posts for the index page are fetched
 :type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
-:param count: The number of posts per page
-:type count: int
-:param page: The page offset
-:type page: int
 """)
 
 index_posts_processed = signals.signal("index_posts_processed", doc="""\
@@ -171,10 +135,6 @@ Signal sent after the posts for the index page are fetched and processed
 :type posts: list
 :param meta: The metadata associated with that page
 :type meta: dict
-:param count: The number of posts per page
-:type count: int
-:param page: The page offset
-:type page: int
 """)
 
 feed_posts_fetched = signals.signal("feed_posts_fetched", doc="""\

@@ -311,7 +311,7 @@ we create our plugin::
         return tag_cloud
 
 
-    def get_tag_cloud(app, engine, posts, meta, count, page):
+    def get_tag_cloud(app, engine, posts, meta):
         if isinstance(engine.storage, SQLAStorage):
             tag_cloud = get_tag_data(engine.storage)
             meta["tag_cloud"] = tag_cloud
