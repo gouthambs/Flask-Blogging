@@ -17,15 +17,6 @@ Features
 - Incorporate math formulas in LaTeX format
 - Integrates with authentication to allow multiple users
 - Plugin framework to easily extend and add new features
-
-
-Sponsor
--------
-
-`ButterCMS <https://buttercms.com/?utm_source=github&utm_medium=sponsorship-link&utm_campaign=flask-blogging>`_ is an API-based CMS and blogging platform built for developers:
-
-.. image:: https://dl.dropboxusercontent.com/u/598519/buttercms-banners/b-on-y-m.png
-    :target: https://buttercms.com/?utm_source=github&utm_medium=sponsorship-banner&utm_campaign=flask-blogging
     
 Screen Shots
 ------------
