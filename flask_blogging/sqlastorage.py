@@ -55,13 +55,19 @@ class SQLAStorage(Storage):
             self._metadata = metadata or sqla.MetaData()
         self._info = {} if self._bind is None else {"bind_key": self._bind}
         self._table_prefix = table_prefix
-        table_suffix = ['post', 'tag', 'user_posts', 'tag_posts']
-        tables = [self._table_name(t) for t in table_suffix]
+
         self._metadata.reflect(bind=self._engine)
         self._create_all_tables()
+
+        # automap base and restrict to the required tables here.
+        table_suffix = ['post', 'tag', 'user_posts', 'tag_posts']
+        table_names = [self._table_name(t) for t in table_suffix]
+        self._metadata.create_all(bind=self._engine, tables=self.all_tables)
+        self._metadata.reflect(bind=self._engine, only=table_names)
         self._Base = automap_base(metadata=self._metadata)
         self._Base.prepare()
         self._inject_models()
+
         sqla_initialized.send(self, engine=self._engine,
                               table_prefix=self._table_prefix,
                               meta=self.metadata,
@@ -99,6 +105,10 @@ class SQLAStorage(Storage):
     @property
     def user_posts_table(self):
         return self._user_posts_table
+
+    @property
+    def all_tables(self):
+        return [self._post_table, self._tag_table, self._user_posts_table, self._tag_posts_table]
 
     @property
     def engine(self):
