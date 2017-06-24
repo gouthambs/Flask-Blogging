@@ -25,7 +25,7 @@
     </div><!-- /.modal -->
     <div class="pull-right">
     {% if post.editable %}
-        <a href="#" id="delete">
+        <a href="#confirmModal" data-toggle="modal" id="delete">
             <span class="glyphicon glyphicon-trash"></span>&nbsp;Delete
         </a>&nbsp&nbsp&nbsp&nbsp
 
@@ -65,14 +65,3 @@ on {{post.post_date.strftime('%d %b, %Y')}}</p>
 {% include "blogging/disqus.html" %}
 {% endblock main %}
 
-{% block extrajs %}
-
-<script>
-    $(document).ready(function(){
-        $("#delete").click(function(){
-            $('#confirmModal').modal('show');
-        });
-        $("img").addClass("center-block").addClass("img-responsive");
-    });
-</script>
-{% endblock extrajs %}
