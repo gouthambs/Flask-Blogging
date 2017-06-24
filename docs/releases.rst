@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+- **Version 0.9.1** (*Release June 23, 2017*)
+
+  - Fixes to ``automap_base`` in creating ``Post`` and ``Tag`` models
+  - Some improvements to blog page generation
+
 
 - **Version 0.9.0** (*Release Jun 17, 2017*)
 
