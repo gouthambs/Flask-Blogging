@@ -108,7 +108,8 @@ class SQLAStorage(Storage):
 
     @property
     def all_tables(self):
-        return [self._post_table, self._tag_table, self._user_posts_table, self._tag_posts_table]
+        return [self._post_table, self._tag_table,
+                self._user_posts_table, self._tag_posts_table]
 
     @property
     def engine(self):
