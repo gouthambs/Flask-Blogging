@@ -63,8 +63,9 @@ class SQLAStorage(Storage):
         table_suffix = ['post', 'tag', 'user_posts', 'tag_posts']
         table_names = [self._table_name(t) for t in table_suffix]
         self._metadata.create_all(bind=self._engine, tables=self.all_tables)
-        self._metadata.reflect(bind=self._engine, only=table_names)
-        self._Base = automap_base(metadata=self._metadata)
+        meta = sqla.MetaData()
+        meta.reflect(bind=self._engine, only=table_names)
+        self._Base = automap_base(metadata=meta)
         self._Base.prepare()
         self._inject_models()
 
@@ -76,7 +77,9 @@ class SQLAStorage(Storage):
     def _inject_models(self):
         global this
         this.Post = getattr(self._Base.classes, self._table_name("post"))
+        this.Post.__name__ = 'Post'
         this.Tag = getattr(self._Base.classes, self._table_name("tag"))
+        this.Tag.__name__ = 'Tag'
 
     @property
     def metadata(self):
