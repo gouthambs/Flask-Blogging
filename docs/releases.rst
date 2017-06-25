@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+- **Version 0.9.2** (*Release June 25, 2017*)
+
+  - Additional fixes to ``automap_base`` in creating ``Post`` and ``Tag`` models
+
 - **Version 0.9.1** (*Release June 23, 2017*)
 
   - Fixes to ``automap_base`` in creating ``Post`` and ``Tag`` models
