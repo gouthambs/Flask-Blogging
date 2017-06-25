@@ -1,0 +1,7 @@
+version: '2'
+services:
+  api:
+    build: .
+    command: uwsgi uwsgi.ini
+    ports:
+      - "80:8000"
