@@ -1,3 +1,4 @@
+import re
 try:
     from builtins import object
 except ImportError:
@@ -41,6 +42,11 @@ class PostProcessor(object):
     def create_slug(title):
         return slugify(title)
 
+    @staticmethod
+    def extract_images(post):
+        regex = re.compile(r'<\s*img [^>]*src="([^"]+)')
+        return regex.findall(post["rendered_text"])
+
     @classmethod
     def construct_url(cls, post):
         url = url_for("blogging.page_by_id", post_id=post["post_id"],
@@ -71,6 +77,7 @@ class PostProcessor(object):
         post["priority"] = 0.8
         if render:
             cls.render_text(post)
+        post["meta"]["images"] = cls.extract_images(post)
 
     @classmethod
     def all_extensions(cls):
