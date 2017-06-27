@@ -32,6 +32,7 @@ Out of the box, Flask-Blogging has support for the following:
 - Sitemap, ATOM support
 - Disqus support for comments
 - Google analytics for usage tracking
+- Open Graph meta tags
 - Permissions enabled to control which users can create/edit blogs
 - Integrated Flask-Cache based caching for optimization
 - Well documented, tested, and extensible design
@@ -56,6 +57,7 @@ Quick Start Example
     app.config["BLOGGING_DISQUS_SITENAME"] = "test"
     app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
     app.config["BLOGGING_SITENAME"] = "My Site"
+    app.config["BLOGGING_KEYWORDS"] = ["blog", "meta", "keywords"]
     app.config["FILEUPLOAD_IMG_FOLDER"] = "fileupload"
     app.config["FILEUPLOAD_PREFIX"] = "/fileupload"
     app.config["FILEUPLOAD_ALLOWED_EXTENSIONS"] = ["png", "jpg", "jpeg", "gif"]
@@ -268,11 +270,12 @@ Extending using Markdown Metadata
 
 Let's say you want to include a summary for your blog post, and have it
 show up along with the post. You don't need to modify the database or 
-the models to accomplish this. This is infact supported by default by way
+the models to accomplish this. This is in fact supported by default by way
 of Markdown metadata syntax. In your blog post, you can include metadata,
 as shown below::
 
     Summary: This is a short summary of the blog post
+    Keywords: Blog, specific, keywords
     
     This is the much larger blog post. There are lot of things
     to discuss here. 
@@ -280,6 +283,14 @@ as shown below::
 In the template ``page.html`` this metadata can be accessed as, ``post.meta.summary``
 and can be populated in the way it is desired. The same metadata for each post
 is also available in other template views like ``index.html``.
+
+If included, the first summary will be used as the page's meta ``description``,
+and Open Graph ``og:description``.
+
+The (optional) blog post specificvkeywords are included in the page's meta
+keywords in addition to ``BLOGGING_KEYWORDS``v(if configured). Any tags are also
+added as meta keywords.
+
 
 
 Extending using the plugin framework
@@ -349,30 +360,33 @@ config variables. These arguments are passed to all the views. The
 keys that are currently supported include:
 
 - ``BLOGGING_SITENAME`` (*str*): The name of the blog to be used as the brand
-  name.This is also used in the feed heading. (default "Flask-Blogging")
-- ``BLOGGING_SITEURL`` (*str*): The url of the site.
-- ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text should be
-  rendered or not. (default ``True``)
+  name. This is also used in the feed heading and ``og:site_name`` meta tag.
+  (default "Flask-Blogging")
+- ``BLOGGING_SITEURL`` (*str*): The url of the site. This is also used in the
+  ``og:pulisher`` meta tag.
+- ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text (markdown)
+  should be rendered to HTML. (default ``True``)
 - ``BLOGGING_DISQUS_SITENAME`` (*str*): Disqus sitename for comments.
   A ``None`` value will disable comments. (default ``None``)
 - ``BLOGGING_GOOGLE_ANALYTICS`` (*str*): Google analytics code for usage
   tracking. A ``None`` value will disable google analytics. (default ``None``)
 - ``BLOGGING_URL_PREFIX`` (*str*) : The prefix for the URL of blog posts. A
-  ``None`` value will have no prefix (default ``None``).
+  ``None`` value will have no prefix. (default ``None``)
 - ``BLOGGING_FEED_LIMIT`` (*int*): The number of posts to limit to in the feed.
   If ``None``, then all are shown, else will be limited to this number. (default ``None``)
-- ``BLOGGING_PERMISSIONS`` (*bool*): if ``True``, this will enable permissions
+- ``BLOGGING_PERMISSIONS`` (*bool*): If ``True``, this will enable permissions
   for the blogging engine. With permissions enabled, the user will need to have
   "blogger" ``Role`` to edit or create blog posts. Other authenticated
   users will not have blog editing permissions. The concepts here derive
-  from ``Flask-Principal`` (default ``False``)
+  from ``Flask-Principal``. (default ``False``)
 - ``BLOGGING_PERMISSIONNAME`` (*str*): The role name used for permissions. 
   It is effective, if "BLOGGING_PERMISSIONS" is "True". (default "blogger")
-- ``BLOGGING_POSTS_PER_PAGE`` (*int*): This sets the default number of pages
+- ``BLOGGING_POSTS_PER_PAGE`` (*int*): The default number of posts per index page.
   to be displayed per page. (default 10)
-- ``BLOGGING_CACHE_TIMEOUT`` (*int*): The timeout in seconds used to cache
+- ``BLOGGING_CACHE_TIMEOUT`` (*int*): The timeout in seconds used to cache.
   the blog pages. (default 60)
 - ``BLOGGING_PLUGINS`` (*list*): A list of plugins to register.
+- ``BLOGGING_KEYWORDS`` (*list*): A list of meta keywords to include on each page.
 
 Blog Views
 ==========
