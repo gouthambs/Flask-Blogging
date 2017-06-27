@@ -77,7 +77,7 @@ class PostProcessor(object):
         post["priority"] = 0.8
         if render:
             cls.render_text(post)
-        post["meta"]["images"] = cls.extract_images(post)
+            post["meta"]["images"] = cls.extract_images(post)
 
     @classmethod
     def all_extensions(cls):
