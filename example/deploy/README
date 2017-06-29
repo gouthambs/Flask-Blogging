@@ -1,0 +1,20 @@
+This is only example deploy stuff. Please modify to fit your needs.
+To use this kit, just copy the whole folder into example root and run
+docker-compose up (--force-recreate --build)
+Use --force-recreate --build if you change any file which gets copied
+into the docker.
+The example docker-compose can be easily extended with e.g. nginx,
+persitent database (remember, nothing is persitent in a docker container
+as long you don't make it persistent). Best way making things persistent
+is in my opinion with the volumes_from feature. If an example is needed,
+feel free to open a new issue.
+
+FAQ:
+
+Q: Where is it running?
+A: Inside the container the uwsgi is running on 0.0.0.0:8000 this is mapped
+   via the docker-compose to the host on port 80.
+
+Q: Why can't i see anything on localhost:80?
+A: If you running on windows with virtualbox your machine creates a own ip
+   You can check the ip with: docker-machine ip default
