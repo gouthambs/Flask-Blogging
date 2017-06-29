@@ -1,4 +1,7 @@
 {% extends "blogging/base.html" %}
+{% block meta %}
+    {% include 'blogging/metatags.html' %}
+{% endblock meta %}
 {% block title %}
     {{post.title}}
 {% endblock title %}

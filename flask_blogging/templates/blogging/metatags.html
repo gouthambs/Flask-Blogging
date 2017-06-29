@@ -1,0 +1,26 @@
+{% block meta %}
+<meta name="author" content="{{ post.user_name }}">
+<meta name="keywords" content="{% if config.BLOGGING_KEYWORDS %}{% for keyword in config.BLOGGING_KEYWORDS -%}
+    {{ keyword }},
+{%- endfor %}{% endif %}{% if post.meta.keywords %}{% for keyword in post.meta.keywords -%}
+    {{ keyword }},
+{%- endfor %}{% endif%}{% for tag in post.tags -%}
+    {{ tag | lower }}{{ ', ' if not loop.last }}
+{%- endfor %}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ post.title }}">
+{% if post.meta.summary %}
+    <meta name="description" content="{{ post.meta.summary[0] }}">
+    <meta property="og:description" content="{{ post.meta.summary[0] }}">
+{% endif %}
+{% for image in post.meta.images %}
+    <meta property="og:image" content="{{ image }}">
+{% endfor %}
+<meta property="og:updated_time" content="{{ post.last_modified_date }}">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:site_name" content="{{ config.BLOGGING_SITENAME or 'Flask-Blogging'}}">
+<meta property="article:section" content="{{ post.tags[0] | title }}">
+<meta property="article:published_time" content="{{ post.post_date }}">
+<meta property="article:modified_time" content="{{ post.last_modified_date }}">
+<meta property="article:publisher" content="{{ config.BLOGGING_SITEURL }}">
+{% endblock meta %}
