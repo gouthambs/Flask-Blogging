@@ -108,6 +108,10 @@ class Storage(object):
         raise NotImplementedError("This method needs to be implemented by the "
                                   "inheriting class")
 
+    @classmethod
+    def normalize_tags(cls, tags):
+        return [cls.normalize_tag(tag) for tag in tags]
+
     @staticmethod
-    def normalize_tags(tags):
-        return [tag.upper().strip() for tag in tags]
+    def normalize_tag(tag):
+        return tag.upper().strip()
