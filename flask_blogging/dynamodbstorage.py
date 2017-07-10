@@ -1,8 +1,5 @@
-import os
 import logging
-from threading import Lock
 from .storage import Storage
-import json
 import boto3
 from boto3.dynamodb.conditions import Key
 import datetime
@@ -11,6 +8,7 @@ import copy
 
 
 class DynamoDBStorage(Storage):
+    _logger = logging.getLogger("flask-blogging")
 
     def __init__(self, table_prefix="", region_name=None,
                  endpoint_url=None):
@@ -27,141 +25,155 @@ class DynamoDBStorage(Storage):
     def save_post(self, title, text, user_id, tags, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,
                   post_id=None):
-        current_datetime = datetime.datetime.utcnow()
-        post_date = post_date or current_datetime
-        post_date = self._to_timestamp(post_date)
-        last_modified_date = last_modified_date or current_datetime
-        tags = self.normalize_tags(tags)
-        draft = 1 if draft else 0
-        r = {'title': title,
-             'text': text,
-             'user_id': user_id,
-             'tags': tags,
-             'draft': draft,
-             'post_date': post_date,
-             'last_modified_date': self._to_timestamp(last_modified_date),
-             'meta_data': meta_data
-             }
-        if post_id is not None:
-            response = self._blog_posts_table.get_item(Key={'post_id': post_id})
-            r0 = response.get("Item")
-            post_id = r0['post_id'] if r0 else None
+        try:
+            current_datetime = datetime.datetime.utcnow()
+            post_date = post_date or current_datetime
+            post_date = self._to_timestamp(post_date)
+            last_modified_date = last_modified_date or current_datetime
+            tags = self.normalize_tags(tags)
+            draft = 1 if draft else 0
+            r = {'title': title,
+                 'text': text,
+                 'user_id': user_id,
+                 'tags': tags,
+                 'draft': draft,
+                 'post_date': post_date,
+                 'last_modified_date': self._to_timestamp(last_modified_date),
+                 'meta_data': meta_data
+                 }
+            if post_id is not None:
+                response = self._blog_posts_table.get_item(
+                    Key={'post_id': post_id})
+                r0 = response.get("Item")
+                post_id = r0['post_id'] if r0 else None
 
-        if post_id is None:
-            post_id = self._uuid.uuid()
-            r['post_id'] = post_id
-            self._blog_posts_table.put_item(Item=r)
-            self._insert_tags(tags, post_id, post_date, draft)
-        else:
-            self._blog_posts_table.update_item(
-                Key={'post_id': post_id},
-                UpdateExpression='SET title = :title, #t = :text, user_id = :user_id, '
-                                 'tags = :tags, draft = :draft, post_date = :post_date, '
-                                 'last_modified_date = :last_modified_date, '
-                                 'meta_data = :meta_data',
-                ExpressionAttributeValues={':title': r['title'],
-                                           ':text': r['text'],
-                                           ':user_id': r['user_id'],
-                                           ':tags': r['tags'],
-                                           ':draft': r['draft'],
-                                           ':post_date': r['post_date'],
-                                           ':last_modified_date': r["last_modified_date"],
-                                           ':meta_data': r['meta_data']
-                                           },
-                ExpressionAttributeNames={'#t': 'text'})
-            tag_inserts = set(r['tags']) - set(r0['tags'])
-            tag_deletes = set(r0['tags']) - set(r['tags'])
-            self._insert_tags(tag_inserts, post_id, post_date, draft)
-            self._delete_tags(tag_deletes, post_id, post_date, draft)
+            if post_id is None:
+                post_id = self._uuid.uuid()
+                r['post_id'] = post_id
+                self._blog_posts_table.put_item(Item=r)
+                self._insert_tags(tags, post_id, post_date, draft)
+            else:
+                expr = 'SET title = :title, #t = :text, user_id = :user_id, '
+                'tags = :tags, draft = :draft, post_date = :post_date, '
+                'last_modified_date = :last_modified_date, '
+                'meta_data = :meta_data',
+                self._blog_posts_table.update_item(
+                    Key={'post_id': post_id},
+                    UpdateExpression=expr,
+                    ExpressionAttributeValues={
+                        ':title': r['title'],
+                        ':text': r['text'],
+                        ':user_id': r['user_id'],
+                        ':tags': r['tags'],
+                        ':draft': r['draft'],
+                        ':post_date': r['post_date'],
+                        ':last_modified_date': r["last_modified_date"],
+                        ':meta_data': r['meta_data']
+                    },
+                    ExpressionAttributeNames={'#t': 'text'})
+                tag_inserts = set(r['tags']) - set(r0['tags'])
+                tag_deletes = set(r0['tags']) - set(r['tags'])
+                self._insert_tags(tag_inserts, post_id, post_date, draft)
+                self._delete_tags(tag_deletes, post_id)
+        except Exception as e:
+            self._logger.exception(str(e))
+            post_id = None
         return post_id
 
     def get_posts(self, count=10, offset=0, recent=True, tag=None,
                   user_id=None, include_draft=False):
-        post_ids = self._get_post_ids(count=count, offset=offset, recent=recent,
-                                      tag=tag, user_id=user_id,
-                                      include_draft=include_draft)
+        try:
+            post_ids = self._get_post_ids(count=count, offset=offset,
+                                          recent=recent,
+                                          tag=tag, user_id=user_id,
+                                          include_draft=include_draft)
+        except Exception as e:
+            self._logger.exception(str(e))
+            post_ids = []
         return [self.get_post_by_id(p) for p in post_ids]
 
     def _get_post_ids(self, count=10, offset=0, recent=True, tag=None,
-                  user_id=None, include_draft=False):
-        kwargs = dict(ProjectionExpression='post_id')
-        if (not include_draft) and (tag is None): # sort doesn't work with scan
-            kwargs['ScanIndexForward'] = not recent
+                      user_id=None, include_draft=False):
+        # include_draft is not supported yet
+        kwargs = dict(ProjectionExpression='post_id',
+                      ScanIndexForward=not recent)
         if count:
             kwargs['Limit'] = count
         table = self._blog_posts_table
-        query_scan = 'scan' if include_draft else 'query'
         if user_id:
-            kwargs.update(dict(IndexName='user_id_index'))
-            if include_draft:
-                kwargs['FilterExpression'] = Key('user_id').eq(user_id) & \
-                                           Key('draft').gte(0)
-            else:
-                kwargs['KeyConditionExpression'] = Key('user_id').eq(user_id)
+            kwargs.update(
+                dict(IndexName='user_id_index',
+                     KeyConditionExpression=Key('user_id').eq(user_id))
+            )
+
         elif tag:
             table = self._tag_posts_table
-            query_scan = 'scan'
             norm_tag = self.normalize_tag(tag)
-            kwargs.update(dict(IndexName='tag_index'))
-            if include_draft:
-                kwargs['FilterExpression'] = Key('tag').eq(norm_tag) & \
-                                             Key('draft').gte(0)
-            else:
-                kwargs['FilterExpression'] = Key('tag').eq(norm_tag)
+            kwargs.update(
+                dict(IndexName='tag_index',
+                     KeyConditionExpression=Key('tag').eq(norm_tag))
+            )
         else:
-            kwargs.update(dict(IndexName='post_index'))
-            if include_draft:
-                kwargs['FilterExpression'] = Key('draft').gte(0)
-            else:
-                kwargs['KeyConditionExpression'] = Key('draft').eq(0)
-
+            kwargs.update(
+                dict(IndexName='post_index',
+                     KeyConditionExpression=Key('draft').eq(0))
+            )
         if offset > 0:
             kwargs2 = copy.deepcopy(kwargs)
-            kwargs2['Limit'] = offset*count
-            response = query_scan(**kwargs2)
+            kwargs2['Limit'] = offset
+            response = getattr(table, "query")(**kwargs2)
             last_key = response.get('LastEvaluatedKey')
         else:
             last_key = None
 
         if last_key:
             kwargs["ExclusiveStartKey"] = last_key
-        response = getattr(table, query_scan)(**kwargs)
+        response = getattr(table, "query")(**kwargs)
         return [p['post_id'] for p in response['Items']]
 
-
     def count_posts(self, tag=None, user_id=None, include_draft=False):
-        post_ids = self._get_post_ids(count=None, offset=0, tag=tag,
-                                      user_id=user_id,
-                                      include_draft=include_draft)
-        return len(post_ids)
+        try:
+            post_ids = self._get_post_ids(count=None, offset=0, tag=tag,
+                                          user_id=user_id,
+                                          include_draft=include_draft)
+            result = len(post_ids)
+        except Exception as e:
+            self._logger.exception(str(e))
+            result = 0
+        return result
 
     def get_post_by_id(self, post_id):
-        response = self._blog_posts_table.get_item(
-            Key={'post_id': post_id}
-        )
-        item = response.get('Item')
-        if item:
-            r = item
-            r['post_date'] = self._from_timestamp(r['post_date'])
-            r['last_modified_date'] = self._from_timestamp(r['last_modified_date'])
-            r["draft"] = bool(r["draft"])
-        else:
+        try:
+            response = self._blog_posts_table.get_item(
+                Key={'post_id': post_id}
+            )
+            item = response.get('Item')
+            if item:
+                r = item
+                r['post_date'] = self._from_timestamp(r['post_date'])
+                r['last_modified_date'] = \
+                    self._from_timestamp(r['last_modified_date'])
+                r["draft"] = bool(r["draft"])
+            else:
+                r = None
+        except Exception as e:
+            self._logger.exception(str(e))
             r = None
-
         return r
 
     def delete_post(self, post_id):
-        r = self.get_post_by_id(post_id)
-        if r:
-            response = self._blog_posts_table.delete_item(Key={'post_id': post_id})
-            for t in r["tags"]:
-                self._tag_posts_table.update_item(
-                    Key={'tag': t},
-                    UpdateExpression="DELETE post_id :value",
-                    ExpressionAttributeValues={
-                        ':value': post_id
-                    }
-                )
+        try:
+            r = self.get_post_by_id(post_id)
+            if r:
+                response = self._blog_posts_table.delete_item(
+                    Key={'post_id': post_id})
+                self._delete_tags(r["tags"], post_id)
+                return True
+            else:
+                return False
+        except Exception as e:
+            self._logger.exception(str(e))
+            return False
 
     @staticmethod
     def _to_timestamp(date_time):
@@ -180,7 +192,6 @@ class DynamoDBStorage(Storage):
         self._create_blog_posts_table(table_names)
         self._create_tag_posts_table(table_names)
 
-
     def _create_blog_posts_table(self, table_names):
         bp_table_name = self._table_name("blog_posts")
         if bp_table_name not in table_names:
@@ -189,7 +200,7 @@ class DynamoDBStorage(Storage):
                 KeySchema=[{
                     'AttributeName': 'post_id',
                     'KeyType': 'HASH'
-                    }
+                }
                 ],
                 GlobalSecondaryIndexes=[
                     {
@@ -258,48 +269,6 @@ class DynamoDBStorage(Storage):
             )
         self._blog_posts_table = self._db.Table(bp_table_name)
 
-    def _create_tag_posts_table0(self, table_names):
-        tp_table_name = self._table_name("tag_posts")
-        if tp_table_name not in table_names:
-            self._client.create_table(
-                TableName=tp_table_name,
-                KeySchema=[{
-                    'AttributeName': 'tag',
-                    'KeyType': 'HASH'
-                    }
-                ],
-                AttributeDefinitions=[
-                    {
-                        'AttributeName': 'tag',
-                        'AttributeType': 'S'
-                    }
-                ],
-                ProvisionedThroughput={
-                    'ReadCapacityUnits': 10,
-                    'WriteCapacityUnits': 10
-                }
-            )
-        self._tag_posts_table = self._db.Table(tp_table_name)
-
-
-    def _insert_tags0(self, tags, post_id, post_date):
-        for t in tags:
-            response = self._tag_posts_table.update_item(
-                Key={'tag': t},
-                UpdateExpression="ADD post_ids :value",
-                ExpressionAttributeValues={':value': {post_id}}
-            )
-            response
-
-
-    def _delete_tags0(self, tags, post_id, post_date):
-        for t in tags:
-            response = self._tag_posts_table.update_item(
-                Key={'tag': t},
-                UpdateExpression="DELETE post_ids :value",
-                ExpressionAttributeValues={':value': {post_id}}
-            )
-
     def _create_tag_posts_table(self, table_names):
         tp_table_name = self._table_name("tag_posts")
         if tp_table_name not in table_names:
@@ -357,11 +326,11 @@ class DynamoDBStorage(Storage):
         for t in tags:
             tag_id = "%s_%s" % (t, post_id)
             _ = self._tag_posts_table.put_item(
-                Item={'tag_id':tag_id, 'tag': t, 'post_date': post_date,
+                Item={'tag_id': tag_id, 'tag': t, 'post_date': post_date,
                       'post_id': post_id, 'draft': draft}
             )
 
-    def _delete_tags(self, tags, post_id, post_date):
+    def _delete_tags(self, tags, post_id):
         for t in tags:
             tag_id = "%s_%s" % (t, post_id)
             _ = self._tag_posts_table.delete_item(

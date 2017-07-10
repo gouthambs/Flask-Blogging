@@ -230,7 +230,7 @@ def editor(post_id):
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
                             (PostProcessor.is_author(post, current_user)) and \
-                            (post["post_id"] == post_id):
+                            (str(post["post_id"]) == post_id):
                         pass
                     else:
                         post = {}
@@ -394,9 +394,9 @@ def create_blueprint(import_name, blogging_engine):
 
     # register page_by_id
     page_by_id_func = cached_func(blogging_engine, page_by_id)
-    blog_app.add_url_rule("/page/<int:post_id>/", defaults={"slug": ""},
+    blog_app.add_url_rule("/page/<post_id>/", defaults={"slug": ""},
                           view_func=page_by_id_func)
-    blog_app.add_url_rule("/page/<int:post_id>/<slug>/",
+    blog_app.add_url_rule("/page/<post_id>/<slug>/",
                           view_func=page_by_id_func)
 
     # register posts_by_tag
@@ -424,12 +424,12 @@ def create_blueprint(import_name, blogging_engine):
     blog_app.add_url_rule('/editor/', methods=["GET", "POST"],
                           defaults={"post_id": None},
                           view_func=editor_func)
-    blog_app.add_url_rule('/editor/<int:post_id>/', methods=["GET", "POST"],
+    blog_app.add_url_rule('/editor/<post_id>/', methods=["GET", "POST"],
                           view_func=editor_func)
 
     # register delete
     delete_func = delete  # For now lets not cache this
-    blog_app.add_url_rule("/delete/<int:post_id>/", methods=["POST"],
+    blog_app.add_url_rule("/delete/<post_id>/", methods=["POST"],
                           view_func=delete_func)
 
     # register sitemap

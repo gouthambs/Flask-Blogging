@@ -61,13 +61,14 @@ class TestViews(FlaskBloggingTestCase):
             identity_changed.send(current_app._get_current_object(),
                                   identity=AnonymousIdentity())
             return redirect("/")
-
+        self.pids = []
         for i in range(20):
             tags = ["hello"] if i < 10 else ["world"]
             user = "testuser" if i < 10 else "newuser"
-            self.storage.save_post(title="Sample Title%d" % i,
-                                   text="Sample Text%d" % i,
-                                   user_id=user, tags=tags)
+            pid = self.storage.save_post(title="Sample Title%d" % i,
+                                         text="Sample Text%d" % i,
+                                         user_id=user, tags=tags)
+            self.pids.append(pid)
 
     def tearDown(self):
         os.remove(self._dbfile)
@@ -86,13 +87,14 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_post_by_id(self):
-        response = self.client.get("/blog/page/1/")
+        post_id0 = self.pids[0]
+        response = self.client.get("/blog/page/%s/" % post_id0)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/blog/page/1/sample-title/")
+        response = self.client.get("/blog/page/%s/sample-title/" % post_id0)
         self.assertEqual(response.status_code, 200)
-
-        response = self.client.get("/blog/page/1")  # trailing slash redirect
+        # trailing slash redirect
+        response = self.client.get("/blog/page/%s" % post_id0)
         self.assertEqual(response.status_code, 301)
 
     def test_post_by_tag(self):
@@ -126,7 +128,7 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.get("/blog/editor/")
             self.assertEqual(response.status_code, 401)
 
-            response = self.client.get("/blog/editor/1/")
+            response = self.client.get("/blog/editor/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 401)
 
             self.login(user_id)
@@ -137,17 +139,17 @@ class TestViews(FlaskBloggingTestCase):
             for i in range(1, 21):
                 # logged in user can edit their post, and will be redirected
                 # if they try to edit other's post
-                response = self.client.get("/blog/editor/%d/" % i)
+                response = self.client.get("/blog/editor/%s/" % self.pids[i-1])
                 expected_status_code = 200 if i <= 10 else 302
                 self.assertEqual(response.status_code, expected_status_code,
-                                 "Error for item %d %d" %
-                                 (i, response.status_code))
+                                 "Error for item %s %d" %
+                                 (self.pids[i - 1], response.status_code))
             # logout and the access should be gone again
             self.logout()
             response = self.client.get("/blog/editor/")
             self.assertEqual(response.status_code, 401)
 
-            response = self.client.get("/blog/editor/1/")
+            response = self.client.get("/blog/editor/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 401)
 
     def test_editor_post(self):
@@ -162,7 +164,7 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.post("/blog/editor/")
             self.assertEqual(response.status_code, 401)
 
-            response = self.client.post("/blog/editor/1/")
+            response = self.client.post("/blog/editor/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 401)
 
             self.login(user_id)
@@ -180,7 +182,7 @@ class TestViews(FlaskBloggingTestCase):
                                                   tags="tag1, tag2"))
             self.assertEqual(response.status_code, 302)
 
-            response = self.client.get("/blog/page/21/")
+            response = self.client.get("/blog/page/%s/" % self.pids[19])
             self.assertEqual(response.status_code, 200)
 
     def test_editor_edit_page(self):
@@ -188,7 +190,7 @@ class TestViews(FlaskBloggingTestCase):
         with self.client:
             self.login(user_id)
             response = self.client.post(
-                "/blog/editor/1/",
+                "/blog/editor/%s/" % self.pids[0],
                 data=dict(title="Sample Title0-Edited",
                           text="Sample Text0-Edited", tags="tag1, tag2"))
 
@@ -207,19 +209,19 @@ class TestViews(FlaskBloggingTestCase):
         with self.client:
 
             # Anonymous user cannot delete
-            response = self.client.post("/blog/delete/1/")
+            response = self.client.post("/blog/delete/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 401)
 
             # a user cannot delete another person's post
             self.login(user_id)
             self.assertEquals(current_user.get_id(), user_id)
-            response = self.client.post("/blog/delete/11/",
+            response = self.client.post("/blog/delete/%s/" % self.pids[12],
                                         follow_redirects=True)
             assert "You do not have the rights to delete this post" in \
                    str(response.data)
 
             # a user can delete his posts
-            response = self.client.post("/blog/delete/1/",
+            response = self.client.post("/blog/delete/%s/" % self.pids[0],
                                         follow_redirects=True)
             assert "Your post was successfully deleted" in str(response.data)
 
@@ -356,23 +358,23 @@ class TestViews(FlaskBloggingTestCase):
 
         with self.client:
             # Anonymous user cannot delete
-            response = self.client.post("/blog/delete/1/")
+            response = self.client.post("/blog/delete/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 401)
 
             self.login(user_id)
             # non blogger cannot delete posts
-            response = self.client.post("/blog/delete/1/")
+            response = self.client.post("/blog/delete/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 302)  # will be redirected
             self.logout()
 
             self.login(user_id, blogger=True)
-            response = self.client.post("/blog/delete/1/",
+            response = self.client.post("/blog/delete/%s/" % self.pids[0],
                                         follow_redirects=True)
             assert "Your post was successfully deleted" in str(response.data)
 
             # a user cannot delete another person's post
             self.assertEquals(current_user.get_id(), user_id)
-            response = self.client.post("/blog/delete/11/",
+            response = self.client.post("/blog/delete/%s/" % self.pids[10],
                                         follow_redirects=True)
             assert "You do not have the rights to delete this post" in \
                    str(response.data)
@@ -410,3 +412,14 @@ class TestViewsWithUnicode(TestViews):
 
     def test_editor_post(self):
         pass
+
+
+class TestViewsWithDynamoDB(TestViews):
+    def _create_storage(self):
+        from flask_blogging.dynamodbstorage import DynamoDBStorage
+        self.storage = DynamoDBStorage(table_prefix="test_",
+                                       endpoint_url='http://localhost:8000')
+
+    def tearDown(self):
+        self.storage._client.delete_table(TableName='test_blog_posts')
+        self.storage._client.delete_table(TableName='test_tag_posts')

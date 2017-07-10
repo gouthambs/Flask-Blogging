@@ -15,6 +15,14 @@ this.Post = None
 this.Tag = None
 
 
+def _as_int(s):
+    try:
+        n = int(s) if s is not None else None
+        return n
+    except ValueError:
+        return None
+
+
 class SQLAStorage(Storage):
     """
     The ``SQLAStorage`` implements the interface specified by the ``Storage``
@@ -146,12 +154,13 @@ class SQLAStorage(Storage):
         :param post_id: (Optional) The post identifier. This should be ``None``
          for an insert call,
          and a valid value for update. (default ``None``)
-        :type post_id: int
+        :type post_id: str
 
         :return: The post_id value, in case of a successful insert or update.
          Return ``None`` if there were errors.
         """
         new_post = post_id is None
+        post_id = _as_int(post_id)
         current_datetime = datetime.datetime.utcnow()
         draft = 1 if draft is True else 0
         post_date = post_date if post_date is not None else current_datetime
@@ -191,11 +200,12 @@ class SQLAStorage(Storage):
         Fetch the blog post given by ``post_id``
 
         :param post_id: The post identifier for the blog post
-        :type post_id: int
+        :type post_id: str
         :return: If the ``post_id`` is valid, the post data is retrieved, else
          returns ``None``.
         """
         r = None
+        post_id = _as_int(post_id)
         with self._engine.begin() as conn:
             try:
                 post_statement = sqla.select([self._post_table]).where(
@@ -314,6 +324,7 @@ class SQLAStorage(Storage):
         """
         status = False
         success = 0
+        post_id = _as_int(post_id)
         with self._engine.begin() as conn:
             try:
                 post_del_statement = self._post_table.delete().where(
