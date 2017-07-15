@@ -3,24 +3,17 @@ try:
 except ImportError:
     pass
 import unittest
-import tempfile
-import os
 from flask_blogging.dynamodbstorage import DynamoDBStorage
 from test import FlaskBloggingTestCase
-import boto3
+try:
+    import boto3
+    HAS_DYNAMODB = True
+except ImportError:
+    HAS_DYNAMODB = False
 import time
-try:
-    import _mysql
-    HAS_MYSQL = True
-except ImportError:
-    HAS_MYSQL = False
-try:
-    import psycopg2
-    HAS_POSTGRES = True
-except ImportError:
-    HAS_POSTGRES = False
 
 
+@unittest.skipUnless(HAS_DYNAMODB, "Need DynamoDB client to run this test.")
 class TestDynamoDBStorage(FlaskBloggingTestCase):
 
     def _create_storage(self):
