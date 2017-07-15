@@ -9,3 +9,4 @@ Markdown
 Werkzeug
 blinker
 python-slugify
+shortuuid

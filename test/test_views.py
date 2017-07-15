@@ -420,6 +420,7 @@ class TestViewsWithUnicode(TestViews):
     def test_editor_post(self):
         pass
 
+
 @unittest.skipUnless(HAS_DYNAMODB, "Need DynamoDB setup for this test")
 class TestViewsWithDynamoDB(TestViews):
     def _create_storage(self):
