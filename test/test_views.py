@@ -3,6 +3,7 @@ try:
 except ImportError:
     pass
 import os
+import unittest
 import tempfile
 from flask import redirect, url_for, current_app
 from flask_login import LoginManager, login_user, logout_user, current_user
@@ -15,6 +16,12 @@ from flask_principal import identity_changed, Identity, Permission,\
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
 from flask_cache import Cache
 from .utils import get_random_unicode
+try:
+    import boto3
+    from flask_blogging.dynamodbstorage import DynamoDBStorage
+    HAS_DYNAMODB = True
+except:
+    HAS_DYNAMODB = False
 
 
 class TestViews(FlaskBloggingTestCase):
@@ -413,10 +420,9 @@ class TestViewsWithUnicode(TestViews):
     def test_editor_post(self):
         pass
 
-
+@unittest.skipUnless(HAS_DYNAMODB, "Need DynamoDB setup for this test")
 class TestViewsWithDynamoDB(TestViews):
     def _create_storage(self):
-        from flask_blogging.dynamodbstorage import DynamoDBStorage
         self.storage = DynamoDBStorage(table_prefix="test_",
                                        endpoint_url='http://localhost:8000')
 

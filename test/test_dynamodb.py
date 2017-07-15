@@ -3,10 +3,10 @@ try:
 except ImportError:
     pass
 import unittest
-from flask_blogging.dynamodbstorage import DynamoDBStorage
 from test import FlaskBloggingTestCase
 try:
     import boto3
+    from flask_blogging.dynamodbstorage import DynamoDBStorage
     HAS_DYNAMODB = True
 except ImportError:
     HAS_DYNAMODB = False
