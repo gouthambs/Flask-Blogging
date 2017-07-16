@@ -364,6 +364,7 @@ keys that are currently supported include:
   (default "Flask-Blogging")
 - ``BLOGGING_SITEURL`` (*str*): The url of the site. This is also used in the
   ``og:pulisher`` meta tag.
+- ``BLOGGING_BRANDURL`` (*str*): The url of the site brand.
 - ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text (markdown)
   should be rendered to HTML. (default ``True``)
 - ``BLOGGING_DISQUS_SITENAME`` (*str*): Disqus sitename for comments.

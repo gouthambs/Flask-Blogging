@@ -53,10 +53,10 @@ class DynamoDBStorage(Storage):
                 self._blog_posts_table.put_item(Item=r)
                 self._insert_tags(tags, post_id, post_date, draft)
             else:
-                expr = 'SET title = :title, #t = :text, user_id = :user_id, '
-                'tags = :tags, draft = :draft, post_date = :post_date, '
-                'last_modified_date = :last_modified_date, '
-                'meta_data = :meta_data',
+                expr = 'SET title = :title, #t = :text, user_id = :user_id, ' \
+                       'tags = :tags, draft = :draft, post_date = :post_date, '\
+                       'last_modified_date = :last_modified_date, ' \
+                       'meta_data = :meta_data'
                 self._blog_posts_table.update_item(
                     Key={'post_id': post_id},
                     UpdateExpression=expr,
@@ -70,7 +70,10 @@ class DynamoDBStorage(Storage):
                         ':last_modified_date': r["last_modified_date"],
                         ':meta_data': r['meta_data']
                     },
-                    ExpressionAttributeNames={'#t': 'text'})
+                    ExpressionAttributeNames={'#t': 'text'},
+                    ReturnValues="ALL_NEW"
+                )
+
                 tag_inserts = set(r['tags']) - set(r0['tags'])
                 tag_deletes = set(r0['tags']) - set(r['tags'])
                 self._insert_tags(tag_inserts, post_id, post_date, draft)
@@ -118,7 +121,7 @@ class DynamoDBStorage(Storage):
                 dict(IndexName='post_index',
                      KeyConditionExpression=Key('draft').eq(0))
             )
-        if offset > 0:
+        if offset and offset > 0:
             kwargs2 = copy.deepcopy(kwargs)
             kwargs2['Limit'] = offset
             response = getattr(table, "query")(**kwargs2)
