@@ -29,7 +29,7 @@ class BloggingEngine(object):
         blog_engine = BloggingEngine(app, storage)
     """
     def __init__(self, app=None, storage=None, post_processor=None,
-                 extensions=None, cache=None):
+                 extensions=None, cache=None, file_upload=None):
         """
 
         :param app: Optional app to use
@@ -45,6 +45,8 @@ class BloggingEngine(object):
         :type extensions: list
         :param cache: (Optional) A Flask-Cache object to enable caching
         :type cache: Object
+        :param file_upload: (Optional) A FileUpload object from flask_fileupload extension
+        :type file_upload: Object
         :return:
         """
         self.app = None
@@ -62,6 +64,7 @@ class BloggingEngine(object):
         if app is not None and storage is not None:
             self.init_app(app, storage)
         self.principal = None
+        self.file_upload = file_upload
 
     @classmethod
     def _register_plugins(cls, app, config):
@@ -103,7 +106,7 @@ class BloggingEngine(object):
         engine_initialised.send(self.app, engine=self)
 
         if self.config.get("BLOGGING_ALLOW_FILEUPLOAD", True):
-            self.ffu = FlaskFileUpload(app)
+            self.ffu = self.file_upload or FlaskFileUpload(app)
 
     @property
     def blogger_permission(self):
