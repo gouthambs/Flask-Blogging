@@ -9,9 +9,10 @@ app.config["BLOGGING_URL_PREFIX"] = "/blog"
 app.config["BLOGGING_DISQUS_SITENAME"] = "test"
 app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
 app.config["BLOGGING_SITENAME"] = "My Site"
-app.config["FILEUPLOAD_IMG_FOLDER"] = "fileupload"
-app.config["FILEUPLOAD_PREFIX"] = "/fileupload"
-app.config["FILEUPLOAD_ALLOWED_EXTENSIONS"] = ["png", "jpg", "jpeg", "gif"]
+app.config["BLOGGING_ALLOW_FILEUPLOAD"] = False
+#app.config["FILEUPLOAD_IMG_FOLDER"] = "fileupload"
+#app.config["FILEUPLOAD_PREFIX"] = "/fileupload"
+#app.config["FILEUPLOAD_ALLOWED_EXTENSIONS"] = ["png", "jpg", "jpeg", "gif"]
 
 # extensions
 dyn_storage = DynamoDBStorage(endpoint_url='http://localhost:8000')

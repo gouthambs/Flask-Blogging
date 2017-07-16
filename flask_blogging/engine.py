@@ -102,7 +102,8 @@ class BloggingEngine(object):
         self.principal = Principal(self.app)
         engine_initialised.send(self.app, engine=self)
 
-        self.ffu = FlaskFileUpload(app)
+        if self.config.get("BLOGGING_ALLOW_FILEUPLOAD", True):
+            self.ffu = FlaskFileUpload(app)
 
     @property
     def blogger_permission(self):

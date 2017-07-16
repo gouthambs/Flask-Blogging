@@ -26,7 +26,9 @@
                 {{form.text(placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
                 <span class="help-block">
                     Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a><br>
-                    <a target="_blank" href="{{ url_for("flask_fileupload.upload") }}">Upload new File</a>
+                    {% if config.BLOGGING_ALLOW_FILEUPLOAD %}
+                        <a target="_blank" href="{{ url_for("flask_fileupload.upload") }}">Upload new File</a>
+                    {% endif %}
                 </span>
             </div>
         </div>

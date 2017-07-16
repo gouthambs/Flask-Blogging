@@ -387,6 +387,7 @@ keys that are currently supported include:
   the blog pages. (default 60)
 - ``BLOGGING_PLUGINS`` (*list*): A list of plugins to register.
 - ``BLOGGING_KEYWORDS`` (*list*): A list of meta keywords to include on each page.
+- ``BLOGGING_ALLOW_FILEUPLOAD`` (*bool*): Allow static file uploads ``flask_fileupload``
 
 Blog Views
 ==========
