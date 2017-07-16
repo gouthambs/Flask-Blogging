@@ -53,9 +53,10 @@ class DynamoDBStorage(Storage):
                 self._blog_posts_table.put_item(Item=r)
                 self._insert_tags(tags, post_id, post_date, draft)
             else:
-                expr = 'SET title = :title, #t = :text, user_id = :user_id, ' \
-                       'tags = :tags, draft = :draft, post_date = :post_date, '\
-                       'last_modified_date = :last_modified_date, ' \
+                expr = 'SET title = :title, #t = :text, user_id = :user_id, '\
+                       'tags = :tags, draft = :draft, '\
+                       'post_date = :post_date, '\
+                       'last_modified_date = :last_modified_date, '\
                        'meta_data = :meta_data'
                 self._blog_posts_table.update_item(
                     Key={'post_id': post_id},

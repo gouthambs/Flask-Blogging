@@ -45,7 +45,8 @@ class BloggingEngine(object):
         :type extensions: list
         :param cache: (Optional) A Flask-Cache object to enable caching
         :type cache: Object
-        :param file_upload: (Optional) A FileUpload object from flask_fileupload extension
+        :param file_upload: (Optional) A FileUpload object from
+         flask_fileupload extension
         :type file_upload: Object
         :return:
         """
@@ -60,11 +61,10 @@ class BloggingEngine(object):
         if extensions:
             self.post_processor.set_custom_extensions(extensions)
         self.user_callback = None
-
+        self.file_upload = file_upload
         if app is not None and storage is not None:
             self.init_app(app, storage)
         self.principal = None
-        self.file_upload = file_upload
 
     @classmethod
     def _register_plugins(cls, app, config):
