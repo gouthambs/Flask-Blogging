@@ -2,6 +2,8 @@ from flask import Flask, render_template_string, redirect
 from flask_login import UserMixin, LoginManager, login_user, logout_user
 from flask_blogging import BloggingEngine
 from flask_blogging.dynamodbstorage import DynamoDBStorage
+from flask_fileupload.storage.s3storage import S3Storage
+from flask_fileupload import FlaskFileUpload
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret"  # for WTF-forms and login
@@ -9,12 +11,18 @@ app.config["BLOGGING_URL_PREFIX"] = "/blog"
 app.config["BLOGGING_DISQUS_SITENAME"] = "test"
 app.config["BLOGGING_SITEURL"] = ""
 app.config["BLOGGING_SITENAME"] = "My Site"
-app.config["BLOGGING_ALLOW_FILEUPLOAD"] = False
+app.config["BLOGGING_ALLOW_FILEUPLOAD"] = True
+app.config["FILEUPLOAD_S3_BUCKET"]='quandldata'
+app.config["FILEUPLOAD_PREFIX"] = "/upload"
+app.config["FILEUPLOAD_ALLOWED_EXTENSIONS"] = ["png", "jpg", "jpeg", "gif"]
 
 
 # extensions
+s3storage = S3Storage(app)
+file_upload = FlaskFileUpload(app, storage=s3storage)
+
 dyn_storage = DynamoDBStorage(endpoint_url='http://localhost:8000')
-blog_engine = BloggingEngine(app, dyn_storage)
+blog_engine = BloggingEngine(app, dyn_storage, file_upload=file_upload)
 login_manager = LoginManager(app)
 
 class User(UserMixin):

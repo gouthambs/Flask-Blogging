@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+- **Version 1.0.1** (*Release July 22, 2017*)
+
+ - Expanded the example with S3Storage for Flask-FileUpload
+ - Post id for DynamoDB only uses lower case alphabet and numbers
+
+- **Version 1.0.0** (*Release July 15, 2017*)
+
+  - Added DynamoDB storage
+
 - **Version 0.9.2** (*Release June 25, 2017*)
 
   - Additional fixes to ``automap_base`` in creating ``Post`` and ``Tag`` models

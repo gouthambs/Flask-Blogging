@@ -21,6 +21,7 @@ class DynamoDBStorage(Storage):
         self._table_prefix = table_prefix
         self._create_all_tables()
         self._uuid = ShortUUID()
+        self._uuid.set_alphabet('23456789abcdefghijkmnopqrstuvwxyz')
 
     def save_post(self, title, text, user_id, tags, draft=False,
                   post_date=None, last_modified_date=None, meta_data=None,

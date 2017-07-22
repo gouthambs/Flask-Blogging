@@ -15,9 +15,7 @@ provided by packages such as
 `Flask-Security <https://pythonhosted.org/Flask-Security/>`_.
 
 The philosophy behind this extension is to provide a lean app based on Markdown
-to provide blog support to your existing web application. This is contrary
-to some other packages such as `Flask-Blog <https://github.com/dmaslov/flask-blog>`_
-that are just blogs. If you already have a
+to provide blog support to your existing web application. If you already have a
 web app and you need to have a blog to communicate with your user or to
 promote your site through content based marketing, then Flask-Blogging would help
 you quickly get a blog up and running.
@@ -36,6 +34,7 @@ Out of the box, Flask-Blogging has support for the following:
 - Permissions enabled to control which users can create/edit blogs
 - Integrated Flask-Cache based caching for optimization
 - Well documented, tested, and extensible design
+- DynamoDB storage for use in AWS
 
 .. contents::
    :local:
@@ -124,7 +123,8 @@ Quick Start Example
 The key components required to get the blog hooked is explained below. Please note
 that as of Flask-Login 0.3.0 the ``is_authenticated`` attribute in the ``UserMixin``
 is a property and not a method. Please use the appropriate option based on your
-Flask-Login version.
+Flask-Login version. You can find more examples here in the
+`Flask-Blogging github project page <https://github.com/gouthambs/Flask-Blogging/tree/master/example>`_.
 
 Configuring your Application
 ============================

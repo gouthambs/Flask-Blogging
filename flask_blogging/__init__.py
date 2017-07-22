@@ -15,4 +15,4 @@ Date: June 1, 2015
 """
 
 __author__ = 'Gouthaman Balaraman'
-__version__ = '1.0.0.post1'
+__version__ = '1.0.1'
