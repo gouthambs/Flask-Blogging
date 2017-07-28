@@ -1,0 +1,17 @@
+<p class="small text-center" id="post-share-links">
+  &nbsp;Share on:
+  <a href="http://twitter.com/home?status={{ post.title | urlencode }}%20{{ request.url | urlencode }}%3Futm_source=twitter
+{% if config.BLOGGING_SITENAME %}%20%23{{ config.BLOGGING_SITENAME | replace(' ', '') | urlencode }}{% endif %}
+{% if config.BLOGGING_TWITTER_USERNAME %}%20{{ config.BLOGGING_TWITTER_USERNAME | urlencode }}{% endif %}"
+target="_blank" title="Share on Twitter">Twitter</a>
+  /
+  <a href="http://www.facebook.com/sharer/sharer.php?u={{ request.url | urlencode }}%3Futm_source=facebook"
+     target="_blank" title="Share on Facebook">Facebook</a>
+  /
+  <a href="https://plus.google.com/share?url={{ request.url | urlencode }}%3Futm_source=google%2B"
+     target="_blank" title="Share on Google Plus">Google+</a>
+  /
+  <a href="mailto:?subject={{ post.title }}&amp;body=I thought you might like this:
+  {{ post.title }}
+  {{ request.url }}?utm_source=email-share" target="_blank" title="Share via Email">Email</a>
+</p>

@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+- **Version 1.0.2** (Unreleased)
+
+ - Add social links
+
 - **Version 1.0.1** (*Release July 22, 2017*)
 
  - Expanded the example with S3Storage for Flask-FileUpload
@@ -9,6 +13,7 @@ Release Notes
 - **Version 1.0.0** (*Release July 15, 2017*)
 
   - Added DynamoDB storage
+  - Add Open Graph support
 
 - **Version 0.9.2** (*Release June 25, 2017*)
 

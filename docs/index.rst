@@ -365,6 +365,7 @@ keys that are currently supported include:
 - ``BLOGGING_SITEURL`` (*str*): The url of the site. This is also used in the
   ``og:pulisher`` meta tag.
 - ``BLOGGING_BRANDURL`` (*str*): The url of the site brand.
+- ``BLOGGING_TWITTER_USERNAME`` (*str*): @name to tag social sharing link with.
 - ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text (markdown)
   should be rendered to HTML. (default ``True``)
 - ``BLOGGING_DISQUS_SITENAME`` (*str*): Disqus sitename for comments.
@@ -380,7 +381,7 @@ keys that are currently supported include:
   "blogger" ``Role`` to edit or create blog posts. Other authenticated
   users will not have blog editing permissions. The concepts here derive
   from ``Flask-Principal``. (default ``False``)
-- ``BLOGGING_PERMISSIONNAME`` (*str*): The role name used for permissions. 
+- ``BLOGGING_PERMISSIONNAME`` (*str*): The role name used for permissions.
   It is effective, if "BLOGGING_PERMISSIONS" is "True". (default "blogger")
 - ``BLOGGING_POSTS_PER_PAGE`` (*int*): The default number of posts per index page.
   to be displayed per page. (default 10)
