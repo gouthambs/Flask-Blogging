@@ -62,6 +62,7 @@ def _get_meta(storage, count, page, tag=None, user_id=None):
     max_pages = math.ceil(float(max_posts)/float(count))
     max_offset = (max_pages-1)*count
     offset = min(max(0, (page-1)*count), max_offset)
+    offset = offset if offset >= 0 else 0
     if (tag is None) and (user_id is None):
         prev_page = None if page <= 1 else url_for(
             "blogging.index", count=count, page=page-1)
