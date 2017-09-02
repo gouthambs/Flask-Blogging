@@ -3,6 +3,7 @@ try:
     from builtins import str
 except ImportError:
     pass
+from flask import escape
 from .processor import PostProcessor
 from flask_login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
@@ -40,9 +41,10 @@ def _clear_cache(cache):
     cache.delete_memoized(feed)
 
 
-def _store_form_data(blog_form, storage, user, post):
+def _store_form_data(blog_form, storage, user, post, escape_text=True):
     title = blog_form.title.data
-    text = blog_form.text.data
+    text = escape(blog_form.text.data) if escape_text \
+        else blog_form.text.data
     tags = blog_form.tags.data.split(",")
     draft = blog_form.draft.data
     user_id = user.get_id()
@@ -235,7 +237,8 @@ def editor(post_id):
                         pass
                     else:
                         post = {}
-                    pid = _store_form_data(form, storage, current_user, post)
+                    escape_text = config.get("BLOGGING_ESCAPE_MARKDOWN", True)
+                    pid = _store_form_data(form, storage, current_user, post, escape_text)
                     editor_post_saved.send(blogging_engine.app,
                                            engine=blogging_engine,
                                            post_id=pid,

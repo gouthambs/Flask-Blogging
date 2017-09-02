@@ -1,9 +1,11 @@
 Release Notes
 =============
 
-- **Version 1.0.2** (Unreleased)
+- **Version 1.0.2** (*Release September 2, 2017*)
 
  - Add social links
+ - Add a choice to escape markdown input
+ - Remove negative offset for ``SQLAStorage`` storage engine.
 
 - **Version 1.0.1** (*Release July 22, 2017*)
 

@@ -390,6 +390,8 @@ keys that are currently supported include:
 - ``BLOGGING_PLUGINS`` (*list*): A list of plugins to register.
 - ``BLOGGING_KEYWORDS`` (*list*): A list of meta keywords to include on each page.
 - ``BLOGGING_ALLOW_FILEUPLOAD`` (*bool*): Allow static file uploads ``flask_fileupload``
+- ``BLOGGING_ESCAPE_MARKDOWN`` (*bool*): Escape input markdown text input. This is ``True`` by
+  default. Set this to false to allow embedding HTML in markdown.
 
 Blog Views
 ==========
