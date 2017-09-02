@@ -9,6 +9,8 @@ This is a Flask extension for adding blog support to your site using Markdown.
 Please see `Flask-Blogging documentation <http://flask-blogging.readthedocs.org/en/latest/>`_
 for more details. You can extend Flask-Blogging by using `plugins from here <https://github.com/gouthambs/blogging_plugins>`_.
 
+Check out the `Serverless Blog <https://serverlessblog.com>`_  demo running on AWS Lambda.
+
 Features
 --------
 
