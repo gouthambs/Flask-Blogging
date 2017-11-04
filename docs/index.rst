@@ -287,8 +287,8 @@ is also available in other template views like ``index.html``.
 If included, the first summary will be used as the page's meta ``description``,
 and Open Graph ``og:description``.
 
-The (optional) blog post specificvkeywords are included in the page's meta
-keywords in addition to ``BLOGGING_KEYWORDS``v(if configured). Any tags are also
+The (optional) blog post specific keywords are included in the page's meta
+keywords in addition to ``BLOGGING_KEYWORDS`` (if configured). Any tags are also
 added as meta keywords.
 
 
