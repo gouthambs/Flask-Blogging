@@ -238,7 +238,8 @@ def editor(post_id):
                     else:
                         post = {}
                     escape_text = config.get("BLOGGING_ESCAPE_MARKDOWN", True)
-                    pid = _store_form_data(form, storage, current_user, post, escape_text)
+                    pid = _store_form_data(form, storage, current_user, post, 
+                                           escape_text)
                     editor_post_saved.send(blogging_engine.app,
                                            engine=blogging_engine,
                                            post_id=pid,
