@@ -363,7 +363,7 @@ keys that are currently supported include:
   name. This is also used in the feed heading and ``og:site_name`` meta tag.
   (default "Flask-Blogging")
 - ``BLOGGING_SITEURL`` (*str*): The url of the site. This is also used in the
-  ``og:pulisher`` meta tag.
+  ``og:publisher`` meta tag.
 - ``BLOGGING_BRANDURL`` (*str*): The url of the site brand.
 - ``BLOGGING_TWITTER_USERNAME`` (*str*): @name to tag social sharing link with.
 - ``BLOGGING_RENDER_TEXT`` (*bool*): Value to specify if the raw text (markdown)
