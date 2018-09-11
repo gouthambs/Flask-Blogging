@@ -2,7 +2,7 @@ Flask
 Flask-WTF>=0.14.0
 Flask-Login
 Flask-Principal
-Flask-Cache
+flask-caching
 Flask-FileUpload
 SQLAlchemy>=0.9.1
 Markdown

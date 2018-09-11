@@ -14,7 +14,7 @@ from test import FlaskBloggingTestCase, TestUser
 import re
 from flask_principal import identity_changed, Identity, Permission,\
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
-from flask_cache import Cache
+from flask_caching import Cache
 from .utils import get_random_unicode
 try:
     import boto3
