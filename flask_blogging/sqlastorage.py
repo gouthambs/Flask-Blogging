@@ -208,31 +208,26 @@ class SQLAStorage(Storage):
         post_id = _as_int(post_id)
         with self._engine.begin() as conn:
             try:
-                post_statement = sqla.select([self._post_table]).where(
-                    self._post_table.c.id == post_id
-                )
-                post_result = conn.execute(post_statement).fetchone()
-                if post_result is not None:
-                    r = dict(post_id=post_result[0], title=post_result[1],
-                             text=post_result[2], post_date=post_result[3],
-                             last_modified_date=post_result[4],
-                             draft=post_result[5])
-                    # get the tags
-                    tag_statement = sqla.select([self._tag_table.c.text]). \
-                        where(
-                            sqla.and_(
-                                self._tag_table.c.id ==
-                                self._tag_posts_table.c.tag_id,
-                                self._tag_posts_table.c.post_id == post_id))
-                    tag_result = conn.execute(tag_statement).fetchall()
-                    r["tags"] = [t[0] for t in tag_result]
-                    # get the user
-                    user_statement = sqla.select([
-                        self._user_posts_table.c.user_id]).where(
-                        self._user_posts_table.c.post_id == post_id
-                    )
-                    user_result = conn.execute(user_statement).fetchone()
-                    r["user_id"] = user_result[0]
+                post_statement = sqla.select([self._post_table]) \
+                    .where(self._post_table.c.id==post_id) \
+                    .alias('post')
+
+                joined_statement = post_statement.join(self._tag_posts_table) \
+                    .join(self._tag_table) \
+                    .join(self._user_posts_table) \
+                    .alias('join')
+
+                # Note this will retrieve one row per tag
+                all_rows = conn.execute(sqla.select([joined_statement])).fetchall()
+
+                if all_rows is not None:
+                    # The post data is the same on all rows
+                    first_row = all_rows[0]
+                    r = dict(post_id=first_row.post_id, title=first_row.post_title,
+                             text=first_row.post_text, post_date=first_row.post_post_date,
+                             last_modified_date=first_row.post_last_modified_date,
+                             draft=first_row.post_draft, user_id=first_row.user_posts_user_id)
+                    r["tags"] = [row.tag_text for row in all_rows]
             except Exception as e:
                 self._logger.exception(str(e))
                 r = None
