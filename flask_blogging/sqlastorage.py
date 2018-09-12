@@ -196,6 +196,7 @@ class SQLAStorage(Storage):
                 post_id = None
         return post_id
 
+    @classmethod
     def _serialise_posts_and_tags_from_joined_rows(cls, joined_rows):
         """
         Translates multiple rows of joined post and tag information
