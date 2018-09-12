@@ -217,7 +217,6 @@ class SQLAStorage(Storage):
 
         return [post for post in posts_by_id.values()]
 
-
     @staticmethod
     def _serialise_post_from_joined_row(joined_row):
         return dict(
@@ -244,7 +243,7 @@ class SQLAStorage(Storage):
         with self._engine.begin() as conn:
             try:
                 post_statement = sqla.select([self._post_table]) \
-                    .where(self._post_table.c.id==post_id) \
+                    .where(self._post_table.c.id == post_id) \
                     .alias('post')
 
                 joined_statement = post_statement.join(self._tag_posts_table) \
@@ -253,8 +252,12 @@ class SQLAStorage(Storage):
                     .alias('join')
 
                 # Note this will retrieve one row per tag
-                all_rows = conn.execute(sqla.select([joined_statement])).fetchall()
-                r = self._serialise_posts_and_tags_from_joined_rows(all_rows)[0]
+                all_rows = conn.execute(
+                    sqla.select([joined_statement])
+                ).fetchall()
+                r = self._serialise_posts_and_tags_from_joined_rows(
+                    all_rows
+                )[0]
 
             except Exception as e:
                 self._logger.exception(str(e))
@@ -310,13 +313,13 @@ class SQLAStorage(Storage):
                     .alias('join')
 
                 all_rows = conn.execute(joined_statement).fetchall()
-                result = self._serialise_posts_and_tags_from_joined_rows(all_rows)
+                result = \
+                    self._serialise_posts_and_tags_from_joined_rows(all_rows)
             except Exception as e:
                 self._logger.exception(str(e))
                 result = []
 
         return result
-
 
     def count_posts(self, tag=None, user_id=None, include_draft=False):
         """
