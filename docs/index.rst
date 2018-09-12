@@ -186,7 +186,7 @@ As of version 0.4.0, Flask-Cache integration is supported. In order
 to use caching in the blogging engine, you need to pass the ``Cache``
 instance to the ``BloggingEngine`` as::
 
-    from flask_cache import Cache
+    from flask_caching import Cache
     from flask_blogging import BloggingEngine
 
     blogging_engine = BloggingEngine(app, storage, cache)

@@ -2,6 +2,7 @@ try:
     from builtins import str
 except ImportError:
     pass
+from collections import defaultdict, OrderedDict
 import sys
 import logging
 import sqlalchemy as sqla
@@ -195,6 +196,40 @@ class SQLAStorage(Storage):
                 post_id = None
         return post_id
 
+    def _serialise_posts_and_tags_from_joined_rows(cls, joined_rows):
+        """
+        Translates multiple rows of joined post and tag information
+        into the dictionary format expected by flask-blogging.
+        There will be one row per post/tag pairing.
+        """
+        posts_by_id = OrderedDict()
+        tags_by_post_id = defaultdict(list)
+        for joined_row in joined_rows:
+            post_id = joined_row.post_id
+            post = cls._serialise_post_from_joined_row(joined_row)
+            posts_by_id[post_id] = post
+            tags_by_post_id[post_id].append(joined_row.tag_text)
+
+        for id, post in posts_by_id.items():
+            tags = tags_by_post_id.get(id)
+            if tags:
+                post["tags"] = tags
+
+        return [post for post in posts_by_id.values()]
+
+
+    @staticmethod
+    def _serialise_post_from_joined_row(joined_row):
+        return dict(
+            post_id=joined_row.post_id,
+            title=joined_row.post_title,
+            text=joined_row.post_text,
+            post_date=joined_row.post_post_date,
+            last_modified_date=joined_row.post_last_modified_date,
+            draft=joined_row.post_draft,
+            user_id=joined_row.user_posts_user_id
+        )
+
     def get_post_by_id(self, post_id):
         """
         Fetch the blog post given by ``post_id``
@@ -208,31 +243,19 @@ class SQLAStorage(Storage):
         post_id = _as_int(post_id)
         with self._engine.begin() as conn:
             try:
-                post_statement = sqla.select([self._post_table]).where(
-                    self._post_table.c.id == post_id
-                )
-                post_result = conn.execute(post_statement).fetchone()
-                if post_result is not None:
-                    r = dict(post_id=post_result[0], title=post_result[1],
-                             text=post_result[2], post_date=post_result[3],
-                             last_modified_date=post_result[4],
-                             draft=post_result[5])
-                    # get the tags
-                    tag_statement = sqla.select([self._tag_table.c.text]). \
-                        where(
-                            sqla.and_(
-                                self._tag_table.c.id ==
-                                self._tag_posts_table.c.tag_id,
-                                self._tag_posts_table.c.post_id == post_id))
-                    tag_result = conn.execute(tag_statement).fetchall()
-                    r["tags"] = [t[0] for t in tag_result]
-                    # get the user
-                    user_statement = sqla.select([
-                        self._user_posts_table.c.user_id]).where(
-                        self._user_posts_table.c.post_id == post_id
-                    )
-                    user_result = conn.execute(user_statement).fetchone()
-                    r["user_id"] = user_result[0]
+                post_statement = sqla.select([self._post_table]) \
+                    .where(self._post_table.c.id==post_id) \
+                    .alias('post')
+
+                joined_statement = post_statement.join(self._tag_posts_table) \
+                    .join(self._tag_table) \
+                    .join(self._user_posts_table) \
+                    .alias('join')
+
+                # Note this will retrieve one row per tag
+                all_rows = conn.execute(sqla.select([joined_statement])).fetchall()
+                r = self._serialise_posts_and_tags_from_joined_rows(all_rows)[0]
+
             except Exception as e:
                 self._logger.exception(str(e))
                 r = None
@@ -267,7 +290,7 @@ class SQLAStorage(Storage):
 
         with self._engine.begin() as conn:
             try:
-                select_statement = sqla.select([self._post_table.c.id])
+                select_statement = sqla.select([self._post_table])
                 sql_filter = self._get_filter(tag, user_id, include_draft,
                                               conn)
 
@@ -279,13 +302,21 @@ class SQLAStorage(Storage):
                     select_statement = select_statement.offset(offset)
 
                 select_statement = select_statement.order_by(ordering)
-                result = conn.execute(select_statement).fetchall()
+                post_statement = select_statement.alias('post')
+
+                joined_statement = post_statement.join(self._tag_posts_table) \
+                    .join(self._tag_table) \
+                    .join(self._user_posts_table) \
+                    .alias('join')
+
+                all_rows = conn.execute(joined_statement).fetchall()
+                result = self._serialise_posts_and_tags_from_joined_rows(all_rows)
             except Exception as e:
                 self._logger.exception(str(e))
                 result = []
 
-        posts = [self.get_post_by_id(pid[0]) for pid in result]
-        return posts
+        return result
+
 
     def count_posts(self, tag=None, user_id=None, include_draft=False):
         """
