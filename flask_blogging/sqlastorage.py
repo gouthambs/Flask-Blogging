@@ -295,8 +295,9 @@ class SQLAStorage(Storage):
                 # post_statement ensures the correct posts are selected
                 # in the correct order
                 post_statement = sqla.select([self._post_table])
-                post_filter = self._get_filter(tag, user_id, include_draft,
-                                              conn)
+                post_filter = self._get_filter(
+                    tag, user_id, include_draft, conn
+                )
 
                 if post_filter is not None:
                     post_statement = post_statement.where(post_filter)
