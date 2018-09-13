@@ -288,31 +288,41 @@ class SQLAStorage(Storage):
          last_modified_date). If count is ``None``, then all the posts are
          returned.
         """
-        ordering = sqla.desc(self._post_table.c.post_date) if recent \
-            else self._post_table.c.post_date
         user_id = str(user_id) if user_id else user_id
 
         with self._engine.begin() as conn:
             try:
-                select_statement = sqla.select([self._post_table])
-                sql_filter = self._get_filter(tag, user_id, include_draft,
+                # post_statement ensures the correct posts are selected
+                # in the correct order
+                post_statement = sqla.select([self._post_table])
+                post_filter = self._get_filter(tag, user_id, include_draft,
                                               conn)
 
-                if sql_filter is not None:
-                    select_statement = select_statement.where(sql_filter)
+                if post_filter is not None:
+                    post_statement = post_statement.where(post_filter)
                 if count:
-                    select_statement = select_statement.limit(count)
+                    post_statement = post_statement.limit(count)
                 if offset:
-                    select_statement = select_statement.offset(offset)
+                    post_statement = post_statement.offset(offset)
 
-                select_statement = select_statement.order_by(ordering)
-                post_statement = select_statement.alias('post')
+                post_ordering = \
+                    sqla.desc(self._post_table.c.post_date) if recent \
+                    else self._post_table.c.post_date
+                post_statement = post_statement.order_by(post_ordering)
+                post_statement = post_statement.alias('post')
 
+                # joined_statement ensures other data is retrieved
                 joined_statement = post_statement.join(self._tag_posts_table) \
                     .join(self._tag_table) \
                     .join(self._user_posts_table) \
                     .alias('join')
 
+                joined_ordering = \
+                    sqla.desc(joined_statement.c.post_post_date) if recent \
+                    else joined_statement.c.post_post_date
+
+                joined_statement = sqla.select([joined_statement]) \
+                    .order_by(joined_ordering)
                 all_rows = conn.execute(joined_statement).fetchall()
                 result = \
                     self._serialise_posts_and_tags_from_joined_rows(all_rows)
