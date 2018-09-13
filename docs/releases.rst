@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+- **Version 1.1.0** (*Release September 12, 2018*)
+
+ - SQLAStorage query optimization
+ - Updated Disqus to latest
+ - Some minor docs fixes
+
 - **Version 1.0.2** (*Release September 2, 2017*)
 
  - Add social links

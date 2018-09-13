@@ -8,4 +8,6 @@ Contributors
 - `Arthur Holzner <https://github.com/Speedy1991>`_
 - `Sean Pianka <https://github.com/seanpianka>`_
 - `Matt Brookes <https://github.com/mbrookes>`_
+- `Stephen Raoul Sullivan <https://github.com/raoulsullivan>`_
+
 
