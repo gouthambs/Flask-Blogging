@@ -4,7 +4,7 @@ python:
   - 3.4
   - 3.5
   - 3.6
-  - 3.7
+  # - 3.7
 before_script:
   - mysql -e 'create database flask_blogging;'
   - psql -c 'create database flask_blogging;' -U postgres;
