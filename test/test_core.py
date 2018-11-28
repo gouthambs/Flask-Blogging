@@ -35,7 +35,7 @@ class TestCore(TestCase):
         pass
 
     def test_custom_md_extension(self):
-        extn = CodeHiliteExtension({})
+        extn = CodeHiliteExtension()
         engine = BloggingEngine(extensions=[extn])
         extns = engine.post_processor.all_extensions()
         self.assertEqual(len(extns), 3)

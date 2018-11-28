@@ -4,8 +4,19 @@ python:
   - 3.4
   - 3.5
   - 3.6
-  # - 3.7
+# Enable 3.7 without globally enabling sudo and dist: xenial for other build jobs
+matrix:
+  include:
+    - python: 3.7
+      env: XENIAL=true
+      dist: xenial
+      sudo: true
 before_script:
+  - if [ "$XENIAL" = true ] ; then sudo apt-get update; fi
+  - if [ "$XENIAL" = true ] ; then sudo apt-get install -y mysql-server; fi
+  - if [ "$XENIAL" = true ] ; then sudo service mysql restart; fi  
+  - if [ "$XENIAL" = true ] ; then sudo service postgresql restart; fi  
+  - if [ "$XENIAL" = true ] ; then which mysql && until mysql -u root -e "show status" &>/dev/null; do sleep 1; done; fi
   - mysql -e 'create database flask_blogging;'
   - psql -c 'create database flask_blogging;' -U postgres;
 install:

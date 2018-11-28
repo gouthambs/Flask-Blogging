@@ -35,6 +35,7 @@ Out of the box, Flask-Blogging has support for the following:
 - Integrated Flask-Cache based caching for optimization
 - Well documented, tested, and extensible design
 - DynamoDB storage for use in AWS
+- Google Cloud Datastore support
 
 .. contents::
    :local:
@@ -238,7 +239,7 @@ Models from SQLAStorage
 -----------------------
 
 `SQLAlchemy` ORM models for the `SQLAStorage` can be accessed after
-configurtion of the `SQLAStorage` object. Here is a quick example::
+configuration of the `SQLAStorage` object. Here is a quick example::
 
     storage = SQLAStorage(db=db)
     from flask_blogging.sqlastorage import Post, Tag  # Has to be after SQLAStorage initialization
