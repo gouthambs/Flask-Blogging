@@ -1,7 +1,7 @@
 Flask-Blogging
 ==============
 
-.. image:: https://travis-ci.org/gouthambs/Flask-Blogging.svg?branch=gcp_support
+.. image:: https://travis-ci.org/gouthambs/Flask-Blogging.svg?branch=master
     :target: https://travis-ci.org/gouthambs/Flask-Blogging
 
 
