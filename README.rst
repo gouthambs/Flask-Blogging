@@ -1,8 +1,8 @@
 Flask-Blogging
 ==============
 
-.. image:: https://travis-ci.org/agiUnderground/Flask-Blogging.svg?branch=gcp_support
-    :target: https://travis-ci.org/agiUnderground/Flask-Blogging
+.. image:: https://travis-ci.org/gouthambs/Flask-Blogging.svg?branch=gcp_support
+    :target: https://travis-ci.org/gouthambs/Flask-Blogging
 
 
 This is a Flask extension for adding blog support to your site using Markdown.
