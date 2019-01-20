@@ -9,5 +9,7 @@ Contributors
 - `Sean Pianka <https://github.com/seanpianka>`_
 - `Matt Brookes <https://github.com/mbrookes>`_
 - `Stephen Raoul Sullivan <https://github.com/raoulsullivan>`_
+- `Alexander Remeza <https://github.com/agiUnderground>`_
+- `Nathanael <https://github.com/roipoussiere>`_
 
 
