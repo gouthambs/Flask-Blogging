@@ -58,7 +58,7 @@ Quick Start Example
     app.config["BLOGGING_SITEURL"] = "http://localhost:8000"
     app.config["BLOGGING_SITENAME"] = "My Site"
     app.config["BLOGGING_KEYWORDS"] = ["blog", "meta", "keywords"]
-    app.config["FILEUPLOAD_IMG_FOLDER"] = "fileupload"
+    app.config["FILEUPLOAD_LOCALSTORAGE_IMG_FOLDER"] = "img_upload"
     app.config["FILEUPLOAD_PREFIX"] = "/fileupload"
     app.config["FILEUPLOAD_ALLOWED_EXTENSIONS"] = ["png", "jpg", "jpeg", "gif"]
 
@@ -270,16 +270,16 @@ Extending using Markdown Metadata
 ---------------------------------
 
 Let's say you want to include a summary for your blog post, and have it
-show up along with the post. You don't need to modify the database or 
+show up along with the post. You don't need to modify the database or
 the models to accomplish this. This is in fact supported by default by way
 of Markdown metadata syntax. In your blog post, you can include metadata,
 as shown below::
 
     Summary: This is a short summary of the blog post
     Keywords: Blog, specific, keywords
-    
+
     This is the much larger blog post. There are lot of things
-    to discuss here. 
+    to discuss here.
 
 In the template ``page.html`` this metadata can be accessed as, ``post.meta.summary``
 and can be populated in the way it is desired. The same metadata for each post
@@ -297,7 +297,7 @@ added as meta keywords.
 Extending using the plugin framework
 ------------------------------------
 
-The plugin framework is a very powerful way to modify the behavior of the 
+The plugin framework is a very powerful way to modify the behavior of the
 blogging engine. Lets say you want to show the top 10 most popular tag in the
 post. Lets show how one can do that using the plugins framework. As a first step,
 we create our plugin::
@@ -469,8 +469,8 @@ Useful Tips
     [alembic:exclude]
     tables = tag, post, tag_posts, user_posts
 
-  If you have a value set for ``table_prefix`` argument while creating the ``SQLAStorage``, 
-  then the table names will contain that prefix in their names. In which case, you have 
+  If you have a value set for ``table_prefix`` argument while creating the ``SQLAStorage``,
+  then the table names will contain that prefix in their names. In which case, you have
   to use appropriate names in the table names.
 
   And in your ``env.py``, we have to mark these tables as the ones to be
