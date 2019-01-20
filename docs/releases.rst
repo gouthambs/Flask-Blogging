@@ -1,8 +1,11 @@
 Release Notes
 =============
 
+- **Version 1.2.1** (*Release January 20, 2019*)
 
-- **Version 1.2.0** (*Release January 19, 2019*)
+ - Fix broken docs and update Flask-Fileupload configurations
+
+- **Version 1.2.0** (*Release January 9, 2019*)
 
  - ``GoogleCloudDatastore`` provides Google clould support
  - Updated markdown js script
