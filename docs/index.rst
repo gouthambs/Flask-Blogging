@@ -360,6 +360,9 @@ The Flask-Blogging extension can be configured by setting the following app
 config variables. These arguments are passed to all the views. The
 keys that are currently supported include:
 
+Flask-blogging
+--------------
+
 - ``BLOGGING_SITENAME`` (*str*): The name of the blog to be used as the brand
   name. This is also used in the feed heading and ``og:site_name`` meta tag.
   (default "Flask-Blogging")
@@ -393,6 +396,17 @@ keys that are currently supported include:
 - ``BLOGGING_ALLOW_FILEUPLOAD`` (*bool*): Allow static file uploads ``flask_fileupload``
 - ``BLOGGING_ESCAPE_MARKDOWN`` (*bool*): Escape input markdown text input. This is ``False`` by
   default. Set this to ``True`` to forbid embedding HTML in markdown.
+
+Vendor libraries location
+-------------------------
+
+- ``VENDOR_BOOTSTRAP_CSS`` (*str*): remote or local location of bootstrap.css (default is ``https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css``)
+- ``VENDOR_BOOTSTRAP_JS`` (*str*): remote or local location of bootstrap.js (default is ``https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js``)
+- ``VENDOR_BOOTSTRAP_MARKDOWN_CSS`` (*str*): remote or local location of bootstrap_markdown.css (default is ``https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css``)
+- ``VENDOR_BOOTSTRAP_MARKDOWN_JS`` (*str*): remote or local location of bootstrap_markdown.js (default is ``https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js``)
+- ``VENDOR_MARKED_JS`` (*str*): remote or local location of marked.js (default is ``https://cdnjs.cloudflare.com/ajax/libs/marked/0.5.1/marked.min.js``)
+- ``VENDOR_JQUERY_JS`` (*str*): remote or local location of jquery.js (default is ``https://code.jquery.com/jquery-2.1.4.min.js``)
+- ``VENDOR_MATHJAX_JS`` (*str*): remote or local location of mathjax.js (default is ``https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML``)
 
 Blog Views
 ==========

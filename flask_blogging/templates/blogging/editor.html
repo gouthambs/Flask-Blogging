@@ -1,7 +1,6 @@
 {% extends 'blogging/base.html' %}
 {% block extrastyle %}
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css"
-      rel="stylesheet"/>
+<link href='{{ config.VENDOR_BOOTSTRAP_MARKDOWN_CSS or "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/css/bootstrap-markdown.min.css"}}' rel="stylesheet"/>
 {% endblock extrastyle %}
 {% block main %}
 <form class="form-horizontal" action="{{url_for('blogging.editor', post_id=post_id or None)}}" method="POST">
@@ -25,7 +24,7 @@
             <div class="input-group col-md-8 col-md-offset-2">
                 {{form.text(placeholder="Blog text", required="", data_provide="markdown", rows="16")}}
                 <span class="help-block">
-                    Learn more about <a href="http://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a><br>
+                    Learn more about <a href="https://en.wikipedia.org/wiki/Markdown" target="_blank">MarkDown</a><br>
                     {% if config.BLOGGING_ALLOW_FILEUPLOAD %}
                         <a target="_blank" href="{{ url_for("flask_fileupload.upload") }}">Upload new File</a>
                     {% endif %}
@@ -58,10 +57,6 @@
 {% endblock main %}
 
 {% block extrajs %}
-    <script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.5.1/marked.min.js">
-    </script>
-    <script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js">
-    </script>
+    <script type="text/javascript" src='{{ config.VENDOR_MARKED_JS or "https://cdnjs.cloudflare.com/ajax/libs/marked/0.5.1/marked.min.js"}}'></script>
+    <script type="text/javascript" src='{{ config.VENDOR_BOOTSTRAP_MARKDOWN_JS or "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-markdown/2.10.0/js/bootstrap-markdown.min.js"}}'></script>
  {% endblock extrajs %}

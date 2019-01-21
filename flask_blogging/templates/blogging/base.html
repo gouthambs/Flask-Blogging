@@ -5,7 +5,7 @@
     {% block meta %}
     {% endblock meta %}
     {% block style %}
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href='{{ config.VENDOR_BOOTSTRAP_CSS or "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"}}' rel="stylesheet"/>
     <style>
         body { padding-top: 80px;}
     </style>
@@ -63,9 +63,9 @@
      </div>
     {% include "blogging/analytics.html" %}
     {% block js %}
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
-    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src='{{ config.VENDOR_JQUERY_JS or "https://code.jquery.com/jquery-2.1.4.min.js"}}'></script>
+    <script type="text/javascript" src='{{ config.VENDOR_MATHJAX_JS or "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"}}'></script>
+    <script type="text/javascript" src='{{ config.VENDOR_BOOTSTRAP_JS or "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"}}'></script>
     <script type="text/x-mathjax-config">
           MathJax.Hub.Config({
           "HTML-CSS": {
