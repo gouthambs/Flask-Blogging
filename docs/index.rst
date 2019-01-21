@@ -408,6 +408,19 @@ Vendor libraries location
 - ``VENDOR_JQUERY_JS`` (*str*): remote or local location of jquery.js (default is ``https://code.jquery.com/jquery-2.1.4.min.js``)
 - ``VENDOR_MATHJAX_JS`` (*str*): remote or local location of mathjax.js (default is ``https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML``)
 
+Flask-FileUpload
+----------------
+
+Flask-blogging uses `Flask-FileUpload <https://flask-login.readthedocs.org/en/latest/>`_ module, which also works with its configuration variables that you can use:
+
+- ``SECRET_KEY`` (*str*): Any Secret key u want
+- ``FILEUPLOAD_LOCALSTORAGE_IMG_FOLDER``(*str*): Where to store the images if used the default LocalStorage
+- ``FILEUPLOAD_PREFIX`` (*str*): Blueprint prefix (ie. the route where fileupload page will be served)
+- ``FILEUPLOAD_ALLOWED_EXTENSIONS`` (*str array*): Allow only these extensions
+- ``FILEUPLOAD_ALLOW_ALL_EXTENSIONS`` (*bool*): Allow all extensions
+- ``FILEUPLOAD_RANDOM_FILE_APPENDIX`` (*bool*): Append a random 6 hash string to selected file
+- ``FILEUPLOAD_CONVERT_TO_SNAKE_CASE`` (*bool*): Converts filenames to snake_case
+
 Blog Views
 ==========
 
