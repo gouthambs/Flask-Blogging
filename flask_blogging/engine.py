@@ -28,6 +28,7 @@ class BloggingEngine(object):
         storage = SQLAStorage(db_engine, metadata=meta)
         blog_engine = BloggingEngine(app, storage)
     """
+
     def __init__(self, app=None, storage=None, post_processor=None,
                  extensions=None, cache=None, file_upload=None):
         """
@@ -74,7 +75,7 @@ class BloggingEngine(object):
                 lib = __import__(plugin, globals(), locals(), str("module"))
                 lib.register(app)
 
-    def init_app(self, app, storage=None, cache=None):
+    def init_app(self, app, storage=None, cache=None, file_upload=None):
         """
         Initialize the engine.
 
@@ -90,6 +91,7 @@ class BloggingEngine(object):
         self.app = app
         self.config = self.app.config
         self.storage = storage or self.storage
+        self.file_upload = file_upload or self.file_upload
         self.cache = cache or self.cache
         self._register_plugins(self.app, self.config)
 
@@ -153,9 +155,9 @@ class BloggingEngine(object):
         try:
             author = self.user_callback(post["user_id"])
         except Exception:
-                raise Exception("No user_loader has been installed for this "
-                                "BloggingEngine. Add one with the "
-                                "'BloggingEngine.user_loader' decorator.")
+            raise Exception("No user_loader has been installed for this "
+                            "BloggingEngine. Add one with the "
+                            "'BloggingEngine.user_loader' decorator.")
         if author is not None:
             post["user_name"] = self.get_user_name(author)
         post_processed.send(self.app, engine=self, post=post, render=render)
