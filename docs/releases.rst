@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+- **Version 1.2.2** (*Release January 31, 2019*)
+
+ - Add file_upload optional argument to engine's init_app method (#133)
+
 - **Version 1.2.1** (*Release January 20, 2019*)
 
  - Fix broken docs and update Flask-Fileupload configurations
