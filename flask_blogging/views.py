@@ -232,7 +232,7 @@ def editor(post_id):
                 if form.validate():
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
-                            (PostProcessor.is_author(post, current_user)) and \
+                        (post_processor.is_author(post, current_user)) and \
                             (str(post["post_id"]) == post_id):
                         pass
                     else:
@@ -257,7 +257,7 @@ def editor(post_id):
                 if post_id is not None:
                     post = storage.get_post_by_id(post_id)
                     if (post is not None) and \
-                            (PostProcessor.is_author(post, current_user)):
+                            (post_processor.is_author(post, current_user)):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
                                           text=post["text"], tags=tags)
@@ -289,11 +289,12 @@ def delete(post_id):
     if cache:
         _clear_cache(cache)
     try:
+        post_processor = blogging_engine.post_processor
         with blogging_engine.blogger_permission.require():
             storage = blogging_engine.storage
             post = storage.get_post_by_id(post_id)
             if (post is not None) and \
-                    (PostProcessor.is_author(post, current_user)):
+                    (post_processor.is_author(post, current_user)):
                 success = storage.delete_post(post_id)
                 if success:
                     flash("Your post was successfully deleted", "info")
