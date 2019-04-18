@@ -4,7 +4,7 @@ Flask-Login
 Flask-Principal
 flask-caching
 Flask-FileUpload
-SQLAlchemy>=1.3.0
+SQLAlchemy>=0.9.1
 Markdown
 Werkzeug
 blinker
