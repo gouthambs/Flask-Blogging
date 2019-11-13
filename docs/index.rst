@@ -122,8 +122,8 @@ Flask-Login version.
 Configuring your Application
 ============================
 
-The `BloggingEngine` class is the gateway to configure blogging support
-to your web app. You should create the `BloggingEngine` instance like this::
+The ``BloggingEngine`` class is the gateway to configure blogging support
+to your web app. You should create the ``BloggingEngine`` instance like this::
 
     blogging_engine = BloggingEngine()
     blogging_engine.init_app(app, storage)
@@ -140,7 +140,7 @@ You also need to pick the ``storage`` for blog. That can be done as::
 Here we have created the storage, and created all the tables
 in the metadata. Once you have created the blogging engine,
 storage, and all the tables in the storage, you can connect
-with your app using the `init_app` method as shown below::
+with your app using the ``init_app`` method as shown below::
 
    blogging_engine.init_app(app, storage)
 
@@ -157,6 +157,23 @@ to provide the ``metadata`` object. This has the benefit of the
 table creation being passed to the user. Also, this gives the user
 the ability to use the common metadata object, and hence helps
 with the tables showing up in migrations while using Alembic.
+
+As of version 0.5.2, support for the multi database scenario
+under Flask-SQLAlchemy was added. When we have a multiple database
+scenario, one can use the ``bind`` keyword in ``SQLAStorage`` to
+specify the database to bind to, as shown below::
+
+    # config value
+    SQLALCHEMY_BINDS = {
+        'blog': "sqlite:////tmp/blog.db"),
+        'security': "sqlite:////tmp/security.db")
+    }
+
+The storage can be initialised as::
+
+    db = SQLAlchemy(app)
+    storage = SQLAStorage(db=db, bind="blog")
+    db.create_all()
 
 As of version 0.4.0, Flask-Cache integration is supported. In order
 to use caching in the blogging engine, you need to pass the ``Cache``
@@ -187,12 +204,15 @@ implement either the ``get_name`` method or the ``__str__`` method.
 The ``BloggingEngine`` accepts an optional ``extensions`` argument. This is a list
 of ``Markdown`` extensions objects to be used during the markdown processing step.
 
+As of version 0.6.0, a plugin interface is available to add new functionality.
+Custom processes can be added to the ``posts`` by subscribing to the
+``post_process_before`` and ``post_process_after`` signals, and adding
+new functionality to it.
+
 The ``BloggingEngine`` also accepts ``post_processor`` argument, which can be
 used to provide a custom post processor object to handle the processing
-of Markdown text. An ideal way to do this would be to inherit the default
-``PostProcessor`` object and override custom methods. There is a
-``custom_process`` method that can be overridden to add extra functionality
-to the post processing step.
+of Markdown text. One way to do this would be to inherit the default
+``PostProcessor`` object and override ``process`` method.
 
 In version 0.4.1 and onwards, the ``BloggingEngine`` object can be accessed
 from your ``app`` as follows::
@@ -207,10 +227,99 @@ In earlier versions the same can be done using the key
 ``FLASK_BLOGGING_ENGINE`` key will be deprecated moving forward.
 
 
+Adding Custom Markdown Extensions
+---------------------------------
+
+One can provide additional MarkDown extensions to the blogging engine.
+One example usage is adding the ``codehilite`` MarkDown extension. Additional
+extensions should be passed as a list while initializing the ``BlogggingEngine``
+as shown::
+
+    from markdown.extensions.codehilite import CodeHiliteExtension
+
+    extn1 = CodeHiliteExtension({})
+    blogging_engine = BloggingEngine(app, storage,extensions=[extn1])
 
 
+This allows for the MarkDown to be processed using CodeHilite along with
+the default extensions. Please note that one would also need to include
+necessary static files in the ``view``, such as for code highlighting to work.
+
+Extending using Markdown Metadata
+---------------------------------
+
+Let's say you want to include a summary for your blog post, and have it
+show up along with the post. You don't need to modify the database or 
+the models to accomplish this. This is infact supported by default by way
+of Markdown metadata syntax. In your blog post, you can include metadata,
+as shown below::
+
+    Summary: This is a short summary of the blog post
+    
+    This is the much larger blog post. There are lot of things
+    to discuss here. 
+
+In the template ``page.html`` this metadata can be accessed as, ``post.meta.summary``
+and can be populated in the way it is desired. The same metadata for each post
+is also available in other template views like ``index.html``.
 
 
+Extending using the plugin framework
+------------------------------------
+
+The plugin framework is a very powerful way to modify the behavior of the 
+blogging engine. Lets say you want to show the top 10 most popular tag in the
+post. Lets show how one can do that using the plugins framework. As a first step,
+we create our plugin::
+
+    # plugins/tag_cloud/__init__.py
+    from flask_blogging import signals
+    from flask_blogging.sqlastorage import SQLAStorage
+    import sqlalchemy as sqla
+    from sqlalchemy import func
+
+
+    def get_tag_data(sqla_storage):
+        engine = sqla_storage.engine
+        with engine.begin() as conn:
+            tag_posts_table = sqla_storage.tag_posts_table
+            tag_table = sqla_storage.tag_table
+
+            tag_cloud_stmt = sqla.select([
+                tag_table.c.text,func.count(tag_posts_table.c.tag_id)]).group_by(
+                tag_posts_table.c.tag_id
+            ).where(tag_table.c.id == tag_posts_table.c.tag_id).limit(10)
+            tag_cloud = conn.execute(tag_cloud_stmt).fetchall()
+        return tag_cloud
+
+
+    def get_tag_cloud(app, engine, posts, meta, count, page):
+        if isinstance(engine.storage, SQLAStorage):
+            tag_cloud = get_tag_data(engine.storage)
+            meta["tag_cloud"] = tag_cloud
+        else:
+            raise RuntimeError("Plugin only supports SQLAStorage. Given storage"
+                               "not supported")
+        return
+
+
+    def register(app):
+        signals.index_posts_fetched.connect(get_tag_cloud)
+        return
+
+
+The ``register`` method is what is invoked in order to register the plugin. We have
+connected this plugin to the ``index_posts_fetched`` signal. So when the posts are
+fetched to show on the index page, this signal will be fired, and this plugin will
+be invoked. The plugin basically queries the table that stores the tags, and returns
+the tag text and the number of times it is referenced. The data about the tag cloud
+we are storing in the ``meta["tag_cloud"]`` which corresponds to the metadata variable.
+
+
+Now in the `index.html` template, one can reference the ``meta.tag_cloud`` to access this
+data for display. The plugin can be registered by setting the config variable as shown::
+
+    app.config["BLOGGING_PLUGINS"] = ["plugins.tag_cloud"]
 
 
 
@@ -243,6 +352,7 @@ keys that are currently supported include:
   to be displayed per page. (default 10)
 - ``BLOGGING_CACHE_TIMEOUT`` (*int*): The timeout in seconds used to cache
   the blog pages. (default 60)
+- ``BLOGGING_PLUGINS`` (*list*): A list of plugins to register.
 
 Blog Views
 ==========
@@ -297,12 +407,6 @@ Blog Editor
 
 Useful Tips
 ===========
-- **Postgres using psycopg2**:
-  If you use ``psycopg2`` driver for Postgres while using the ``SQLAStorage``
-  you would need to have ``autocommit`` turned on while creating the engine::
-
-    create_engine("postgresql+psycopg2://postgres:@localhost/flask_blogging",
-                  isolation_level="AUTOCOMMIT")
 
 - **Migrations with Alembic**: (Applies to versions 0.3.0 and earlier)
   If you have migrations part of your project
@@ -437,6 +541,52 @@ flask_blogging.forms module
     :members:
     :undoc-members:
 
+flask_blogging.signals module
+---------------------------
+
+.. automodule:: flask_blogging.signals
+    :members: engine_initialised
+
+.. autodata:: flask_blogging.signals
+
+.. autodata:: flask_blogging.signals.engine_initialised
+
+.. autodata:: flask_blogging.signals.post_processed
+
+.. autodata:: flask_blogging.signals.page_by_id_fetched
+
+.. autodata:: flask_blogging.signals.page_by_id_processed
+
+.. autodata:: flask_blogging.signals.posts_by_tag_fetched
+
+.. autodata:: flask_blogging.signals.posts_by_tag_processed
+
+.. autodata:: flask_blogging.signals.posts_by_author_fetched
+
+.. autodata:: flask_blogging.signals.posts_by_author_processed
+
+.. autodata:: flask_blogging.signals.index_posts_fetched
+
+.. autodata:: flask_blogging.signals.index_posts_processed
+
+.. autodata:: flask_blogging.signals.feed_posts_fetched
+
+.. autodata:: flask_blogging.signals.feed_posts_processed
+
+
+.. autodata:: flask_blogging.signals.sitemap_posts_fetched
+
+.. autodata:: flask_blogging.signals.sitemap_posts_processed
+
+.. autodata:: flask_blogging.signals.editor_post_saved
+
+.. autodata:: flask_blogging.signals.editor_get_fetched
+
+.. autodata:: flask_blogging.signals.post_deleted
+
+.. autodata:: flask_blogging.signals.blueprint_created
+
+.. autodata:: flask_blogging.signals.sqla_initialized
 
 
 .. include:: authors.rst

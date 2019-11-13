@@ -6,7 +6,8 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
-from flask.ext.principal import Principal, Permission, RoleNeed
+from flask_principal import Principal, Permission, RoleNeed
+from .signals import engine_initialised, post_processed, blueprint_created
 
 
 class BloggingEngine(object):
@@ -17,7 +18,7 @@ class BloggingEngine(object):
     .. code:: python
 
         from flask import Flask
-        from flask.ext.blogging import BloggingEngine, SQLAStorage
+        from flask_blogging import BloggingEngine, SQLAStorage
         from sqlalchemy import create_engine
 
         app = Flask(__name__)
@@ -57,6 +58,15 @@ class BloggingEngine(object):
 
         if app is not None and storage is not None:
             self.init_app(app, storage)
+        self.principal = None
+
+    @classmethod
+    def _register_plugins(cls, app, config):
+        plugins = config.get("BLOGGING_PLUGINS")
+        if plugins:
+            for plugin in plugins:
+                lib = __import__(plugin, globals(), locals(), str("module"))
+                lib.register(app)
 
     def init_app(self, app, storage=None, cache=None):
         """
@@ -70,18 +80,24 @@ class BloggingEngine(object):
         :type cache: Object
          ``Storage`` class interface.
         """
+
         self.app = app
         self.config = self.app.config
         self.storage = storage or self.storage
         self.cache = cache or self.cache
+        self._register_plugins(self.app, self.config)
 
         from .views import create_blueprint
+        blog_app = create_blueprint(__name__, self)
+        # extenral urls
+        blueprint_created.send(self.app, engine=self, blueprint=blog_app)
         self.app.register_blueprint(
-            create_blueprint(__name__, self),
-            url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
+            blog_app, url_prefix=self.config.get("BLOGGING_URL_PREFIX"))
+
         self.app.extensions["FLASK_BLOGGING_ENGINE"] = self  # duplicate
         self.app.extensions["blogging"] = self
         self.principal = Principal(self.app)
+        engine_initialised.send(self.app, engine=self)
 
     @property
     def blogger_permission(self):
@@ -132,6 +148,7 @@ class BloggingEngine(object):
                                 "'BloggingEngine.user_loader' decorator.")
         if author is not None:
             post["user_name"] = self.get_user_name(author)
+        post_processed.send(self.app, engine=self, post=post, render=render)
 
     @classmethod
     def get_user_name(cls, user):

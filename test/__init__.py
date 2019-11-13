@@ -1,5 +1,6 @@
 import unittest
 from flask import Flask
+from flask_login import UserMixin
 
 __author__ = 'gbalaraman'
 
@@ -15,3 +16,8 @@ class FlaskBloggingTestCase(unittest.TestCase):
         @self.app.route("/")
         def index():
             return "Hello World!"
+
+
+class TestUser(UserMixin):
+    def __init__(self, user_id):
+        self.id = user_id

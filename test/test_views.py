@@ -5,21 +5,16 @@ except ImportError:
 import os
 import tempfile
 from flask import redirect, url_for, current_app
-from flask.ext.login import LoginManager, login_user, logout_user, current_user
+from flask_login import LoginManager, login_user, logout_user, current_user
 from sqlalchemy import create_engine, MetaData
 from flask_blogging.sqlastorage import SQLAStorage
 from flask_blogging import BloggingEngine
-from test import FlaskBloggingTestCase
-from flask_login import UserMixin
+from test import FlaskBloggingTestCase, TestUser
 import re
-from flask.ext.principal import identity_changed, Identity, \
+from flask_principal import identity_changed, Identity, \
     AnonymousIdentity, identity_loaded, RoleNeed, UserNeed
-from flask.ext.cache import Cache
-
-
-class TestUser(UserMixin):
-    def __init__(self, user_id):
-        self.id = user_id
+from flask_cache import Cache
+from .utils import get_random_unicode
 
 
 class TestViews(FlaskBloggingTestCase):
@@ -40,6 +35,7 @@ class TestViews(FlaskBloggingTestCase):
         FlaskBloggingTestCase.setUp(self)
         self._create_storage()
         self.app.config["BLOGGING_URL_PREFIX"] = "/blog"
+        self.app.config["BLOGGING_PLUGINS"] = []
         self.engine = self._create_blogging_engine()
         self.login_manager = LoginManager(self.app)
 
@@ -119,7 +115,8 @@ class TestViews(FlaskBloggingTestCase):
         response = self.client.get("/blog/author/newuser/5/2/")
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get("/blog/author/nonexistent_user/")
+        response = self.client.get("/blog/author/nonexistent_user/",
+                                   follow_redirects=True)
         assert "No posts found for this user!" in str(response.data)
 
     def test_editor_get(self):
@@ -374,3 +371,23 @@ class TestViewsWithCache(TestViews):
     def _create_blogging_engine(self):
         cache = Cache(self.app, config={"CACHE_TYPE": "simple"})
         return BloggingEngine(self.app, self.storage, cache=cache)
+
+
+class TestViewsWithUnicode(TestViews):
+
+    def setUp(self):
+        TestViews.setUp(self)
+
+        for i in range(20):
+            tags = ["unicode hello"] if i < 10 else ["unicode world"]
+            user = "testuser" if i < 10 else "newuser"
+            self.storage.save_post(
+                    title=u'{0}_{1}'.format(get_random_unicode(15), i),
+                    text=u'{0}_{1}'.format(get_random_unicode(200), i),
+                    user_id=user, tags=tags)
+
+    def test_editor_edit_page(self):
+        pass
+
+    def test_editor_post(self):
+        pass

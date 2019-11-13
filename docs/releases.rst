@@ -1,9 +1,63 @@
 Release Notes
 =============
 
+- **Version 0.7.4**
+  *Release November 17, 2017*
+
+  - Fix Requirements.txt error
+
+- **Version 0.7.3**
+  *Release November 6, 2016*
+  
+  - Fix issues with slugs with special characters (#80)
+
+- **Version 0.7.2**
+  *Release October 30, 2016*
+  
+  - Moved default static assets to https (#78)
+  - Fixed the issue where post fetched wouldn't emit when no posts exist (#76)
+
+- **Version 0.7.1**
+
+  *Released July 5, 2016*
+ 
+  - Improvements to docs
+  - Added extension import transition (@slippers)
+
+- **Version 0.7.0**
+  
+  *Released May 25, 2016*
+
+
+- **Version 0.6.0**
+
+  *Released January 14, 2016*
+
+  - The plugin framework for Flask-Blogging to allow users to add new
+    features and capabilities.
+
+- **Version 0.5.2**
+
+  *Released January 12, 2016*
+
+  - Added support for multiple binds for SQLAStorage
+
+
+- **Version 0.5.1**
+
+  *Released December 6, 2015*
+
+  - Fixed the flexibility to add custom extensions to `BloggingEngine`.
+
+- **Version 0.5.0**
+
+  *Released November 23, 2015*
+
+  - Fixed errors encountered while using Postgres database
+
 - **Version 0.4.2**
 
-  *Release September 20, 2015*
+  *Released September 20, 2015*
 
   - Added compatibility with Flask-Login version 0.3.0 and higher, especially to handle migration of
     ``is_autheticated`` attribute from method to property. (#43)
@@ -82,7 +136,7 @@ Release Notes
     - Fixed PEP8 errors
     - Expanded SQLAStorage to include Postgres and MySQL flavors
     - Added ``post_date`` and ``last_modified_date`` as arguments to the
-    ``Storage.save_post(...)`` call for general compatibility
+      ``Storage.save_post(...)`` call for general compatibility
 
 
 - **Version 0.1.0**:

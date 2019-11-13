@@ -4,14 +4,22 @@ try:
 except ImportError:
     pass
 from .processor import PostProcessor
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
 import math
 from werkzeug.contrib.atom import AtomFeed
 import datetime
-from flask.ext.principal import PermissionDenied
+from flask_principal import PermissionDenied
+from .signals import page_by_id_fetched, page_by_id_processed, \
+    posts_by_tag_fetched, posts_by_tag_processed, \
+    posts_by_author_fetched, posts_by_author_processed, \
+    index_posts_fetched, index_posts_processed, \
+    feed_posts_fetched, feed_posts_processed, \
+    sitemap_posts_fetched, sitemap_posts_processed, editor_post_saved, \
+    post_deleted, editor_get_fetched
+from .utils import ensureUtf
 
 
 def _get_blogging_engine(app):
@@ -110,8 +118,12 @@ def index(count, page):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, include_draft=False,
                               tag=None, user_id=None, recent=True)
+    index_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
+                             posts=posts, meta=meta, count=count, page=page)
     for post in posts:
         blogging_engine.process_post(post, render=render)
+    index_posts_processed.send(blogging_engine.app, engine=blogging_engine,
+                               posts=posts, meta=meta, count=count, page=page)
     return render_template("blogging/index.html", posts=posts, meta=meta,
                            config=config)
 
@@ -125,8 +137,14 @@ def page_by_id(post_id, slug):
     meta["is_user_blogger"] = _is_blogger(blogging_engine.blogger_permission)
 
     render = config.get("BLOGGING_RENDER_TEXT", True)
+    page_by_id_fetched.send(blogging_engine.app, engine=blogging_engine,
+                            post=post, meta=meta, post_id=post_id,
+                            slug=slug)
     if post is not None:
         blogging_engine.process_post(post, render=render)
+        page_by_id_processed.send(blogging_engine.app, engine=blogging_engine,
+                                  post=post, meta=meta, post_id=post_id,
+                                  slug=slug)
         return render_template("blogging/page.html", post=post, config=config,
                                meta=meta)
     else:
@@ -146,10 +164,22 @@ def posts_by_tag(tag, count, page):
     render = config.get("BLOGGING_RENDER_TEXT", True)
     posts = storage.get_posts(count=count, offset=offset, tag=tag,
                               include_draft=False, user_id=None, recent=True)
-    for post in posts:
-        blogging_engine.process_post(post, render=render)
-    return render_template("blogging/index.html", posts=posts, meta=meta,
-                           config=config)
+    posts_by_tag_fetched.send(blogging_engine.app, engine=blogging_engine,
+                              posts=posts, meta=meta, tag=tag, count=count,
+                              page=page)
+    if len(posts):
+        for post in posts:
+            blogging_engine.process_post(post, render=render)
+        posts_by_tag_processed.send(blogging_engine.app,
+                                    engine=blogging_engine,
+                                    posts=posts, meta=meta, tag=tag,
+                                    count=count,
+                                    page=page)
+        return render_template("blogging/index.html", posts=posts, meta=meta,
+                               config=config)
+    else:
+        flash("No posts found for this tag!", "warning")
+        return redirect(url_for("blogging.index", post_id=None))
 
 
 def posts_by_author(user_id, count, page):
@@ -164,13 +194,21 @@ def posts_by_author(user_id, count, page):
     posts = storage.get_posts(count=count, offset=offset, user_id=user_id,
                               include_draft=False, tag=None, recent=True)
     render = config.get("BLOGGING_RENDER_TEXT", True)
+    posts_by_author_fetched.send(blogging_engine.app, engine=blogging_engine,
+                                 posts=posts, meta=meta, user_id=user_id,
+                                 count=count, page=page)
     if len(posts):
         for post in posts:
             blogging_engine.process_post(post, render=render)
+        posts_by_author_processed.send(blogging_engine.app,
+                                       engine=blogging_engine, posts=posts,
+                                       meta=meta, user_id=user_id, count=count,
+                                       page=page)
+        return render_template("blogging/index.html", posts=posts, meta=meta,
+                               config=config)
     else:
         flash("No posts found for this user!", "warning")
-    return render_template("blogging/index.html", posts=posts, meta=meta,
-                           config=config)
+        return redirect(url_for("blogging.index", post_id=None))
 
 
 @login_required
@@ -195,6 +233,11 @@ def editor(post_id):
                     else:
                         post = {}
                     pid = _store_form_data(form, storage, current_user, post)
+                    editor_post_saved.send(blogging_engine.app,
+                                           engine=blogging_engine,
+                                           post_id=pid,
+                                           user=current_user,
+                                           post=post)
                     flash("Blog posted successfully!", "info")
                     slug = post_processor.create_slug(form.title.data)
                     return redirect(url_for("blogging.page_by_id", post_id=pid,
@@ -211,6 +254,10 @@ def editor(post_id):
                         tags = ", ".join(post["tags"])
                         form = BlogEditor(title=post["title"],
                                           text=post["text"], tags=tags)
+                        editor_get_fetched.send(blogging_engine.app,
+                                                engine=blogging_engine,
+                                                post_id=post_id,
+                                                form=form)
                         return render_template("blogging/editor.html",
                                                form=form, post_id=post_id,
                                                config=config)
@@ -243,6 +290,10 @@ def delete(post_id):
                 success = storage.delete_post(post_id)
                 if success:
                     flash("Your post was successfully deleted", "info")
+                    post_deleted.send(blogging_engine.app,
+                                      engine=blogging_engine,
+                                      post_id=post_id,
+                                      post=post)
                 else:
                     flash("There were errors while deleting your post",
                           "warning")
@@ -261,8 +312,14 @@ def sitemap():
     config = blogging_engine.config
     posts = storage.get_posts(count=None, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
-    for post in posts:
-        blogging_engine.process_post(post, render=False)
+    sitemap_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
+                               posts=posts)
+
+    if len(posts):
+        for post in posts:
+            blogging_engine.process_post(post, render=False)
+        sitemap_posts_processed.send(blogging_engine.app,
+                                     engine=blogging_engine, posts=posts)
     sitemap_xml = render_template("blogging/sitemap.xml", posts=posts,
                                   config=config)
     response = make_response(sitemap_xml)
@@ -277,19 +334,25 @@ def feed():
     count = config.get("BLOGGING_FEED_LIMIT")
     posts = storage.get_posts(count=count, offset=None, recent=True,
                               user_id=None, tag=None, include_draft=False)
+
     feed = AtomFeed(
         '%s - All Articles' % config.get("BLOGGING_SITENAME",
                                          "Flask-Blogging"),
         feed_url=request.url, url=request.url_root, generator=None)
 
-    for post in posts:
-        blogging_engine.process_post(post, render=True)
-        feed.add(post["title"], str(post["rendered_text"]),
-                 content_type='html',
-                 author=post["user_name"],
-                 url=config.get("BLOGGING_SITEURL", "")+post["url"],
-                 updated=post["last_modified_date"],
-                 published=post["post_date"])
+    feed_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
+                            posts=posts)
+    if len(posts):
+        for post in posts:
+            blogging_engine.process_post(post, render=True)
+            feed.add(post["title"], ensureUtf(post["rendered_text"]),
+                     content_type='html',
+                     author=post["user_name"],
+                     url=config.get("BLOGGING_SITEURL", "")+post["url"],
+                     updated=post["last_modified_date"],
+                     published=post["post_date"])
+        feed_posts_processed.send(blogging_engine.app, engine=blogging_engine,
+                                  feed=feed)
     response = feed.get_response()
     response.headers["Content-Type"] = "application/xml"
     return response
