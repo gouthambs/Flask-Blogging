@@ -249,11 +249,6 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.get("/blog/sitemap.xml")
             self.assertEqual(response.status_code, 200)
 
-    def test_atom(self):
-        with self.client:
-            # access to editor should be forbidden before login
-            response = self.client.get("/blog/feeds/all.atom.xml")
-            self.assertEqual(response.status_code, 200)
 
     def test_posts_per_page(self):
         posts_per_page = 5
@@ -303,10 +298,6 @@ class TestViews(FlaskBloggingTestCase):
         # sitemap
         sitemap_url = url_for("blogging.sitemap")
         self.assertEqual(sitemap_url, "/blog/sitemap.xml")
-
-        # feeds
-        feed_url = url_for("blogging.feed")
-        self.assertEqual(feed_url, "/blog/feeds/all.atom.xml")
 
         ctx.pop()
 

@@ -10,14 +10,12 @@ from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
 import math
-from werkzeug.contrib.atom import AtomFeed
 import datetime
 from flask_principal import PermissionDenied
 from .signals import page_by_id_fetched, page_by_id_processed, \
     posts_by_tag_fetched, posts_by_tag_processed, \
     posts_by_author_fetched, posts_by_author_processed, \
     index_posts_fetched, index_posts_processed, \
-    feed_posts_fetched, feed_posts_processed, \
     sitemap_posts_fetched, sitemap_posts_processed, editor_post_saved, \
     post_deleted, editor_get_fetched
 from .utils import ensureUtf
@@ -38,7 +36,6 @@ def _clear_cache(cache):
     cache.delete_memoized(posts_by_author)
     cache.delete_memoized(posts_by_tag)
     cache.delete_memoized(sitemap)
-    cache.delete_memoized(feed)
 
 
 def _store_form_data(blog_form, storage, user, post, escape_text=True):
@@ -335,37 +332,6 @@ def sitemap():
     return response
 
 
-def feed():
-    blogging_engine = _get_blogging_engine(current_app)
-    storage = blogging_engine.storage
-    config = blogging_engine.config
-    count = config.get("BLOGGING_FEED_LIMIT")
-    posts = storage.get_posts(count=count, offset=None, recent=True,
-                              user_id=None, tag=None, include_draft=False)
-
-    feed = AtomFeed(
-        '%s - All Articles' % config.get("BLOGGING_SITENAME",
-                                         "Flask-Blogging"),
-        feed_url=request.url, url=request.url_root, generator=None)
-
-    feed_posts_fetched.send(blogging_engine.app, engine=blogging_engine,
-                            posts=posts)
-    if len(posts):
-        for post in posts:
-            blogging_engine.process_post(post, render=True)
-            feed.add(post["title"], ensureUtf(post["rendered_text"]),
-                     content_type='html',
-                     author=post["user_name"],
-                     url=config.get("BLOGGING_SITEURL", "")+post["url"],
-                     updated=post["last_modified_date"],
-                     published=post["post_date"])
-        feed_posts_processed.send(blogging_engine.app, engine=blogging_engine,
-                                  feed=feed)
-    response = feed.get_response()
-    response.headers["Content-Type"] = "application/xml"
-    return response
-
-
 def unless(blogging_engine):
     # disable caching for bloggers. They can change state!
     def _unless():
@@ -442,8 +408,5 @@ def create_blueprint(import_name, blogging_engine):
     sitemap_func = cached_func(blogging_engine, sitemap)
     blog_app.add_url_rule("/sitemap.xml", view_func=sitemap_func)
 
-    # register feed
-    feed_func = cached_func(blogging_engine, feed)
-    blog_app.add_url_rule('/feeds/all.atom.xml', view_func=feed_func)
 
     return blog_app

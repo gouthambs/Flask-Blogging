@@ -13,8 +13,6 @@ from test.plugin import disconnect_receivers
 class SignalCountingBloggingEngine(BloggingEngine):
     ctr_blueprint_created = 0
     ctr_sitemap_posts = 0
-    ctr_feed_posts_fetched = 0
-    ctr_feed_posts_processed = 0
     ctr_index_posts = 0
     ctr_page_by_id = 0
     ctr_posts_by_tag = 0
@@ -85,13 +83,6 @@ class TestSignals(FlaskBloggingTestCase):
             response = self.client.get("/blog/sitemap.xml")
             self.assertEqual(response.status_code, 200)
             self.assertEqual(self.engine.ctr_sitemap_posts, 2)
-
-    def test_feed_signals(self):
-        with self.client:
-            response = self.client.get("/blog/feeds/all.atom.xml")
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(self.engine.ctr_feed_posts_fetched, 1)
-            self.assertEqual(self.engine.ctr_feed_posts_processed, 1)
 
     def test_index_posts_signals(self):
         with self.client:

@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+  **Version 2.0.0** (*Release December 31 2021*)
+
+  - Fork from Goutham Balaraman
+  - Rename package to Flask-Blogging2
+  - Removed ATOM support (support was removed from Werkzeug)
+  - Upgrade to Flask 2.0
+  - Upgrade to SQLAlchemy>=1.3.1 (Security bug)
+
 - **Version 1.2.2** (*Release January 31, 2019*)
 
  - Add file_upload optional argument to engine's init_app method (#133)

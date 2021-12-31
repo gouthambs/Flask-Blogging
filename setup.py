@@ -10,7 +10,7 @@ features out of the box:
 - Markdown based blog editor
 - Models to store blog
 - Authentication of User's choice
-- Sitemap, ATOM support
+- Sitemap support
 - Disqus support for comments
 - Google analytics for usage tracking
 - Permissions enabled to control which users can create/edit blogs
@@ -47,12 +47,12 @@ def get_requirements(suffix=''):
     return rv
 
 setup(
-    name='Flask-Blogging',
+    name='Flask-Blogging2',
     version=version,
-    url='https://github.com/gouthambs/Flask-Blogging',
+    url='https://github.com/mar1ad/Flask-Blogging2',
     license='MIT',
-    author='Gouthaman Balaraman',
-    author_email='gouthaman.balaraman@gmail.com',
+    author='mar1ad',
+    author_email='75585399+mar1ad@users.noreply.github.com',
     description='A flask extension for adding Markdown blog support to your site',
     long_description=__doc__,
     packages=find_packages(),
@@ -70,8 +70,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
