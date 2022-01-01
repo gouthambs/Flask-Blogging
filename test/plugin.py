@@ -1,6 +1,5 @@
 from flask_blogging import signals, BloggingEngine
 from flask import Blueprint
-from werkzeug.contrib.atom import AtomFeed
 
 
 # receivers for various signals
@@ -16,20 +15,6 @@ def sitemap_posts_receiver(sender, engine, posts):
     isinstance(engine, BloggingEngine)
     isinstance(posts, list)
     engine.ctr_sitemap_posts += 1
-
-
-def feed_posts_fetched_receiver(sender, engine, posts):
-    assert sender == engine.app
-    isinstance(engine, BloggingEngine)
-    isinstance(posts, list)
-    engine.ctr_feed_posts_fetched += 1
-
-
-def feed_posts_processed_receiver(sender, engine, feed):
-    assert sender == engine.app
-    isinstance(engine, BloggingEngine)
-    isinstance(feed, AtomFeed)
-    engine.ctr_feed_posts_processed += 1
 
 
 def index_posts_receiver(sender, engine, posts, meta):
@@ -80,9 +65,6 @@ def register(app):
     signals.sitemap_posts_fetched.connect(sitemap_posts_receiver)
     signals.sitemap_posts_processed.connect(sitemap_posts_receiver)
 
-    signals.feed_posts_fetched.connect(feed_posts_fetched_receiver)
-    signals.feed_posts_processed.connect(feed_posts_processed_receiver)
-
     signals.index_posts_fetched.connect(index_posts_receiver)
     signals.index_posts_processed.connect(index_posts_receiver)
 
@@ -101,9 +83,6 @@ def disconnect_receivers(app):
 
     signals.sitemap_posts_fetched.disconnect(sitemap_posts_receiver)
     signals.sitemap_posts_processed.disconnect(sitemap_posts_receiver)
-
-    signals.feed_posts_fetched.disconnect(feed_posts_fetched_receiver)
-    signals.feed_posts_processed.disconnect(feed_posts_processed_receiver)
 
     signals.index_posts_fetched.disconnect(index_posts_receiver)
     signals.index_posts_processed.disconnect(index_posts_receiver)

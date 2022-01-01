@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User %r>' % self.username
-     
+
     def get_name(self):
         return self.username
 
@@ -70,7 +70,6 @@ index_template = """
         {% endif %}
         &nbsp&nbsp<a href="/blog/"> Blog </a>
         &nbsp&nbsp<a href="/blog/sitemap.xml">Sitemap</a>
-        &nbsp&nbsp<a href="/blog/feeds/all.atom.xml">ATOM</a>
         &nbsp&nbsp<a href="/fileupload/">FileUpload</a>
         &nbsp&nbsp<a href="/admin/">Admin</a>
     </body>

@@ -95,7 +95,6 @@ Quick Start Example
             {% endif %}
             &nbsp&nbsp<a href="/blog/"> Blog </a>
             &nbsp&nbsp<a href="/blog/sitemap.xml">Sitemap</a>
-            &nbsp&nbsp<a href="/blog/feeds/all.atom.xml">ATOM</a>
             &nbsp&nbsp<a href="/fileupload/">FileUpload</a>
         </body>
     </html>
@@ -361,7 +360,7 @@ config variables. These arguments are passed to all the views. The
 keys that are currently supported include:
 
 - ``BLOGGING_SITENAME`` (*str*): The name of the blog to be used as the brand
-  name. This is also used in the feed heading and ``og:site_name`` meta tag.
+  name. This is also used in the ``og:site_name`` meta tag.
   (default "Flask-Blogging")
 - ``BLOGGING_SITEURL`` (*str*): The url of the site. This is also used in the
   ``og:publisher`` meta tag.
@@ -375,8 +374,6 @@ keys that are currently supported include:
   tracking. A ``None`` value will disable google analytics. (default ``None``)
 - ``BLOGGING_URL_PREFIX`` (*str*) : The prefix for the URL of blog posts. A
   ``None`` value will have no prefix. (default ``None``)
-- ``BLOGGING_FEED_LIMIT`` (*int*): The number of posts to limit to in the feed.
-  If ``None``, then all are shown, else will be limited to this number. (default ``None``)
 - ``BLOGGING_PERMISSIONS`` (*bool*): If ``True``, this will enable permissions
   for the blogging engine. With permissions enabled, the user will need to have
   "blogger" ``Role`` to edit or create blog posts. Other authenticated
@@ -422,7 +419,6 @@ the various views are:
   permissions (if enabled).
 - ``url_for('blogging.sitemap')`` (GET): The sitemap
   with a link to all the posts is returned.
-- ``url_for('blogging.feed')`` (GET): Returns ATOM feed URL.
 
 The view can be easily customised by the user by overriding with their own templates. The template pages that need
 to be customized are:
@@ -615,10 +611,6 @@ flask_blogging.signals module
 .. autodata:: flask_blogging.signals.index_posts_fetched
 
 .. autodata:: flask_blogging.signals.index_posts_processed
-
-.. autodata:: flask_blogging.signals.feed_posts_fetched
-
-.. autodata:: flask_blogging.signals.feed_posts_processed
 
 
 .. autodata:: flask_blogging.signals.sitemap_posts_fetched

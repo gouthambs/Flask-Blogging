@@ -137,27 +137,6 @@ Signal sent after the posts for the index page are fetched and processed
 :type meta: dict
 """)
 
-feed_posts_fetched = signals.signal("feed_posts_fetched", doc="""\
-Signal send after feed posts are fetched
-
-:param app: The Flask app which is the sender
-:type app: object
-:param engine: The blogging engine that was initialized
-:type engine: object
-:param posts: Lists of post fetched and processed with a given author
-:type posts: list
-""")
-feed_posts_processed = signals.signal("feed_posts_processed", doc="""\
-Signal send after feed posts are processed
-
-:param app: The Flask app which is the sender
-:type app: object
-:param engine: The blogging engine that was initialized
-:type engine: object
-:param feed: Feed of post fetched and processed
-:type feed: list
-""")
-
 sitemap_posts_fetched = signals.signal("sitemap_posts_fetched", doc="""\
 Signal send after posts are fetched
 
