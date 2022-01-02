@@ -1,6 +1,6 @@
 from flask_blogging import signals, BloggingEngine
 from flask import Blueprint
-from werkzeug.contrib.atom import AtomFeed
+from feedwerk.atom import AtomFeed
 
 
 # receivers for various signals

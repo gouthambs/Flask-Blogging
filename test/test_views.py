@@ -85,7 +85,7 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get("/blog")
-        self.assertEqual(response.status_code, 301)
+        self.assertIn(response.status_code, [301, 308])
 
         response = self.client.get("/blog/5/")
         self.assertEqual(response.status_code, 200)
@@ -102,7 +102,7 @@ class TestViews(FlaskBloggingTestCase):
         self.assertEqual(response.status_code, 200)
         # trailing slash redirect
         response = self.client.get("/blog/page/%s" % post_id0)
-        self.assertEqual(response.status_code, 301)
+        self.assertIn(response.status_code, [301, 308])
 
     def test_post_by_tag(self):
         response = self.client.get("/blog/tag/hello/")
