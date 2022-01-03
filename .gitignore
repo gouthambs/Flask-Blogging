@@ -1,7 +1,9 @@
 *.py[cod]
+*.swp
 .idea
 .cache
 .env
 dist/
 Flask_Blogging.egg-info/
 example/static/*
+.coverage
