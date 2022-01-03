@@ -10,7 +10,7 @@ from flask import Blueprint, current_app, render_template, request, redirect, \
     url_for, flash, make_response
 from flask_blogging.forms import BlogEditor
 import math
-from werkzeug.contrib.atom import AtomFeed
+from feedwerk.atom import AtomFeed
 import datetime
 from flask_principal import PermissionDenied
 from .signals import page_by_id_fetched, page_by_id_processed, \
