@@ -4,6 +4,7 @@ except ImportError:
     pass
 import os
 import unittest
+import unittest.mock
 import tempfile
 from flask import redirect, url_for, current_app
 from flask_login import LoginManager, login_user, logout_user, current_user
@@ -159,6 +160,7 @@ class TestViews(FlaskBloggingTestCase):
             response = self.client.get("/blog/editor/%s/" % self.pids[0])
             self.assertEqual(response.status_code, 401)
 
+    @unittest.mock.patch('flask_blogging.sqlastorage.SQLAStorage._logger', unittest.mock.Mock())
     def test_editor_post(self):
         user_id = "testuser"
         with self.client:
