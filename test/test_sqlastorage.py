@@ -3,6 +3,7 @@ try:
 except ImportError:
     pass
 import unittest
+import unittest.mock
 import tempfile
 import os
 from flask_blogging.sqlastorage import SQLAStorage
@@ -172,6 +173,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         self.test_tag_post_table_exists()
         self.test_user_post_table_exists()
 
+    @unittest.mock.patch('flask_blogging.sqlastorage.SQLAStorage._logger', unittest.mock.Mock())
     def test_save_post(self):
         pid = self.storage.save_post(title="Title1", text="Sample Text",
                                      user_id="testuser",
@@ -192,6 +194,7 @@ class TestSQLiteStorage(FlaskBloggingTestCase):
         p = self.storage.get_post_by_id(2)
         self.assertIsNotNone(p)
 
+    @unittest.mock.patch('flask_blogging.sqlastorage.SQLAStorage._logger', unittest.mock.Mock())
     def test_delete_post(self):
         # insert, check exists, delete, check doesn't exist anymore
         pid = self.storage.save_post(title="Title1", text="Sample Text",
