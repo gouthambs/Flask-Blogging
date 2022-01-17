@@ -14,7 +14,7 @@ import sqlalchemy as sqla
 from flask_sqlalchemy import SQLAlchemy
 import time
 try:
-    import _mysql
+    from MySQLdb import _mysql
     HAS_MYSQL = True
 except ImportError:
     HAS_MYSQL = False
@@ -343,7 +343,7 @@ class TestMySQLStorage(TestSQLiteStorage):
 
     def _create_storage(self):
         self._engine = create_engine(
-            "mysql+mysqldb://root:@localhost/flask_blogging")
+            "mysql+mysqldb://root:root@localhost/flask_blogging")
         self._meta = sqla.MetaData()
         self.storage = SQLAStorage(self._engine, metadata=self._meta)
         self._meta.create_all(bind=self._engine)
@@ -359,7 +359,7 @@ class TestPostgresStorage(TestSQLiteStorage):
 
     def _create_storage(self):
         self._engine = create_engine(
-            "postgresql+psycopg2://postgres:@localhost/flask_blogging")
+            "postgresql+psycopg2://postgres:postgres@localhost/flask_blogging")
         self._meta = sqla.MetaData()
         self.storage = SQLAStorage(self._engine, metadata=self._meta)
         self._meta.create_all(bind=self._engine)
@@ -451,7 +451,7 @@ class TestSQLiteBinds(FlaskBloggingTestCase):
 class TestMySQLBinds(TestSQLiteBinds):
 
     def _conn_string(self, dbfile):
-        return "mysql+mysqldb://root:@localhost/flask_blogging"
+        return "mysql+mysqldb://root:root@localhost/flask_blogging"
 
     def tearDown(self):
         pass
@@ -461,7 +461,7 @@ class TestMySQLBinds(TestSQLiteBinds):
 class TestPostgresBinds(TestSQLiteBinds):
 
     def _conn_string(self, dbfile):
-        return "postgresql+psycopg2://postgres:@localhost/flask_blogging"
+        return "postgresql+psycopg2://postgres:postgres@localhost/flask_blogging"
 
     def tearDown(self):
         pass
