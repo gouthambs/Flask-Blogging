@@ -39,7 +39,7 @@ jobs:
       run: |
         sudo apt-get install -y python3-dev default-libmysqlclient-dev build-essential
         python -m pip install --upgrade pip wheel
-        python -m pip install flake8 nose2 mysqlclient psycopg2 flask_sqlalchemy
+        python -m pip install flake8 nose2 mysqlclient psycopg2 flask_sqlalchemy moto
         if [ -f Requirements.txt ]; then pip install -r Requirements.txt; fi
     - name: Lint with flake8
       run: |
