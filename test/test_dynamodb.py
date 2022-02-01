@@ -4,21 +4,23 @@ except ImportError:
     pass
 import unittest
 from test import FlaskBloggingTestCase
-try:
-    import boto3
-    from flask_blogging.dynamodbstorage import DynamoDBStorage
-    HAS_DYNAMODB = True
-except ImportError:
-    HAS_DYNAMODB = False
+from moto import mock_dynamodb2
 import time
+import os
 
 
-@unittest.skipUnless(HAS_DYNAMODB, "Need DynamoDB client to run this test.")
+@mock_dynamodb2
 class TestDynamoDBStorage(FlaskBloggingTestCase):
 
     def _create_storage(self):
-        self.storage = DynamoDBStorage(table_prefix="test_",
-                                       endpoint_url='http://localhost:8000')
+        """Mocked AWS Credentials for moto."""
+        os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+        os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+        os.environ["AWS_SECURITY_TOKEN"] = "testing"
+        os.environ["AWS_SESSION_TOKEN"] = "testing"
+        os.environ["AWS_DEFAULT_REGION"] = "us-west-2"
+        from flask_blogging.dynamodbstorage import DynamoDBStorage
+        self.storage = DynamoDBStorage(table_prefix="test_")
 
     def setUp(self):
         FlaskBloggingTestCase.setUp(self)
