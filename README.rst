@@ -1,8 +1,8 @@
 Flask-Blogging
 ==============
 
-.. image:: https://github.com/gouthambs/Flask-Blogging/actions/workflows/python-package.yml/badge.svg
-    :target: https://github.com/gouthambs/Flask-Blogging/actions/workflows/python-package.yml
+.. image:: https://github.com/gouthambs/Flask-Blogging/actions/workflows/unittesting.yml/badge.svg
+    :target: https://github.com/gouthambs/Flask-Blogging/actions/workflows/unittesting.yml
 
 This is a Flask extension for adding blog support to your site using Markdown.
 Please see `Flask-Blogging documentation <http://flask-blogging.readthedocs.org/en/latest/>`_
