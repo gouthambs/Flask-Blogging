@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+- **Version 2.0.0** (*Release February, 2022*)
+
+ - Updates to be compatible with Flask 2.0
+ - Improved unit testing and build / release pipeline
+
 - **Version 1.2.2** (*Release January 31, 2019*)
 
  - Add file_upload optional argument to engine's init_app method (#133)

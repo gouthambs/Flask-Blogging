@@ -1,4 +1,4 @@
-Flask
+Flask>=2.0.0
 Flask-WTF>=0.14.0
 Flask-Login
 Flask-Principal
