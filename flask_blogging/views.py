@@ -3,7 +3,7 @@ try:
     from builtins import str
 except ImportError:
     pass
-from flask import escape
+from markupsafe import escape
 from .processor import PostProcessor
 from flask_login import login_required, current_user
 from flask import Blueprint, current_app, render_template, request, redirect, \
